@@ -1,0 +1,55 @@
+.sideBar{
+    left: 0%;
+    float: left;
+    width: 10%;
+}
+
+.form{
+    margin-left: 300px;
+    margin-right: 100px;
+    left: 15%;
+    border-style: groove;
+    border-radius: 7px;
+    min-height: 500px;
+    width: fit-content;
+
+}
+.leftDivision{
+    float: left;
+    min-width: 30%;
+}
+
+.rightDivision{
+    width: 50%;
+    float: left;
+    margin-top: -32px;
+}
+
+.addItem{
+    background-color: black;
+    float: left;
+    color: rgb(222, 235, 232);
+    width: 800px;
+    /* border-style: groove; */
+    border-radius: 4px;
+    padding-left: 5px;
+    
+}
+.item{
+  padding-left: 10px;
+  float: left;
+  width: 520px;
+}
+.quantity{
+    float: left;
+    width: 90px;
+}
+.rate{
+    float: left;
+    padding-right: 90px;
+    width: 50px;
+}
+
+.itemInput{
+  width: fit-content;
+}
