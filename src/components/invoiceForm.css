@@ -6,7 +6,7 @@
 
 .form{
     margin-left: 300px;
-    margin-right: 100px;
+    margin-right: 150px;
     left: 15%;
     border-style: groove;
     border-radius: 7px;
@@ -20,8 +20,8 @@
 }
 
 .rightDivision{
-    width: 50%;
-    float: left;
+    width: 40%;
+    float: right;
     margin-top: -32px;
 }
 

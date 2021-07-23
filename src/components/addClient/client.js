@@ -131,11 +131,9 @@ export default function FormPropsTextFields() {
                       </div>
                       
                     </div>
-              </form>    
-          </div> 
-              <div>
-                <div style={{float:'left',overflow:'hidden'}}>
-                  <div style={{marginTop:'15px',marginRight:"300px"}}>
+              </form>  
+              <div style={{float:'left',overflow:'hidden'}}>
+                  <div style={{marginTop:'15px'}}>
                     <TextField
                       id="outlined-textarea"
                       label="Notes"
@@ -152,7 +150,7 @@ export default function FormPropsTextFields() {
 
                     />
                   </div>
-                  <div style={{marginTop:"15px",marginRight:"200px"}}>
+                  <div style={{marginTop:"15px"}}>
                     <TextField
                       id="outlined-textarea"
                       label="Terms"
@@ -167,8 +165,8 @@ export default function FormPropsTextFields() {
                       onChange={handleChange}
                     />
                   </div>
-                </div>
-              </div>
+                </div>  
+          </div> 
       </Box>
       
       <div style={{marginLeft:"300px",marginTop:"10px"}}>

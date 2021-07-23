@@ -84,8 +84,27 @@ export default function FormPropsTextFields() {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
   const [clientData, setClientdata] = React.useState([]);
+  const [defaultValues, setDefaultValues] = React.useState({bill_from:'',bill_to:'',ship_to:'',notes:'',terms:'',payment_terms:''});
 
-  const handleChange = (event) => {
+  const [fields, setFields] = React.useState([{ item: '' ,quantity: 0,rate:0,amount:0}]);
+  const [subTotal,setSubTotal]= React.useState(0);
+  const [total,setTotal]= React.useState(0);
+  const [tax,setTax]= React.useState(0);
+
+  const [invoiceData,setState] = React.useState({client:'',bill_from:'',bill_to:'',ship_to:'',items:[{}],notes:'',terms:'',date:'',due_date:'',payment_terms:'',sub_total:'0',total:'0',tax:'0'});
+
+  
+
+  function handleChange(event){
+    let data=clientData.filter(eachObj => eachObj._id === event.target.value);
+    const tempDefault = invoiceData;
+    tempDefault.client = data[0]._id;
+    tempDefault.bill_to=data[0].billing_address;
+    tempDefault.ship_to = data[0].shipping_address;
+    tempDefault.terms = data[0].terms;
+    tempDefault.notes = data[0].notes;
+    tempDefault.payment_terms = data[0].payment_terms;
+    setState(tempDefault);
     setPersonName(event.target.value);
   };
   
@@ -96,20 +115,15 @@ export default function FormPropsTextFields() {
   const fetchData = () => {
     axios.get("https://codeunity-invoice-backend.herokuapp.com/client")
       .then((res) => {
-        setClientdata(res.data.data.results)
+        setClientdata(res.data.data.results);
       })
+
   };
 
 
   ///functions for add item
 
-  const [fields, setFields] = React.useState([{ item: '' ,quantity: 0,rate:0,amount:0}]);
-  const [subTotal,setSubTotal]= React.useState(0);
-  const [total,setTotal]= React.useState(0);
-  const [tax,setTax]= React.useState(0);
-
-
-  const [invoiceData,setState] = React.useState({from:'',billTo:'',shipTo:'',items:fields,notes:'',terms:'',date:'',dueDate:'',paymentTerms:'',subTotal,total,tax});
+  
   function handleChanges(i, event) {
     const items = [...fields];
     items[i].item = event.target.value;
@@ -164,12 +178,17 @@ export default function FormPropsTextFields() {
   function printdata(){
     const data = invoiceData;
     data.items = fields;
-    data.subTotal = subTotal;
+    data.sub_total = subTotal;
     data.total = total;
     data.tax= tax;
     setState(data);
     console.log(invoiceData);
     console.log(clientData);
+
+    axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
+    .then(function (response) {
+      console.log(response);
+    })
   }
 
   const handleDataChange = e =>{
@@ -196,12 +215,12 @@ export default function FormPropsTextFields() {
                   labelId="demo-mutiple-name-label"
                   id="demo-mutiple-name"
                   value={personName}
-                  onChange={handleChange}
+                  onChange={e=>handleChange(e)}
                   input={<Input />}
                   MenuProps={MenuProps}
                 >
                   {clientData.map((name) => (
-                    <MenuItem key={name.client_name} value={name.client_name} style={getStyles(name.client_name, personName, theme)}>
+                    <MenuItem key={name._id} value={name._id} style={getStyles(name.client_name, personName, theme)}>
                       {name.client_name}
                     </MenuItem>
                   ))}
@@ -218,11 +237,12 @@ export default function FormPropsTextFields() {
                           placeholder="Who is invoice from (required)"
                           fullWidth
                           margin="normal"
-                          name="from"
+                          name="bill_from"
                           InputLabelProps={{
                             shrink: true,
                           }}
                           variant="outlined"
+                          value={invoiceData.bill_from}
                           onChange={handleDataChange}
                           
                         />
@@ -232,8 +252,9 @@ export default function FormPropsTextFields() {
                         required
                         id="outlined-required"
                         label="Bill To"
-                        name="billTo"
+                        name="bill_to"
                         variant="outlined"
+                        value={invoiceData.bill_to}
                         onChange={handleDataChange}
                         />
                       </div>
@@ -242,13 +263,14 @@ export default function FormPropsTextFields() {
                         required
                         id="outlined-required"
                         label="Ship To"
-                        name="shipTo"
+                        name="ship_to"
                         variant="outlined"
+                        value={invoiceData.ship_to}
                         onChange={handleDataChange}
                         />
                       </div>
                   </div>
-                  <div>
+                  <div className='rightDivision'>
                       <div style={{float:"right",marginTop:'30px',marginRight :"15px",marginBottom:'10px',marginLeft :"45px"}}>
                         <TextField
                         required
@@ -266,8 +288,9 @@ export default function FormPropsTextFields() {
                             label="Payment Terms"
                             multiline
                             variant="outlined"
-                            name="paymentTerms"
+                            name="payment_terms"
                             onChange={handleDataChange}
+                            value = {invoiceData.payment_terms}
                             inputProps={{className:classes.payment}}
 
                           />
@@ -278,12 +301,14 @@ export default function FormPropsTextFields() {
                         id="outlined-required"
                         label="Due Date"
                         placeholder="yyyy-mm-dd"
-                        name="dueDate"
+                        name="due_date"
                         variant="outlined"
                         onChange={handleDataChange}
                         />
                       </div>
 
+                  </div>
+                  <div style={{clear:'both'}}>
                   </div>
                   <div className="addItem">
                     <div className="item">
@@ -299,86 +324,87 @@ export default function FormPropsTextFields() {
                       Amount
                     </div>          
                   </div>
+                  <div className="itemInput">
+                    {fields.map((field, idx) => {
+                      return (
+                        <div key={`${field}-${idx}`}>
+                          <TextField
+                            name
+                            id="outlined"
+                            style={{ margin: 8 }}
+                            placeholder="Description of service or product.."
+                            margin="normal"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            inputProps={{
+                              className:classes.item,
+                            }}
+                            variant="outlined"
+                            value={field.item || ""}
+                            onChange={e => handleChanges(idx, e)}
+                          />
+                          <TextField
+                            id="outlined"
+                            style={{ margin: 8}}
+                            margin="normal"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            inputProps={{
+                              className:classes.quantity,
+                            }}
+                            variant="outlined"
+                            value={field.quantity}
+                            onChange={e => handleChangesforQuantity(idx, e)}
+                          />
+                          <TextField
+                            id="outlined"
+                            style={{ margin: 8}}
+                            margin="normal"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            inputProps={{
+                              className:classes.rate,
+                            }}
+                            variant="outlined"
+                            value={field.rate}
+                            onChange={e => handleChangesforRate(idx, e)}
+                          />
+                          <TextField
+                            id="outlined"
+                            style={{ margin: 8}}
+                            margin="normal"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            inputProps={{
+                              className:classes.rate,
+                              readOnly: true,
+                            }}
+                            variant="outlined"
+                            value={field.amount}
+                            onChange={e => handleChangesforRate(idx, e)}
+                          />
+                          <IconButton size ="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{marginTop:"6px"}}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                        
+                      );
+                      
+                    })}
+                    <Button variant="contained" color="primary" onClick={handleAdd}>
+                        Add item
+                    </Button>
+                    </div>
               </form>    
           </div>
-          <div className="itemInput">
-              {fields.map((field, idx) => {
-                return (
-                  <div key={`${field}-${idx}`}>
-                    <TextField
-                      name
-                      id="outlined"
-                      style={{ margin: 8 }}
-                      placeholder="Description of service or product.."
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      inputProps={{
-                        className:classes.item,
-                      }}
-                      variant="outlined"
-                      value={field.item || ""}
-                      onChange={e => handleChanges(idx, e)}
-                    />
-                    <TextField
-                      id="outlined"
-                      style={{ margin: 8}}
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      inputProps={{
-                        className:classes.quantity,
-                      }}
-                      variant="outlined"
-                      value={field.quantity}
-                      onChange={e => handleChangesforQuantity(idx, e)}
-                    />
-                    <TextField
-                      id="outlined"
-                      style={{ margin: 8}}
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      inputProps={{
-                        className:classes.rate,
-                      }}
-                      variant="outlined"
-                      value={field.rate}
-                      onChange={e => handleChangesforRate(idx, e)}
-                    />
-                    <TextField
-                      id="outlined"
-                      style={{ margin: 8}}
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      inputProps={{
-                        className:classes.rate,
-                        readOnly: true,
-                      }}
-                      variant="outlined"
-                      value={field.amount}
-                      onChange={e => handleChangesforRate(idx, e)}
-                    />
-                    <IconButton size ="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{marginTop:"6px"}}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </div>
-                  
-                );
-                
-              })}
-              <Button variant="contained" color="primary" onClick={handleAdd}>
-                  Add item
-              </Button>
-              </div>
+          
               <div>
                 <div style={{float:'left',overflow:'hidden'}}>
-                  <div style={{marginTop:'15px',marginRight:"300px"}}>
+                  <div style={{marginTop:'15px'}}>
                     <TextField
                       id="outlined-textarea"
                       label="Notes"
@@ -386,6 +412,7 @@ export default function FormPropsTextFields() {
                       multiline
                       variant="outlined"
                       name="notes"
+                      value = {invoiceData.notes}
                       onChange={handleDataChange}
                       inputProps={{
                         className:classes.multiline
@@ -393,7 +420,7 @@ export default function FormPropsTextFields() {
 
                     />
                   </div>
-                  <div style={{marginTop:"15px",marginRight:"200px"}}>
+                  <div style={{marginTop:"15px",marginBottom:'20px'}}>
                     <TextField
                       id="outlined-textarea"
                       label="Terms"
@@ -401,6 +428,7 @@ export default function FormPropsTextFields() {
                       multiline
                       name="terms"
                       variant="outlined"
+                      value = {invoiceData.terms}
                       onChange={handleDataChange}
                       inputProps={{
                         className:classes.multiline
@@ -408,7 +436,7 @@ export default function FormPropsTextFields() {
                     />
                   </div>
                 </div>
-                
+                <div className='rightDivision'>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
@@ -443,6 +471,8 @@ export default function FormPropsTextFields() {
                   variant="outlined"
                   />
                 </div>
+                </div>
+                
                 <div style={{clear:'both'}}>
                 </div>
               </div>
