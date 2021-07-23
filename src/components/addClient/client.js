@@ -173,7 +173,7 @@ export default function FormPropsTextFields() {
                           format="yyyy-MM-dd"
                           margin="normal"
                           id="date-picker-inline"
-                          label="Date picker inline"
+                          label="Date of contract"
                           value={selectedDate}
                           onChange={handleDateChange}
                           KeyboardButtonProps={{
