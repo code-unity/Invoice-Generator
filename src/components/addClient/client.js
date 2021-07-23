@@ -4,6 +4,15 @@ import { makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import axios from 'axios'
 import { Box } from '@material-ui/core';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .MuiTextField-root': {
@@ -32,28 +41,67 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+
+
+
+
 export default function FormPropsTextFields() {
   const classes = useStyles();
-  const [clientData , setState] = React.useState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:""});
-  
+  const [clientData , setState] = React.useState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date)});
+  const [open, setOpen] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState(new Date);
+  const [alert, setMessage] = React.useState({message:"",severity:""});
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    clientData.date_of_contract = String(date);
+    console.log(selectedDate);
+  };
+
+
   const handleChange= e =>{
       setState({
         ...clientData,
         [e.target.name]: e.target.value,
       });
   }
+  
 
   function printdata(){
     
     axios.post('https://codeunity-invoice-backend.herokuapp.com/client', clientData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
-      console.log(response);
+      console.log("CLient added successfully",clientData);
+      const message = alert;
+      message.message = "client added successfully";
+      message.severity = "success"
+      setMessage(message);
+      setOpen(true);
+      setState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date)});
     })
-    
+    .catch(error => {
+      const message = alert;
+      message.message = "add client unsuccessful";
+      message.severity = "error"
+      setMessage(message);
+      console.log(clientData);
+      console.log("message",message);
+      setOpen(true);
+    })
 
-    console.log(clientData);
   }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
   
   
 
@@ -118,16 +166,21 @@ export default function FormPropsTextFields() {
                           />
                       </div>
                       <div style={{marginBottom:'10px',marginRight :"15px"}}>
-                        <TextField
-                            id="outlined-required"
-                            label="Date of contract"
-                            placeholder="yyyy-mm-dd"
-                            variant="outlined"
-                            inputProps={{className:classes.payment}}
-                            name="date_of_contract"
-                            value={clientData.date_of_contract}
-                            onChange={handleChange}
-                          />
+                      <MuiPickersUtilsProvider  utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                          disableToolbar
+                          variant="inline"
+                          format="yyyy-MM-dd"
+                          margin="normal"
+                          id="date-picker-inline"
+                          label="Date picker inline"
+                          value={selectedDate}
+                          onChange={handleDateChange}
+                          KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                          }}
+                        />
+                        </MuiPickersUtilsProvider>
                       </div>
                       
                     </div>
@@ -150,7 +203,7 @@ export default function FormPropsTextFields() {
 
                     />
                   </div>
-                  <div style={{marginTop:"15px"}}>
+                  <div style={{marginTop:"15px",marginBottom:"20px"}}>
                     <TextField
                       id="outlined-textarea"
                       label="Terms"
@@ -167,15 +220,23 @@ export default function FormPropsTextFields() {
                   </div>
                 </div>  
           </div> 
+          <div style={{clear:'both'}}>
+          </div>
       </Box>
       
       <div style={{marginLeft:"300px",marginTop:"10px"}}>
-        <Button variant="contained" color="primary" onClick={printdata}>
+        <Button type="reset" variant="contained" color="primary" onClick={printdata}>
                 Add Client
         </Button>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={alert.severity}>
+            {alert.message}
+          </Alert>
+        </Snackbar>
+        
       </div>
-
     </div>
+    
     
   );
 }

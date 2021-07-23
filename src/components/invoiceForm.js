@@ -12,6 +12,14 @@ import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 import './invoiceForm.css'
 import { Box } from '@material-ui/core';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,6 +61,10 @@ const useStyles = makeStyles((theme) => ({
   rate:{
     width:'70px',
     padding:'5px'
+  },
+  math:{
+    width:'150px',
+    padding:'10px'
   }
 }));
 
@@ -67,6 +79,9 @@ const MenuProps = {
   },
 };
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 
 function getStyles(name, personName, theme) {
@@ -84,14 +99,36 @@ export default function FormPropsTextFields() {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
   const [clientData, setClientdata] = React.useState([]);
-  const [defaultValues, setDefaultValues] = React.useState({bill_from:'',bill_to:'',ship_to:'',notes:'',terms:'',payment_terms:''});
-
+  const [alert, setMessage] = React.useState({message:"",severity:""});
+  const [open, setOpen] = React.useState(false);
   const [fields, setFields] = React.useState([{ item: '' ,quantity: 0,rate:0,amount:0}]);
   const [subTotal,setSubTotal]= React.useState(0);
   const [total,setTotal]= React.useState(0);
   const [tax,setTax]= React.useState(0);
+  const [discount,setDiscount]= React.useState(0);
+  const [amountPaid,setAmountPaid]= React.useState(0);
+  const [balanceDue,setBalanceDue]= React.useState(0);
+  const [selectedDate, setSelectedDate] = React.useState(new Date);
+  const [selectedDueDate, setSelectedDueDate] = React.useState(new Date);
 
-  const [invoiceData,setState] = React.useState({client:'',bill_from:'',bill_to:'',ship_to:'',items:[{}],notes:'',terms:'',date:'',due_date:'',payment_terms:'',sub_total:'0',total:'0',tax:'0'});
+  const [invoiceData,setState] = React.useState({
+    client:'',
+    bill_from:'',
+    bill_to:'',
+    ship_to:'',
+    items:[{}],
+    notes:'',
+    terms:'',
+    date:String(new Date),
+    due_date:String(new Date),
+    payment_terms:'',
+    sub_total:'0',
+    total:'0',
+    tax:'0',
+    discount:0,
+    amount_paid:'0',
+    balance_due:0
+  });
 
   
 
@@ -120,6 +157,24 @@ export default function FormPropsTextFields() {
 
   };
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    invoiceData.date = String(selectedDate);
+  };
+  const handleDueDateChange = (date) => {
+    setSelectedDueDate(date);
+    invoiceData.due_date = String(date);
+    
+  };
+
 
   ///functions for add item
 
@@ -137,10 +192,11 @@ export default function FormPropsTextFields() {
     items[i].quantity = event.target.value;
     items[i].amount = event.target.value * items[i].rate ;
     sub=sub+items[i].amount;
-    tot= sub+sub*tax/100;
+    tot= Math.ceil(sub+sub*tax/100);
     setSubTotal(sub);
     setTotal(tot);
     setFields(items);
+    setBalanceDue(tot - amountPaid);
   }
   function handleChangesforRate(i, event) {
     const items = [...fields];
@@ -150,10 +206,11 @@ export default function FormPropsTextFields() {
     items[i].rate = event.target.value;
     items[i].amount = event.target.value*items[i].quantity;
     sub=sub+items[i].amount;
-    tot= sub+sub*tax/100;
+    tot= Math.ceil(sub+sub*tax/100);
     setSubTotal(sub);
     setTotal(tot);
     setFields(items);
+    setBalanceDue(tot - amountPaid);
   }
 
   function handleAdd() {
@@ -171,23 +228,94 @@ export default function FormPropsTextFields() {
   }
 
   function handleTaxChange(e){
+    const temp = invoiceData;
+    temp.tax = e.target.value;
     setTax(e.target.value);
-    setTotal(Math.ceil(subTotal*(1+e.target.value/100)));
+    const a = subTotal*(1-discount/100);
+    const b = a*(1+e.target.value/100);
+    setTotal(Math.ceil(b));
+    temp.total = Math.ceil(b);
+    setState(temp);
+    setBalanceDue(Math.ceil(b)-amountPaid);
+  }
+
+  function handleDiscountChange(e){
+    const temp = invoiceData;
+    temp.discount = e.target.value;
+    setDiscount(e.target.value);
+    const a = subTotal*(1-e.target.value/100);
+    const b = a*(1+tax/100);
+    setTotal(Math.ceil(b));
+    temp.total = Math.ceil(b);
+    setState(temp);
+    setBalanceDue(Math.ceil(b) - amountPaid);
+  }
+  function handlePaidChange(e){
+    const temp = invoiceData;
+    temp.amount_paid = e.target.value;
+    setAmountPaid(e.target.value);
+    setBalanceDue(total - e.target.value);
+  }
+
+  function changeFieldValue(){
+    const fieldValues = {
+      client:'',
+      bill_from:'',
+      bill_to:'',
+      ship_to:'',
+      items:[{}],
+      notes:'',
+      terms:'',
+      date:String(new Date),
+      due_date:String(new Date),
+      payment_terms:'',
+      sub_total:'0',
+      total:'0',
+      tax:'0',
+      discount:0,
+      amount_paid:'0',
+      balance_due:0
+    }
+    setState(fieldValues);
+    setFields([{ item: '' ,quantity: 0,rate:0,amount:0}]);
+    setSubTotal(0);
+    setTotal(0);
+    setDiscount(0);
+    setAmountPaid(0);
+    setTax(0);
+    setBalanceDue(0);
+    
   }
 
   function printdata(){
+
     const data = invoiceData;
     data.items = fields;
     data.sub_total = subTotal;
     data.total = total;
     data.tax= tax;
+    data.amount_paid = amountPaid;
+    data.balance_due = balanceDue;
+    data.discount = discount;
     setState(data);
     console.log(invoiceData);
-    console.log(clientData);
 
     axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
-      console.log(response);
+      const message = alert;
+      message.message = "invoice generated successfully";
+      message.severity = "success"
+      setMessage(message);
+      setOpen(true);
+      changeFieldValue();
+      setPersonName([]);
+    })
+    .catch(error => {
+      const message = alert;
+      message.message = "invoice generation failed";
+      message.severity = "error"
+      setMessage(message);
+      setOpen(true);
     })
   }
 
@@ -272,15 +400,39 @@ export default function FormPropsTextFields() {
                   </div>
                   <div className='rightDivision'>
                       <div style={{float:"right",marginTop:'30px',marginRight :"15px",marginBottom:'10px',marginLeft :"45px"}}>
-                        <TextField
-                        required
-                        id="outlined-required"
-                        label="Date"
-                        name="date"
-                        placeholder="yyyy-mm-dd"
-                        variant="outlined"
-                        onChange={handleDataChange}
+                        <MuiPickersUtilsProvider  utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                          disableToolbar
+                          variant="inline"
+                          format="yyyy-MM-dd"
+                          margin="normal"
+                          id="date-picker-inline"
+                          label="Date"
+                          value={selectedDate}
+                          onChange={handleDateChange}
+                          KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                          }}
                         />
+                        </MuiPickersUtilsProvider>
+                      </div>
+                      
+                      <div style={{float:"right",marginBottom:'10px',marginRight :"15px",marginLeft :"45px"}}>
+                      <MuiPickersUtilsProvider  utils={DateFnsUtils}>
+                        <KeyboardDatePicker
+                          disableToolbar
+                          variant="inline"
+                          format="yyyy-MM-dd"
+                          margin="normal"
+                          id="date-picker-inline"
+                          label="Due date"
+                          value={selectedDueDate}
+                          onChange={handleDueDateChange}
+                          KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                          }}
+                        />
+                        </MuiPickersUtilsProvider>
                       </div>
                       <div style={{float:'right',marginLeft :"45px",marginBottom:'10px',marginRight :"15px"}}>
                         <TextField
@@ -294,17 +446,6 @@ export default function FormPropsTextFields() {
                             inputProps={{className:classes.payment}}
 
                           />
-                      </div>
-                      <div style={{float:"right",marginBottom:'10px',marginRight :"15px",marginLeft :"45px"}}>
-                        <TextField
-                        required
-                        id="outlined-required"
-                        label="Due Date"
-                        placeholder="yyyy-mm-dd"
-                        name="due_date"
-                        variant="outlined"
-                        onChange={handleDataChange}
-                        />
                       </div>
 
                   </div>
@@ -444,6 +585,7 @@ export default function FormPropsTextFields() {
                   label="Sub total in ₹"
                   inputProps={{
                     readOnly: true,
+                    className:classes.math
                   }}
                   value={subTotal}
                   variant="outlined"
@@ -453,10 +595,27 @@ export default function FormPropsTextFields() {
                   <TextField
                   required
                   id="outlined-required"
+                  label="Discount in %"
+                  variant="outlined"
+                  value = {discount}
+                  onChange ={e=> handleDiscountChange(e)}
+                  defaultValue='0'
+                  inputProps={{
+                    className:classes.math
+                  }}
+                  />
+                </div>
+                <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
+                  <TextField
+                  required
+                  id="outlined-required"
                   label="Tax in %"
                   variant="outlined"
                   onChange ={e=> handleTaxChange(e)}
-                  defaultValue='0'
+                  value={tax}
+                  inputProps={{
+                    className:classes.math
+                  }}
                   />
                 </div>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
@@ -467,6 +626,33 @@ export default function FormPropsTextFields() {
                   value={total}
                   inputProps={{
                     readOnly: true,
+                    className:classes.math
+                  }}
+                  variant="outlined"
+                  />
+                </div>
+                <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
+                  <TextField
+                  required
+                  id="outlined-required"
+                  label="Amount paid in ₹"
+                  value={amountPaid}
+                  onChange={handlePaidChange}
+                  inputProps={{
+                    className:classes.math
+                  }}
+                  variant="outlined"
+                  />
+                </div>
+                <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
+                  <TextField
+                  required
+                  id="outlined-required"
+                  label="Balance due in ₹"
+                  value={balanceDue}
+                  inputProps={{
+                    readOnly: true,
+                    className:classes.math
                   }}
                   variant="outlined"
                   />
@@ -481,6 +667,11 @@ export default function FormPropsTextFields() {
         <Button variant="contained" color="primary" onClick={printdata}>
                 Download Invoice
         </Button>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={alert.severity}>
+            {alert.message}
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );
