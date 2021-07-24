@@ -16,6 +16,7 @@ import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import base64  from 'base64topdf';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -157,6 +158,8 @@ export default function FormPropsTextFields() {
 
   };
 
+
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -286,7 +289,7 @@ export default function FormPropsTextFields() {
     setBalanceDue(0);
     
   }
-
+  let b64;
   function printdata(){
 
     const data = invoiceData;
@@ -299,23 +302,64 @@ export default function FormPropsTextFields() {
     data.discount = discount;
     setState(data);
     console.log(invoiceData);
-
+   
     axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
+      
       const message = alert;
       message.message = "invoice generated successfully";
-      message.severity = "success"
+      message.severity = "success";
       setMessage(message);
       setOpen(true);
       changeFieldValue();
       setPersonName([]);
+      console.log(response);
+      //console.log(response.data.pdf);
+      b64 = response.data.pdf;
+      // let decodedBase64 = base64.base64Decode(response.data.pdf, 'invoice');
+      //  console.log(response.data.pdf);
+      
+        var bin = atob(b64);
+        console.log('File Size:', Math.round(bin.length / 1024), 'KB');
+        console.log('PDF Version:', bin.match(/^.PDF-([0-9.]+)/)[1]);
+        // console.log('Create Date:', bin.match(/<xmp:CreateDate>(.+?)<\/xmp:CreateDate>/)[1]);
+        // console.log('Modify Date:', bin.match(/<xmp:ModifyDate>(.+?)<\/xmp:ModifyDate>/)[1]);
+        // console.log('Creator Tool:', bin.match(/<xmp:CreatorTool>(.+?)<\/xmp:CreatorTool>/)[1]);
+
+        // Embed the PDF into the HTML page and show it to the user
+        // var obj = document.createElement('object');
+        // obj.style.width = '100%';
+        // obj.style.height = '842pt';
+        // obj.type = 'application/pdf';
+        // obj.data = 'data:application/pdf;base64,' + b64;
+        // document.body.appendChild(obj);
+
+        // Insert a link that allows the user to download the PDF file
+        var link = document.createElement('a');
+        link.innerHTML = 'Download PDF file';
+        link.download = 'file.pdf';
+        link.href = 'data:application/octet-stream;base64,' + b64;
+        document.body.appendChild(link);
+      
+      
+      
     })
     .catch(error => {
-      const message = alert;
-      message.message = "invoice generation failed";
-      message.severity = "error"
-      setMessage(message);
-      setOpen(true);
+      if(error.response){
+        console.log(1);
+        console.log(error.response);
+        const message = alert;
+        message.message = "invoice generation failed. "+ error.response.data.status.message;
+        message.severity = "error"
+        setMessage(message);
+        setOpen(true);
+      }
+      //else if(error.request){
+      //   console.log(error.request);
+      // }else {
+      //    console.log(error);
+      // }
+      
     })
   }
 
@@ -331,12 +375,12 @@ export default function FormPropsTextFields() {
 
 
   return (
-    <div>
+    <div >
       <h1 style={{marginLeft:'300px',marginTop:'50px'}}>
         Generate Invoice
       </h1>
-        <Box className="form">
-            <div>
+        <div className="form">
+            
               <FormControl className={classes.formControl}>
                 <InputLabel id="demo-mutiple-name-label">Select Client</InputLabel>
                 <Select
@@ -354,9 +398,9 @@ export default function FormPropsTextFields() {
                   ))}
                 </Select>
               </FormControl>
-          </div>
-          <div style ={{marginLeft:'10px'}}>
-              <form  noValidate autoComplete="off">
+          
+          
+              <form  noValidate autoComplete="off" style={{padding:"10px"}}>
                   <div className="leftDivision">
                     <div style={{ marginRight: '15px'}} >
                         <TextField
@@ -541,10 +585,10 @@ export default function FormPropsTextFields() {
                     </Button>
                     </div>
               </form>    
-          </div>
+         
           
-              <div>
-                <div style={{float:'left',overflow:'hidden'}}>
+              
+                <div style={{float:'left',overflow:'hidden',padding:"10px"}}>
                   <div style={{marginTop:'15px'}}>
                     <TextField
                       id="outlined-textarea"
@@ -577,7 +621,7 @@ export default function FormPropsTextFields() {
                     />
                   </div>
                 </div>
-                <div className='rightDivision'>
+               <div className='rightDivision'>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
@@ -661,8 +705,8 @@ export default function FormPropsTextFields() {
                 
                 <div style={{clear:'both'}}>
                 </div>
-              </div>
-      </Box>
+              
+      </div>
       <div style={{marginLeft:"300px",marginBottom:"30px",marginTop:"10px"}}>
         <Button variant="contained" color="primary" onClick={printdata}>
                 Download Invoice
@@ -673,6 +717,7 @@ export default function FormPropsTextFields() {
           </Alert>
         </Snackbar>
       </div>
+
     </div>
   );
 }
