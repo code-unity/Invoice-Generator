@@ -332,12 +332,12 @@ export default function FormPropsTextFields() {
         obj.data = 'data:application/pdf;base64,' + b64;
         document.body.appendChild(obj);
 
-        // Insert a link that allows the user to download the PDF file
-        // var link = document.createElement('a');
-        // link.innerHTML = 'Download PDF file';
-        // link.download = 'file.pdf';
-        // link.href = 'data:application/octet-stream;base64,' + b64;
-        // document.body.appendChild(link);
+        //Insert a link that allows the user to download the PDF file
+        var link = document.createElement('a');
+        link.innerHTML = 'Download PDF file';
+        link.download = 'file.pdf';
+        link.href = 'data:application/octet-stream;base64,' + b64;
+        document.body.appendChild(link);
       
       
       
