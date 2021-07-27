@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 345,
     margin:'auto',
-    marginTop:"50px"
+    marginTop:"100px"
   },
 }));
 
@@ -32,13 +32,6 @@ function LoginForm() {
   const [details, setDetails] = useState({ username: '', password: '' });
   // const [error, setError] = useState('');
   // const [error1, setError1] = useState('');
-
-  // useEffect(()=>{
-  //   const signedin = localStorage.getItem('signedin');
-  //   if(signedin) history.push('/home');
-  
-  // },[])
-
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -62,12 +55,8 @@ function LoginForm() {
 
   return (
     <div>
-      {/* <div>
-        <Header/>
-      </div> */}
       <Card className={classes.card}>
         <div>
-          
             <div>
               <div className="logo">
               <img

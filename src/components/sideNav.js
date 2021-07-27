@@ -69,8 +69,6 @@ const useStyles = makeStyles((theme) => ({
   
 
 export default function PersistentDrawerLeft(props) {
-
-
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -100,7 +98,7 @@ export default function PersistentDrawerLeft(props) {
             edge="start"
             className={clsx(classes.menuButton, open && classes.hide)}
           >
-            <MenuIcon />
+          <MenuIcon /> 
           </IconButton>
           <Typography variant="h6" noWrap>
             Invoice Generator

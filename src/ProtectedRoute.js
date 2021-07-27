@@ -1,4 +1,5 @@
 import React from 'react';
+import SideNav from './components/sideNav';
 import {Route,Redirect} from 'react-router-dom'
 function ProtectedRoute({component:Component,...rest}) {
     const signedin = localStorage.getItem('signedin');
@@ -9,7 +10,13 @@ function ProtectedRoute({component:Component,...rest}) {
             console.log("rest",rest);
             console.log("signed",signedin);
             if(signedin ){
-                return <Component/>;
+                return (
+                <div>
+                    <SideNav/>
+                    <Component/>
+                </div>
+                
+                )
             }else{
                 return (
                     <Redirect to ={{pathname: "/",state:{ from: props.location}}}/>

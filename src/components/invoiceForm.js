@@ -312,32 +312,15 @@ export default function FormPropsTextFields() {
       changeFieldValue();
       setPersonName([]);
       console.log(response);
-      //console.log(response.data.pdf);
+      console.log(response.data.pdf);
       b64 = response.data.pdf;
-      // let decodedBase64 = base64.base64Decode(response.data.pdf, 'invoice');
-      //  console.log(response.data.pdf);
-      
-        var bin = atob(b64);
-        console.log('File Size:', Math.round(bin.length / 1024), 'KB');
-        console.log('PDF Version:', bin.match(/^.PDF-([0-9.]+)/)[1]);
-        console.log('Create Date:', bin.match(/<xmp:CreateDate>(.+?)<\/xmp:CreateDate>/)[1]);
-        console.log('Modify Date:', bin.match(/<xmp:ModifyDate>(.+?)<\/xmp:ModifyDate>/)[1]);
-        console.log('Creator Tool:', bin.match(/<xmp:CreatorTool>(.+?)<\/xmp:CreatorTool>/)[1]);
-
-        // Embed the PDF into the HTML page and show it to the user
-        var obj = document.createElement('object');
-        obj.style.width = '100%';
-        obj.style.height = '842pt';
-        obj.type = 'application/pdf';
-        obj.data = 'data:application/pdf;base64,' + b64;
-        document.body.appendChild(obj);
-
-        //Insert a link that allows the user to download the PDF file
-        var link = document.createElement('a');
-        link.innerHTML = 'Download PDF file';
-        link.download = 'file.pdf';
-        link.href = 'data:application/octet-stream;base64,' + b64;
-        document.body.appendChild(link);
+      var link = document.createElement('a');
+      link.innerHTML = 'Download PDF file';
+      link.download = 'file.pdf';
+      link.href = 'data:application/octet-stream;base64,' + b64;
+      document.body.appendChild(link);
+      link.click();    
+      link.remove();
       
       
       
@@ -689,7 +672,7 @@ export default function FormPropsTextFields() {
               
       </div>
       <div style={{marginLeft:"300px",marginBottom:"30px",marginTop:"10px"}}>
-        <Button variant="contained" color="primary" onClick={printdata} href={'data:application/octet-stream;base64,' + b64}>
+        <Button variant="contained" color="primary" onClick={printdata} >
                 Download Invoice
         </Button>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
