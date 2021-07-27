@@ -51,9 +51,9 @@ function Alert(props) {
 
 export default function FormPropsTextFields() {
   const classes = useStyles();
-  const [clientData , setState] = React.useState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date)});
+  const [clientData , setState] = React.useState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date())});
   const [open, setOpen] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState(new Date);
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [alert, setMessage] = React.useState({message:"",severity:""});
 
   const handleDateChange = (date) => {
@@ -81,7 +81,7 @@ export default function FormPropsTextFields() {
       message.severity = "success"
       setMessage(message);
       setOpen(true);
-      setState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date)});
+      setState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date())});
     })
     .catch(error => {
       const message = alert;

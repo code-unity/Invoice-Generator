@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import Header from '../../components/header';
+import React, { useState} from 'react';
 import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import history from '../../history';
+import axios from 'axios';
 import './login.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -23,40 +23,51 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
+
+  
+
+
 function LoginForm() {
   const classes = useStyles();
-  const [details, setDetails] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
-  const [error1, setError1] = useState('');
+  const [details, setDetails] = useState({ username: '', password: '' });
+  // const [error, setError] = useState('');
+  // const [error1, setError1] = useState('');
 
-  const Login = async (details) => {
-    if( details.email=== "sanjaykumar@gmail.com" && details.password === "12345"){
-        history.push('/home');
+  // useEffect(()=>{
+  //   const signedin = localStorage.getItem('signedin');
+  //   if(signedin) history.push('/home');
+  
+  // },[])
 
-    }
-    
-  };
 
-//   const ValidateEmail = (e) => {
-//     e.preventDefault();
-//     var email = e.target.value;
-//     if (!validator.isEmail(email)) {
-//       setError1('Enter valid Email!');
-//     }
-//   };
   const submitHandler = (e) => {
     e.preventDefault();
-    Login(details);
+    const data ={
+      username: details.username,
+      password: details.password
+    }
+    console.log(JSON.stringify(data));
+
+    axios.post('https://codeunity-invoice-backend.herokuapp.com/admin',data,{ headers: { 'Content-Type': 'application/json' } })
+    .then(res=>{
+      console.log(res);
+      localStorage.setItem('token',res.data.token);
+      localStorage.setItem('signedin',res.data.status.success);
+      history.push('/home');
+    })
+    .catch(err=>{
+      console.log(err);
+    })
   };
 
   return (
     <div>
-      <div>
+      {/* <div>
         <Header/>
-      </div>
+      </div> */}
       <Card className={classes.card}>
         <div>
-          <form className={classes.root} onSubmit={submitHandler}>
+          
             <div>
               <div className="logo">
               <img
@@ -73,26 +84,25 @@ function LoginForm() {
               ></img>
               </div>
               <h2 style={{marginLeft:'50px',marginTop:'-45px'}}>Log In to Your Account</h2>
-              <form className={classes.root} noValidate autoComplete="off">
+              <form className={classes.root} onSubmit={submitHandler}>
                 <div style={{marginLeft:"20px"}}>
                   <TextField
                     required
                     id="outlined-full-width"
-                    label="Email"
-                    type="email"
+                    label="Username"
                     variant="outlined"
                     inputProps={{
                       className:classes.textField
                     }}
                     onChange={(e) => {
-                      setDetails({ ...details, email: e.target.value });
+                      setDetails({ ...details, username: e.target.value });
                     }}
                   />
-                  {error1 !== '' ? (
+                  {/* {error1 !== '' ? (
                   <div className="error"> &nbsp; &nbsp; &nbsp; {error1}</div>
                   ) : (
                   ''
-                  )}
+                  )} */}
                   <TextField
                     id="outlined-password-input"
                     label="Password"
@@ -104,11 +114,11 @@ function LoginForm() {
                       setDetails({ ...details, password: e.target.value })
                     }
                   />
-                  {error !== '' ? (
+                  {/* {error !== '' ? (
                   <div className="error"> &nbsp; &nbsp; &nbsp; {error}</div>
                     ) : (
                       ''
-                    )}
+                    )} */}
                     
                 </div>
                 <div style={{marginLeft:"30px",marginBottom:"30px"}}>
@@ -118,7 +128,6 @@ function LoginForm() {
                 </div>
               </form>         
             </div>
-          </form>
         </div>
       </Card>
     </div>

@@ -123,53 +123,6 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-        {/* <FormControl variant="filled" className={classes.formControl}>
-        <InputLabel htmlFor="filled-age-native-simple">Age</InputLabel>
-        <Select
-          native
-          value={state.age}
-          onChange={handleChange}
-          inputProps={{
-            name: 'age',
-            id: 'filled-age-native-simple',
-          }}
-        >
-          <option aria-label="None" value="" />
-          <option value={10}>Ten</option>
-          <option value={20}>Twenty</option>
-          <option value={30}>Thirty</option>
-        </Select>
-      </FormControl> */}
-    {/* <ListItem >
-        <ListItemIcon >
-          <InboxIcon />
-        </ListItemIcon>
-        <ListItemText primary="Customers" />
-        <IconButton button onClick={handleClick}>
-            {open1 ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
-        
-    </ListItem>
-      <Collapse in={open1} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {/* <ListItem button className={classes.nested}>
-            <ListItemText primary="demo1" />
-          </ListItem>
-          <ListItem button className={classes.nested}>
-            <ListItemText primary="demo2" />
-          </ListItem>
-          <ListItem button className={classes.nested}>
-            <ListItemText primary="demo3" />
-          </ListItem> */}
-          {/* {names.map((text,index)=>(
-            <ListItem button className={classes.nested}>
-            <ListItemText primary={text} />
-          </ListItem>
-
-          ))}
-        </List>
-      </Collapse>  */}
-            
             <ListItem button onClick ={()=> history.push('/client')}>
               <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
               <ListItemText primary='Add Client' />
@@ -184,22 +137,13 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Generate Invoice' />
             </ListItem>
-          {/* {['Customers', 'Invoice History', 'Generate Invoice'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
+
+            <ListItem button onClick ={()=> {history.push('/');localStorage.clear()}}>
+              <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
+              <ListItemText primary='Logout' />
             </ListItem>
-          ))} */}
+            
         </List>
-        {/* <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List> */}
       </Drawer>
       <main
         className={clsx(classes.content, {
@@ -207,7 +151,6 @@ export default function PersistentDrawerLeft(props) {
         })}
       >
         <div className={classes.drawerHeader} />
-        
       </main>
     </div>
   );

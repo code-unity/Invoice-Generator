@@ -3,19 +3,20 @@ import Home from './pages/home';
 import Client from './pages/addclient/addClient'
 import History  from './pages/history/history';
 import SideNav from './components/sideNav'
-import {Route,Router } from 'react-router-dom';
+import {Route,Router,Switch } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
 import history from './history'
 
 function App() {
   return (
     <Router history={history}>
         <SideNav/>
-        <switch>
-        <Route path="/" component={Login} exact></Route>
-        <Route path="/home" component={Home} exact></Route>
-        <Route path="/client" component={Client} exact></Route>
-        <Route path="/history" component={History} exact></Route>
-        </switch>
+        <Switch>
+        <Route path="/" component={Login} exact />
+        <ProtectedRoute path="/home" component={Home} exact />
+        <ProtectedRoute path="/client" component={Client}  exact/>
+        <ProtectedRoute path="/history" component={History} exact />
+        </Switch>
     </Router>
   );
 }

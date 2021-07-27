@@ -11,12 +11,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 import './invoiceForm.css'
-import { Box } from '@material-ui/core';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import base64  from 'base64topdf';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -102,15 +100,15 @@ export default function FormPropsTextFields() {
   const [clientData, setClientdata] = React.useState([]);
   const [alert, setMessage] = React.useState({message:"",severity:""});
   const [open, setOpen] = React.useState(false);
-  const [fields, setFields] = React.useState([{ item: '' ,quantity: 0,rate:0,amount:0}]);
-  const [subTotal,setSubTotal]= React.useState(0);
-  const [total,setTotal]= React.useState(0);
-  const [tax,setTax]= React.useState(0);
-  const [discount,setDiscount]= React.useState(0);
-  const [amountPaid,setAmountPaid]= React.useState(0);
-  const [balanceDue,setBalanceDue]= React.useState(0);
-  const [selectedDate, setSelectedDate] = React.useState(new Date);
-  const [selectedDueDate, setSelectedDueDate] = React.useState(new Date);
+  const [fields, setFields] = React.useState([{ item: '' ,quantity: '0',rate:'0',amount:'0'}]);
+  const [subTotal,setSubTotal]= React.useState('0');
+  const [total,setTotal]= React.useState('0');
+  const [tax,setTax]= React.useState('0');
+  const [discount,setDiscount]= React.useState('0');
+  const [amountPaid,setAmountPaid]= React.useState('0');
+  const [balanceDue,setBalanceDue]= React.useState('0');
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [selectedDueDate, setSelectedDueDate] = React.useState(new Date());
 
   const [invoiceData,setState] = React.useState({
     client:'',
@@ -120,8 +118,8 @@ export default function FormPropsTextFields() {
     items:[{}],
     notes:'',
     terms:'',
-    date:String(new Date),
-    due_date:String(new Date),
+    date:String(new Date()),
+    due_date:String(new Date()),
     payment_terms:'',
     sub_total:'0',
     total:'0',
@@ -269,8 +267,8 @@ export default function FormPropsTextFields() {
       items:[{}],
       notes:'',
       terms:'',
-      date:String(new Date),
-      due_date:String(new Date),
+      date:String(new Date()),
+      due_date:String(new Date()),
       payment_terms:'',
       sub_total:'0',
       total:'0',
@@ -322,24 +320,24 @@ export default function FormPropsTextFields() {
         var bin = atob(b64);
         console.log('File Size:', Math.round(bin.length / 1024), 'KB');
         console.log('PDF Version:', bin.match(/^.PDF-([0-9.]+)/)[1]);
-        // console.log('Create Date:', bin.match(/<xmp:CreateDate>(.+?)<\/xmp:CreateDate>/)[1]);
-        // console.log('Modify Date:', bin.match(/<xmp:ModifyDate>(.+?)<\/xmp:ModifyDate>/)[1]);
-        // console.log('Creator Tool:', bin.match(/<xmp:CreatorTool>(.+?)<\/xmp:CreatorTool>/)[1]);
+        console.log('Create Date:', bin.match(/<xmp:CreateDate>(.+?)<\/xmp:CreateDate>/)[1]);
+        console.log('Modify Date:', bin.match(/<xmp:ModifyDate>(.+?)<\/xmp:ModifyDate>/)[1]);
+        console.log('Creator Tool:', bin.match(/<xmp:CreatorTool>(.+?)<\/xmp:CreatorTool>/)[1]);
 
         // Embed the PDF into the HTML page and show it to the user
-        // var obj = document.createElement('object');
-        // obj.style.width = '100%';
-        // obj.style.height = '842pt';
-        // obj.type = 'application/pdf';
-        // obj.data = 'data:application/pdf;base64,' + b64;
-        // document.body.appendChild(obj);
+        var obj = document.createElement('object');
+        obj.style.width = '100%';
+        obj.style.height = '842pt';
+        obj.type = 'application/pdf';
+        obj.data = 'data:application/pdf;base64,' + b64;
+        document.body.appendChild(obj);
 
         // Insert a link that allows the user to download the PDF file
-        var link = document.createElement('a');
-        link.innerHTML = 'Download PDF file';
-        link.download = 'file.pdf';
-        link.href = 'data:application/octet-stream;base64,' + b64;
-        document.body.appendChild(link);
+        // var link = document.createElement('a');
+        // link.innerHTML = 'Download PDF file';
+        // link.download = 'file.pdf';
+        // link.href = 'data:application/octet-stream;base64,' + b64;
+        // document.body.appendChild(link);
       
       
       
@@ -386,6 +384,7 @@ export default function FormPropsTextFields() {
                 <Select
                   labelId="demo-mutiple-name-label"
                   id="demo-mutiple-name"
+                  defaultValue={""}
                   value={personName}
                   onChange={e=>handleChange(e)}
                   input={<Input />}
@@ -404,7 +403,6 @@ export default function FormPropsTextFields() {
                   <div className="leftDivision">
                     <div style={{ marginRight: '15px'}} >
                         <TextField
-                          id="outlined-full-width"
                           required
                           placeholder="Who is invoice from (required)"
                           fullWidth
@@ -422,7 +420,6 @@ export default function FormPropsTextFields() {
                       <div style={{float:"left",marginRight :"15px",marginTop:'30px',marginBottom:'30px'}}>
                         <TextField
                         required
-                        id="outlined-required"
                         label="Bill To"
                         name="bill_to"
                         variant="outlined"
@@ -433,7 +430,6 @@ export default function FormPropsTextFields() {
                       <div style={{float:"left",marginRight :"15px",marginTop:'30px',marginBottom:'30px'}}>
                         <TextField
                         required
-                        id="outlined-required"
                         label="Ship To"
                         name="ship_to"
                         variant="outlined"
@@ -450,7 +446,6 @@ export default function FormPropsTextFields() {
                           variant="inline"
                           format="yyyy-MM-dd"
                           margin="normal"
-                          id="date-picker-inline"
                           label="Date"
                           value={selectedDate}
                           onChange={handleDateChange}
@@ -480,7 +475,6 @@ export default function FormPropsTextFields() {
                       </div>
                       <div style={{float:'right',marginLeft :"45px",marginBottom:'10px',marginRight :"15px"}}>
                         <TextField
-                            id="outlined-textarea"
                             label="Payment Terms"
                             multiline
                             variant="outlined"
@@ -514,8 +508,6 @@ export default function FormPropsTextFields() {
                       return (
                         <div key={`${field}-${idx}`}>
                           <TextField
-                            name
-                            id="outlined"
                             style={{ margin: 8 }}
                             placeholder="Description of service or product.."
                             margin="normal"
@@ -526,11 +518,10 @@ export default function FormPropsTextFields() {
                               className:classes.item,
                             }}
                             variant="outlined"
-                            value={field.item || ""}
+                            value={field.item}
                             onChange={e => handleChanges(idx, e)}
                           />
                           <TextField
-                            id="outlined"
                             style={{ margin: 8}}
                             margin="normal"
                             InputLabelProps={{
@@ -544,7 +535,6 @@ export default function FormPropsTextFields() {
                             onChange={e => handleChangesforQuantity(idx, e)}
                           />
                           <TextField
-                            id="outlined"
                             style={{ margin: 8}}
                             margin="normal"
                             InputLabelProps={{
@@ -558,7 +548,6 @@ export default function FormPropsTextFields() {
                             onChange={e => handleChangesforRate(idx, e)}
                           />
                           <TextField
-                            id="outlined"
                             style={{ margin: 8}}
                             margin="normal"
                             InputLabelProps={{
@@ -607,7 +596,6 @@ export default function FormPropsTextFields() {
                   </div>
                   <div style={{marginTop:"15px",marginBottom:'20px'}}>
                     <TextField
-                      id="outlined-textarea"
                       label="Terms"
                       placeholder="Terms and conditions"
                       multiline
@@ -625,7 +613,6 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Sub total in ₹"
                   inputProps={{
                     readOnly: true,
@@ -638,12 +625,10 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Discount in %"
                   variant="outlined"
                   value = {discount}
                   onChange ={e=> handleDiscountChange(e)}
-                  defaultValue='0'
                   inputProps={{
                     className:classes.math
                   }}
@@ -652,7 +637,6 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Tax in %"
                   variant="outlined"
                   onChange ={e=> handleTaxChange(e)}
@@ -665,7 +649,6 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Total in ₹"
                   value={total}
                   inputProps={{
@@ -678,7 +661,6 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Amount paid in ₹"
                   value={amountPaid}
                   onChange={handlePaidChange}
@@ -691,7 +673,6 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  id="outlined-required"
                   label="Balance due in ₹"
                   value={balanceDue}
                   inputProps={{
@@ -708,7 +689,7 @@ export default function FormPropsTextFields() {
               
       </div>
       <div style={{marginLeft:"300px",marginBottom:"30px",marginTop:"10px"}}>
-        <Button variant="contained" color="primary" onClick={printdata}>
+        <Button variant="contained" color="primary" onClick={printdata} href={'data:application/octet-stream;base64,' + b64}>
                 Download Invoice
         </Button>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
