@@ -7,6 +7,8 @@ import { Box } from '@material-ui/core';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
 import {
   MuiPickersUtilsProvider,
@@ -37,7 +39,13 @@ const useStyles = makeStyles((theme) => ({
   rate:{
     width:'100px',
     padding:'5px'
-  }
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+    display: 'flex',
+    flexDirection: 'column'
+  },
 }));
 
 
@@ -55,6 +63,7 @@ export default function FormPropsTextFields() {
   const [open, setOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [alert, setMessage] = React.useState({message:"",severity:""});
+  const [openLoader, setOpenLoader] = React.useState(false);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -72,9 +81,10 @@ export default function FormPropsTextFields() {
   
 
   function printdata(){
-    
+    setOpenLoader(true);
     axios.post('https://codeunity-invoice-backend.herokuapp.com/client', clientData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
+      setOpenLoader(false);
       console.log("CLient added successfully",clientData);
       const message = alert;
       message.message = "client added successfully";
@@ -84,6 +94,7 @@ export default function FormPropsTextFields() {
       setState({client_name:"",billing_address:"",shipping_address:"",payment_terms:"",notes:"",terms:"",date_of_contract:String(new Date())});
     })
     .catch(error => {
+      setOpenLoader(false);
       const message = alert;
       message.message = "add client unsuccessful";
       message.severity = "error"
@@ -233,6 +244,12 @@ export default function FormPropsTextFields() {
             {alert.message}
           </Alert>
         </Snackbar>
+        <Backdrop className={classes.backdrop} open={openLoader} >
+          <div>
+          <CircularProgress color="primary" />
+          </div>
+          <span>adding client...</span>
+        </Backdrop>
         
       </div>
     </div>

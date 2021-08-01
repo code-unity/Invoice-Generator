@@ -9,6 +9,8 @@ import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@material-ui/core/Backdrop';
 import axios from 'axios';
 import './invoiceForm.css'
 import 'date-fns';
@@ -64,7 +66,13 @@ const useStyles = makeStyles((theme) => ({
   math:{
     width:'150px',
     padding:'10px'
-  }
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+    display: 'flex',
+    flexDirection: 'column'
+  },
 }));
 
 const ITEM_HEIGHT = 48;
@@ -99,7 +107,7 @@ export default function FormPropsTextFields() {
   const [personName, setPersonName] = React.useState([]);
   const [clientData, setClientdata] = React.useState([]);
   const [alert, setMessage] = React.useState({message:"",severity:""});
-  const [open, setOpen] = React.useState(false);
+  const [openAlert, setOpenAlert] = React.useState(false);
   const [fields, setFields] = React.useState([{ item: '' ,quantity: '0',rate:'0',amount:'0'}]);
   const [subTotal,setSubTotal]= React.useState('0');
   const [total,setTotal]= React.useState('0');
@@ -109,6 +117,8 @@ export default function FormPropsTextFields() {
   const [balanceDue,setBalanceDue]= React.useState('0');
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [selectedDueDate, setSelectedDueDate] = React.useState(new Date());
+  const [open, setOpen] = React.useState(false);
+
 
   const [invoiceData,setState] = React.useState({
     client:'',
@@ -163,7 +173,7 @@ export default function FormPropsTextFields() {
       return;
     }
 
-    setOpen(false);
+    setOpenAlert(false);
   };
 
   const handleDateChange = (date) => {
@@ -226,6 +236,7 @@ export default function FormPropsTextFields() {
     setTotal(Math.ceil((subTotal-(fields[i].amount))*(1+tax/100)));
     setSubTotal(subTotal-(fields[i].amount));
     setFields(items);
+    setBalanceDue(Math.ceil((subTotal-(fields[i].amount))*(1+tax/100))-amountPaid);
   }
 
   function handleTaxChange(e){
@@ -289,7 +300,7 @@ export default function FormPropsTextFields() {
   }
   let b64;
   function printdata(){
-
+    setOpen(!open);
     const data = invoiceData;
     data.items = fields;
     data.sub_total = subTotal;
@@ -303,12 +314,12 @@ export default function FormPropsTextFields() {
    
     axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
-      
+      setOpen(false);
       const message = alert;
       message.message = "invoice generated successfully";
       message.severity = "success";
       setMessage(message);
-      setOpen(true);
+      setOpenAlert(true);
       changeFieldValue();
       setPersonName([]);
       console.log(response);
@@ -333,7 +344,8 @@ export default function FormPropsTextFields() {
         message.message = "invoice generation failed. "+ error.response.data.status.message;
         message.severity = "error"
         setMessage(message);
-        setOpen(true);
+        setOpenAlert(true);
+        setOpen(false);
       }
       //else if(error.request){
       //   console.log(error.request);
@@ -675,11 +687,17 @@ export default function FormPropsTextFields() {
         <Button variant="contained" color="primary" onClick={printdata} >
                 Download Invoice
         </Button>
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
           <Alert onClose={handleClose} severity={alert.severity}>
             {alert.message}
           </Alert>
         </Snackbar>
+        <Backdrop className={classes.backdrop} open={open} >
+          <div>
+          <CircularProgress color="primary" />
+          </div>
+          <span>downloading invoice...</span>
+        </Backdrop>
       </div>
 
     </div>

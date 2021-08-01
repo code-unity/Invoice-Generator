@@ -2,24 +2,33 @@ import React,{useState} from "react";
 import Card from "../../components/historyCard";
 import { Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@material-ui/core/Backdrop';
 import axios from "axios";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme)=>({
     gridContainer:{
         paddingLeft :"100px",
         marginTop :"20px"
-    }
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
 
-})
+}))
 
 export default function History(){
     const classes = useStyles();
     const [data ,setData] = useState([]);
+    const [open, setOpen] = React.useState(false);
 
-    React.useEffect(() => {
+    React.useEffect((open) => {
         const fetchData = () => {
+            setOpen(!open);
             axios.get("https://codeunity-invoice-backend.herokuapp.com/invoice")
               .then((res) => {
+                setOpen(false);
                 setData(res.data.data.results);
               })
           };
@@ -39,6 +48,9 @@ export default function History(){
                 );
             })}
             </Grid>
+            <Backdrop className={classes.backdrop} open={open} >
+                <CircularProgress color="primary" />
+            </Backdrop>
         </div>
         
     )

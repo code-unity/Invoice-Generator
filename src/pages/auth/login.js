@@ -3,6 +3,8 @@ import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@material-ui/core/Backdrop';
 import history from '../../history';
 import axios from 'axios';
 import './login.css';
@@ -20,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
     margin:'auto',
     marginTop:"100px"
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
 
 
@@ -30,11 +36,13 @@ const useStyles = makeStyles((theme) => ({
 function LoginForm() {
   const classes = useStyles();
   const [details, setDetails] = useState({ username: '', password: '' });
+  const [open, setOpen] = React.useState(false);
   // const [error, setError] = useState('');
   // const [error1, setError1] = useState('');
 
   const submitHandler = (e) => {
     e.preventDefault();
+    setOpen(!open);
     const data ={
       username: details.username,
       password: details.password
@@ -44,12 +52,14 @@ function LoginForm() {
     axios.post('https://codeunity-invoice-backend.herokuapp.com/admin',data,{ headers: { 'Content-Type': 'application/json' } })
     .then(res=>{
       console.log(res);
+      setOpen(false);
       localStorage.setItem('token',res.data.token);
       localStorage.setItem('signedin',res.data.status.success);
       history.push('/home');
     })
     .catch(err=>{
       console.log(err);
+      setOpen(false);
     })
   };
 
@@ -114,6 +124,9 @@ function LoginForm() {
                     <Button variant="contained" color="primary" onClick={submitHandler}>
                       Log In
                     </Button>
+                    <Backdrop className={classes.backdrop} open={open} >
+                      <CircularProgress color="primary" />
+                    </Backdrop>
                 </div>
               </form>         
             </div>
