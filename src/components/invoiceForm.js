@@ -48,6 +48,12 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: 2,
   },
+  invoiceNumber:{
+    marginRight:'10px',
+    float:'right',
+    width:'150px',
+    padding: '10px'
+  },
   noLabel: {
     marginTop: theme.spacing(3),
   },
@@ -132,6 +138,8 @@ export default function FormPropsTextFields() {
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [selectedDueDate, setSelectedDueDate] = React.useState(new Date());
   const [open, setOpen] = React.useState(false);
+  const [invoiceHistory,setInvoiceHistory] = React.useState([]);
+  const [invoiceNumber,setInvoiceNumber] = React.useState(0);
 
 
   const [invoiceData,setState] = React.useState({
@@ -167,6 +175,8 @@ export default function FormPropsTextFields() {
       tempDefault.payment_terms = data[0].payment_terms;
       setState(tempDefault);
       setPersonName(event.target.value);
+      setOpen(!open);
+      settinginvoiceNumber(event.target.value);
     }
     
   };
@@ -174,12 +184,18 @@ export default function FormPropsTextFields() {
   React.useEffect(() => {
     fetchData();
   }, []);
-
+  
   const fetchData = () => {
+    setOpen(true);
     axios.get("https://codeunity-invoice-backend.herokuapp.com/client")
-      .then((res) => {
-        setClientdata(res.data.data.results);
-      })
+    .then((res) => {
+      setClientdata(res.data.data.results);
+    });
+    axios.get("https://codeunity-invoice-backend.herokuapp.com/invoice")
+    .then((res) => {
+      setOpen(false);
+      setInvoiceHistory(res.data.data.results);
+    })
 
   };
 
@@ -202,6 +218,12 @@ export default function FormPropsTextFields() {
     invoiceData.due_date = String(date);
     
   };
+  //functions for invoice number
+  function settinginvoiceNumber(id){
+    const count = invoiceHistory.filter(data=>data.client ===id);
+    setInvoiceNumber(count.length +1);
+    setOpen(false);
+  }
 
   //function for math calculations
   function updateInputFields(dType,tType,sTotal,ptax,pdiscount){
@@ -324,6 +346,7 @@ export default function FormPropsTextFields() {
       amount_paid:'0',
       balance_due:0
     }
+    setInvoiceNumber(0);
     setState(fieldValues);
     setFields([{ item: '' ,quantity: 0,rate:0,amount:0}]);
     setSubTotal(0);
@@ -424,7 +447,16 @@ export default function FormPropsTextFields() {
                   ))}
                 </Select>
               </FormControl>
-          
+              <div className={classes.invoiceNumber}>
+                <TextField
+                  required
+                  label="Invoive Number"
+                  variant="outlined"
+                  value={invoiceNumber}
+                  onChange={e=>setInvoiceNumber(e.target.value)}
+                />
+              </div>
+              
           
               <form  noValidate autoComplete="off" style={{padding:"10px"}}>
                   <div className="leftDivision">
