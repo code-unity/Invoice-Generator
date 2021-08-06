@@ -67,6 +67,18 @@ const useStyles = makeStyles((theme) => ({
     width:'150px',
     padding:'10px'
   },
+  discount:{
+    width:'100px',
+    padding:'10px'
+  },
+  type:{
+    width:'50px',
+    marginLeft:'5px'
+  },
+  menu:{
+    width:'100px',
+    padding:'10px'
+  },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff',
@@ -111,7 +123,9 @@ export default function FormPropsTextFields() {
   const [fields, setFields] = React.useState([{ item: '' ,quantity: '0',rate:'0',amount:'0'}]);
   const [subTotal,setSubTotal]= React.useState('0');
   const [total,setTotal]= React.useState('0');
-  const [tax,setTax]= React.useState('0');
+  const [tax,setTax]= React.useState(0);
+  const [taxType,setTaxType]= React.useState('%');
+  const [discountType,setDiscountType]= React.useState('%');
   const [discount,setDiscount]= React.useState('0');
   const [amountPaid,setAmountPaid]= React.useState('0');
   const [balanceDue,setBalanceDue]= React.useState('0');
@@ -142,16 +156,19 @@ export default function FormPropsTextFields() {
   
 
   function handleChange(event){
-    let data=clientData.filter(eachObj => eachObj._id === event.target.value);
-    const tempDefault = invoiceData;
-    tempDefault.client = data[0]._id;
-    tempDefault.bill_to=data[0].billing_address;
-    tempDefault.ship_to = data[0].shipping_address;
-    tempDefault.terms = data[0].terms;
-    tempDefault.notes = data[0].notes;
-    tempDefault.payment_terms = data[0].payment_terms;
-    setState(tempDefault);
-    setPersonName(event.target.value);
+    if(event.target.value!==""){
+      let data=clientData.filter(eachObj => eachObj._id === event.target.value);
+      const tempDefault = invoiceData;
+      tempDefault.client = data[0]._id;
+      tempDefault.bill_to=data[0].billing_address;
+      tempDefault.ship_to = data[0].shipping_address;
+      tempDefault.terms = data[0].terms;
+      tempDefault.notes = data[0].notes;
+      tempDefault.payment_terms = data[0].payment_terms;
+      setState(tempDefault);
+      setPersonName(event.target.value);
+    }
+    
   };
   
   React.useEffect(() => {
@@ -186,6 +203,44 @@ export default function FormPropsTextFields() {
     
   };
 
+  //function for math calculations
+  function updateInputFields(dType,tType,sTotal,ptax,pdiscount){
+    let b;
+    if(dType==='₹'){
+      const a=(sTotal-parseInt(pdiscount));
+      if(tType==='₹'){
+        b=Math.ceil(a+parseInt(ptax));
+      }
+      else if(tType==='%'){
+        b = Math.ceil(a*(1+ptax/100));
+      }
+      setTotal(b);
+      setBalanceDue(b-amountPaid);
+    }
+    else if(dType==='%'){
+      const a=((sTotal*(1-pdiscount/100)));
+      if(tType==='₹'){
+        b=Math.ceil(a+parseInt(ptax));
+      }
+      else if(tType==='%'){
+        b = Math.ceil(a*(1+ptax/100));
+      }
+      setTotal(b);
+      setBalanceDue(b-amountPaid);
+      
+    }
+    
+  }
+  //functions for discount and tax type change
+  function handleDiscountTypeChange(e){
+    setDiscountType(e.target.value);
+    updateInputFields(e.target.value,taxType,subTotal,tax,discount);
+  }
+  function handleTaxTypeChange(e){
+    setTaxType(e.target.value);
+    updateInputFields(discountType,e.target.value,subTotal,tax,discount);
+  }
+
 
   ///functions for add item
 
@@ -198,30 +253,28 @@ export default function FormPropsTextFields() {
   function handleChangesforQuantity(i, event) {
     const items = [...fields];
     let sub = subTotal;
-    let tot = total;
     sub=sub-items[i].amount;
     items[i].quantity = event.target.value;
     items[i].amount = event.target.value * items[i].rate ;
     sub=sub+items[i].amount;
-    tot= Math.ceil(sub+sub*tax/100);
     setSubTotal(sub);
-    setTotal(tot);
+    // setTotal(tot);
     setFields(items);
-    setBalanceDue(tot - amountPaid);
+    // setBalanceDue(tot - amountPaid);
+    updateInputFields(discountType,taxType,sub,tax,discount);
   }
   function handleChangesforRate(i, event) {
     const items = [...fields];
     let sub = subTotal;
-    let tot = total;
     sub=sub-items[i].amount;
     items[i].rate = event.target.value;
     items[i].amount = event.target.value*items[i].quantity;
     sub=sub+items[i].amount;
-    tot= Math.ceil(sub+sub*tax/100);
     setSubTotal(sub);
-    setTotal(tot);
+    // setTotal(tot);
     setFields(items);
-    setBalanceDue(tot - amountPaid);
+    // setBalanceDue(tot - amountPaid);
+    updateInputFields(discountType,taxType,sub,tax,discount);
   }
 
   function handleAdd() {
@@ -233,38 +286,21 @@ export default function FormPropsTextFields() {
   function handleRemove(i) {
     const items = [...fields];
     items.splice(i, 1);
-    setTotal(Math.ceil((subTotal-(fields[i].amount))*(1+tax/100)));
     setSubTotal(subTotal-(fields[i].amount));
+    updateInputFields(discountType,taxType,subTotal-(fields[i].amount),tax,discount);
     setFields(items);
-    setBalanceDue(Math.ceil((subTotal-(fields[i].amount))*(1+tax/100))-amountPaid);
   }
 
   function handleTaxChange(e){
-    const temp = invoiceData;
-    temp.tax = e.target.value;
     setTax(e.target.value);
-    const a = subTotal*(1-discount/100);
-    const b = a*(1+e.target.value/100);
-    setTotal(Math.ceil(b));
-    temp.total = Math.ceil(b);
-    setState(temp);
-    setBalanceDue(Math.ceil(b)-amountPaid);
+    updateInputFields(discountType,taxType,subTotal,e.target.value,discount)
   }
 
   function handleDiscountChange(e){
-    const temp = invoiceData;
-    temp.discount = e.target.value;
     setDiscount(e.target.value);
-    const a = subTotal*(1-e.target.value/100);
-    const b = a*(1+tax/100);
-    setTotal(Math.ceil(b));
-    temp.total = Math.ceil(b);
-    setState(temp);
-    setBalanceDue(Math.ceil(b) - amountPaid);
+    updateInputFields(discountType,taxType,subTotal,tax,e.target.value)
   }
   function handlePaidChange(e){
-    const temp = invoiceData;
-    temp.amount_paid = e.target.value;
     setAmountPaid(e.target.value);
     setBalanceDue(total - e.target.value);
   }
@@ -338,7 +374,6 @@ export default function FormPropsTextFields() {
     })
     .catch(error => {
       if(error.response){
-        console.log(1);
         console.log(error.response);
         const message = alert;
         message.message = "invoice generation failed. "+ error.response.data.status.message;
@@ -347,12 +382,6 @@ export default function FormPropsTextFields() {
         setOpenAlert(true);
         setOpen(false);
       }
-      //else if(error.request){
-      //   console.log(error.request);
-      // }else {
-      //    console.log(error);
-      // }
-      
     })
   }
 
@@ -385,6 +414,9 @@ export default function FormPropsTextFields() {
                   input={<Input />}
                   MenuProps={MenuProps}
                 >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
                   {clientData.map((name) => (
                     <MenuItem key={name._id} value={name._id} style={getStyles(name.client_name, personName, theme)}>
                       {name.client_name}
@@ -620,26 +652,55 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Discount in %"
+                  label="Discount"
                   variant="outlined"
                   value = {discount}
                   onChange ={e=> handleDiscountChange(e)}
                   inputProps={{
-                    className:classes.math
+                    className:classes.discount
                   }}
                   />
+                  <FormControl variant="outlined" className={classes.type}>
+                    <Select
+                      labelId="demo-simple-select-outlined-label"
+                      id="demo-simple-select-outlined"
+                      value={discountType}
+                      onChange={e=>handleDiscountTypeChange(e)}
+                      inputProps={{
+                        className:classes.menu
+                      }}
+                    >
+                      
+                      <MenuItem value={'₹'}>₹</MenuItem>
+                      <MenuItem value={'%'}>%</MenuItem>
+                    </Select>
+                  </FormControl>
                 </div>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Tax in %"
+                  label="Tax"
                   variant="outlined"
                   onChange ={e=> handleTaxChange(e)}
                   value={tax}
                   inputProps={{
-                    className:classes.math
+                    className:classes.discount
                   }}
                   />
+                  <FormControl variant="outlined" className={classes.type}>
+                    <Select
+                      labelId="demo-simple-select-outlined-label"
+                      id="demo-simple-select-outlined"
+                      value={taxType}
+                      onChange={e=>handleTaxTypeChange(e)}
+                      inputProps={{
+                        className:classes.menu
+                      }}
+                    >
+                      <MenuItem value={'₹'}>₹</MenuItem>
+                      <MenuItem value={'%'}>%</MenuItem>
+                    </Select>
+                  </FormControl>
                 </div>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
