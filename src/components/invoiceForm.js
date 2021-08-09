@@ -137,6 +137,7 @@ export default function FormPropsTextFields() {
   const [balanceDue,setBalanceDue]= React.useState('0');
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [selectedDueDate, setSelectedDueDate] = React.useState(new Date());
+  const [openDownloader, setOpenDownloader] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory,setInvoiceHistory] = React.useState([]);
   const [invoiceNumber,setInvoiceNumber] = React.useState(0);
@@ -150,15 +151,16 @@ export default function FormPropsTextFields() {
     items:[{}],
     notes:'',
     terms:'',
-    date:String(new Date()),
-    due_date:String(new Date()),
+    date:String(new Date().toDateString()),
+    due_date:String(new Date().toDateString()),
     payment_terms:'',
     sub_total:'0',
     total:'0',
     tax:'0',
     discount:0,
     amount_paid:'0',
-    balance_due:0
+    balance_due:0,
+    invoice_number:''
   });
 
   
@@ -199,8 +201,6 @@ export default function FormPropsTextFields() {
 
   };
 
-
-
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -211,12 +211,11 @@ export default function FormPropsTextFields() {
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    invoiceData.date = String(selectedDate);
+    invoiceData.date = date.toDateString();
   };
   const handleDueDateChange = (date) => {
     setSelectedDueDate(date);
-    invoiceData.due_date = String(date);
-    
+    invoiceData.due_date = date.toDateString();
   };
   //functions for invoice number
   function settinginvoiceNumber(id){
@@ -359,21 +358,32 @@ export default function FormPropsTextFields() {
   }
   let b64;
   function printdata(){
-    setOpen(!open);
+    setOpenDownloader(!open);
     const data = invoiceData;
     data.items = fields;
-    data.sub_total = subTotal;
-    data.total = total;
-    data.tax= tax;
-    data.amount_paid = amountPaid;
-    data.balance_due = balanceDue;
-    data.discount = discount;
+    data.sub_total = '₹'+subTotal;
+    data.total = '₹'+total;
+    if(taxType==='₹'){
+      data.tax= '₹'+tax;
+    }
+    else{
+      data.tax = tax+'%';
+    }
+    data.amount_paid = '₹'+amountPaid;
+    data.balance_due = '₹'+balanceDue;
+    if(discountType === '₹'){
+      data.discount= '₹'+discount;
+    }
+    else{
+      data.discount = discount+'%';
+    }
+    data.invoice_number = invoiceNumber;
     setState(data);
     console.log(invoiceData);
    
     axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
-      setOpen(false);
+      setOpenDownloader(false);
       const message = alert;
       message.message = "invoice generated successfully";
       message.severity = "success";
@@ -391,9 +401,7 @@ export default function FormPropsTextFields() {
       document.body.appendChild(link);
       link.click();    
       link.remove();
-      
-      
-      
+     
     })
     .catch(error => {
       if(error.response){
@@ -403,7 +411,7 @@ export default function FormPropsTextFields() {
         message.severity = "error"
         setMessage(message);
         setOpenAlert(true);
-        setOpen(false);
+        setOpenDownloader(false);
       }
     })
   }
@@ -786,6 +794,11 @@ export default function FormPropsTextFields() {
           </Alert>
         </Snackbar>
         <Backdrop className={classes.backdrop} open={open} >
+          <div>
+          <CircularProgress color="primary" />
+          </div>
+        </Backdrop>
+        <Backdrop className={classes.backdrop} open={openDownloader} >
           <div>
           <CircularProgress color="primary" />
           </div>
