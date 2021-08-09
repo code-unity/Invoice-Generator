@@ -108,22 +108,22 @@ export default function OutlinedCard(props) {
         </Typography>
         <Divider/>
         <Typography  color="textSecondary" gutterBottom>
-          subTotal: ₹{props.data.sub_total}
+          subTotal: {props.data.sub_total}
         </Typography>
         <Typography  color="textSecondary" gutterBottom>
-          Discount: {props.data.discount}%
+          Discount: {props.data.discount}
         </Typography>
         <Typography  color="textSecondary" gutterBottom>
-          Tax: {props.data.tax}%
+          Tax: {props.data.tax}
         </Typography>
         <Typography  color="textSecondary" gutterBottom>
-          Total: ₹{props.data.total}
+          Total: {props.data.total}
         </Typography>
         <Typography  color="textSecondary" gutterBottom>
-          Amount paid: ₹{props.data.amount_paid}
+          Amount paid: {props.data.amount_paid}
         </Typography>
         <Typography  color="primary" gutterBottom>
-          Balance due: ₹{props.data.balance_due}
+          Balance due: {props.data.balance_due}
         </Typography>
 
         
