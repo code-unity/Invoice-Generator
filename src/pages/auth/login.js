@@ -49,7 +49,7 @@ function LoginForm() {
     }
     console.log(JSON.stringify(data));
 
-    axios.post('http://localhost:3000/admin',data,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/admin`,data,{ headers: { 'Content-Type': 'application/json' } })
     .then(res=>{
       console.log(res);
       setOpen(false);

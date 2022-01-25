@@ -189,11 +189,11 @@ export default function FormPropsTextFields() {
   
   const fetchData = () => {
     setOpen(true);
-    axios.get("http://localhost:3000/client")
+    axios.get(`${process.env.REACT_APP_API_URL}/client`)
     .then((res) => {
       setClientdata(res.data.data.results);
     });
-    axios.get("http://localhost:3000/invoice")
+    axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
     .then((res) => {
       setOpen(false);
       setInvoiceHistory(res.data.data.results);
@@ -381,7 +381,7 @@ export default function FormPropsTextFields() {
     setState(data);
     console.log(invoiceData);
    
-    axios.post('http://localhost:3000/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenDownloader(false);
       const message = alert;

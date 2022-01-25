@@ -82,7 +82,7 @@ export default function FormPropsTextFields() {
 
   function printdata(){
     setOpenLoader(true);
-    axios.post('http://localhost:3000/client', clientData,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/client`, clientData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenLoader(false);
       console.log("CLient added successfully",clientData);

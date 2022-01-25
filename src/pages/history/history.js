@@ -26,7 +26,7 @@ export default function History(){
     React.useEffect((open) => {
         const fetchData = () => {
             setOpen(!open);
-            axios.get("http://localhost:3000/invoice")
+            axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
               .then((res) => {
                 setOpen(false);
                 setData(res.data.data.results);
