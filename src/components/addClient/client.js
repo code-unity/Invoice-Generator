@@ -82,7 +82,7 @@ export default function FormPropsTextFields() {
 
   function printdata(){
     setOpenLoader(true);
-    axios.post('https://codeunity-invoice-backend.herokuapp.com/client', clientData,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post('http://localhost:3000/client', clientData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenLoader(false);
       console.log("CLient added successfully",clientData);

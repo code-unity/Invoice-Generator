@@ -189,11 +189,11 @@ export default function FormPropsTextFields() {
   
   const fetchData = () => {
     setOpen(true);
-    axios.get("https://codeunity-invoice-backend.herokuapp.com/client")
+    axios.get("http://localhost:3000/client")
     .then((res) => {
       setClientdata(res.data.data.results);
     });
-    axios.get("https://codeunity-invoice-backend.herokuapp.com/invoice")
+    axios.get("http://localhost:3000/invoice")
     .then((res) => {
       setOpen(false);
       setInvoiceHistory(res.data.data.results);
@@ -381,7 +381,7 @@ export default function FormPropsTextFields() {
     setState(data);
     console.log(invoiceData);
    
-    axios.post('https://codeunity-invoice-backend.herokuapp.com/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post('http://localhost:3000/invoice', invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenDownloader(false);
       const message = alert;

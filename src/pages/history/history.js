@@ -26,7 +26,7 @@ export default function History(){
     React.useEffect((open) => {
         const fetchData = () => {
             setOpen(!open);
-            axios.get("https://codeunity-invoice-backend.herokuapp.com/invoice")
+            axios.get("http://localhost:3000/invoice")
               .then((res) => {
                 setOpen(false);
                 setData(res.data.data.results);

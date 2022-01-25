@@ -49,7 +49,7 @@ function LoginForm() {
     }
     console.log(JSON.stringify(data));
 
-    axios.post('https://codeunity-invoice-backend.herokuapp.com/admin',data,{ headers: { 'Content-Type': 'application/json' } })
+    axios.post('http://localhost:3000/admin',data,{ headers: { 'Content-Type': 'application/json' } })
     .then(res=>{
       console.log(res);
       setOpen(false);
