@@ -7,8 +7,7 @@ function ProtectedRoute({component:Component,...rest}) {
         <Route
         {...rest}
         render ={(props)=>{
-            console.log("rest",rest);
-            console.log("signed",signedin);
+           
             if(signedin ){
                 return (
                 <div>

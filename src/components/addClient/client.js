@@ -68,7 +68,6 @@ export default function FormPropsTextFields() {
   const handleDateChange = (date) => {
     setSelectedDate(date);
     clientData.date_of_contract = String(date);
-    console.log(selectedDate);
   };
 
 
@@ -85,7 +84,6 @@ export default function FormPropsTextFields() {
     axios.post(`${process.env.REACT_APP_API_URL}/client`, clientData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenLoader(false);
-      console.log("CLient added successfully",clientData);
       const message = alert;
       message.message = "client added successfully";
       message.severity = "success"
@@ -99,8 +97,6 @@ export default function FormPropsTextFields() {
       message.message = "add client unsuccessful";
       message.severity = "error"
       setMessage(message);
-      console.log(clientData);
-      console.log("message",message);
       setOpen(true);
     })
 
