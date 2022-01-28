@@ -18,6 +18,10 @@ const TimeSheetComp = () => {
       sheet[index].description = value;
     } else if (type == "noOfHours") {
       sheet[index].noOfHours = value;
+    } else if (type == "attendance") {
+      sheet[index].attendance = value;
+    } else if (type == "date") {
+      sheet[index].selectedDate = value;
     }
   };
   useEffect(() => {
@@ -25,6 +29,7 @@ const TimeSheetComp = () => {
       sheet.push({
         description: "",
         noOfHours: "",
+        attendance: "Absent",
         selectedDate: new Date(),
       });
     } else if (duplicate) {
@@ -33,6 +38,7 @@ const TimeSheetComp = () => {
       sheet.push({
         description: sheet[timelen - 2].description,
         noOfHours: sheet[timelen - 2].noOfHours,
+        attendance: "Absent",
         selectedDate: datee,
       });
     } else {
@@ -41,6 +47,7 @@ const TimeSheetComp = () => {
       sheet.push({
         description: "",
         noOfHours: "",
+        attendance: "Absent",
         selectedDate: datee,
       });
     }

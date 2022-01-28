@@ -24,7 +24,7 @@ const TimeList = (props) => {
   const [noOfHours, setNoOfHours] = useState("");
   const [changed, setChanged] = useState("");
   const classes = useStyles();
-  const [attendance, setAttendance] = useState("");
+  const [attendance, setAttendance] = useState("Absent");
   const [selectedDate, setSelectedDate] = useState(props.date);
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -37,12 +37,14 @@ const TimeList = (props) => {
     },
   };
   const handleDateChange = (date) => {
+    setChanged('date');
     setSelectedDate(date);
   };
   useEffect(() => {
     if (props.duplicate) {
       setDescription(props.data.description);
       setNoOfHours(props.data.noOfHours);
+      setAttendance(props.data.attendance);
     }
   }, []);
   useEffect(() => {
@@ -50,7 +52,11 @@ const TimeList = (props) => {
       props.onChanged("description", description, props.index);
     else if (changed == "noOfHours")
       props.onChanged("noOfHours", noOfHours, props.index);
-  }, [description, noOfHours, selectedDate]);
+    else if (changed == "attendance")
+      props.onChanged("attendance",attendance,props.index);
+    else if(changed == 'date')
+      props.onChanged("date",selectedDate,props.index)
+  }, [description, noOfHours, selectedDate,attendance]);
   return (
     <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
       <TableCell component="th" scope="row">
@@ -77,7 +83,9 @@ const TimeList = (props) => {
           <Select
             defaultValue="Absent"
             value={attendance}
-            onChange={(e) => {setAttendance(e.target.value)
+            onChange={(e) => {
+              setChanged('attendance');
+              setAttendance(e.target.value);
             }}
             input={<Input />}
             MenuProps={MenuProps}
