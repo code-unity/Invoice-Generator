@@ -1,22 +1,29 @@
-import Login from './pages/auth/login';
-import Home from './pages/home';
-import Client from './pages/addclient/addClient'
-import History  from './pages/history/history';
-import Header from './components/header'
-import {Route,Router,Switch } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import history from './history'
-
+import Login from "./pages/auth/login";
+import Home from "./pages/home";
+import Client from "./pages/addclient/addClient";
+import History from "./pages/history/history";
+import Header from "./components/header";
+import timeSheetView from "./pages/timeSheet/timeSheetView";
+import { Route, Router, Switch } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import history from "./history";
+import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 function App() {
   return (
     <Router history={history}>
-        <Header/>
-        <Switch>
+      <Header />
+      <Switch>
         <Route path="/" component={Login} exact />
         <ProtectedRoute path="/home" component={Home} exact />
-        <ProtectedRoute path="/client" component={Client}  exact/>
+        <ProtectedRoute path="/client" component={Client} exact />
         <ProtectedRoute path="/history" component={History} exact />
-        </Switch>
+        <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
+        <ProtectedRoute
+          path="/timesheet/view"
+          component={timeSheetView}
+          exact
+        />
+      </Switch>
     </Router>
   );
 }
