@@ -25,7 +25,7 @@ const TimeSheetComp = () => {
     }
   };
   useEffect(() => {
-    if (timelen == 1 && !duplicate) {
+    if (timelen == 1) {
       sheet.push({
         description: "",
         noOfHours: "",
@@ -34,36 +34,36 @@ const TimeSheetComp = () => {
       });
     } else if (duplicate) {
       const datee = new Date(sheet[timelen - 2].selectedDate);
-      datee.setDate(datee.getDate() + 1);
       sheet.push({
         description: sheet[timelen - 2].description,
         noOfHours: sheet[timelen - 2].noOfHours,
-        attendance: "Absent",
+        attendance: new Date(datee.getTime()+(24*60*60*1000)),
         selectedDate: datee,
       });
     } else {
       const datee = new Date(sheet[timelen - 2].selectedDate);
-      datee.setDate(datee.getDate() + 1);
       sheet.push({
         description: "",
         noOfHours: "",
         attendance: "Absent",
-        selectedDate: datee,
+        selectedDate: new Date(datee.getTime()+(24*60*60*1000)),
       });
     }
   }, [timelen]);
   let timeSheet = [];
   for (let i = 0; i < timelen; i++) {
     if (i == 0) {
-      <TimeList
-        key={i}
-        onChanged={onChanged}
-        index={i}
-        duplicate={false}
-        date={new Date()}
-        data={[]}
-        sheet={sheet}
-      />;
+      timeSheet.push(
+        <TimeList
+          key={i}
+          onChanged={onChanged}
+          index={i}
+          duplicate={false}
+          date={new Date()}
+          data={[]}
+          sheet={sheet}
+        />
+      );
     } else if (duplicate) {
       timeSheet.push(
         <TimeList
