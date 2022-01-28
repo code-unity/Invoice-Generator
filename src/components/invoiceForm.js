@@ -433,25 +433,6 @@ export default function FormPropsTextFields() {
       link.remove();
      
     })
-    .catch(error => {
-      if(error.response){
-        const message = alert;
-        message.message = "invoice generated successfully";
-        message.severity = "success";
-        setMessage(message);
-        setOpenAlert(true);
-        changeFieldValue();
-        setPersonName([]);
-        b64 = response.data.pdf;
-        var link = document.createElement('a');
-        link.innerHTML = 'Download PDF file';
-        link.download = 'file.pdf';
-        link.href = 'data:application/octet-stream;base64,' + b64;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-      })
       .catch(error => {
         if (error.response) {
           const message = alert;
