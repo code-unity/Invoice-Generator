@@ -17,6 +17,9 @@ import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextareaAutosize from '@mui/material/TextareaAutosize'
+
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -58,15 +61,15 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
   },
   item:{
-    width:'500px',
+    width:'490px',
     padding:'5px'
   },
   quantity:{
-    width:'50px',
+    width:'45px',
     padding:'5px'
   },
   rate:{
-    width:'70px',
+    width:'45px',
     padding:'5px'
   },
   math:{
@@ -122,6 +125,7 @@ function getStyles(name, personName, theme) {
 export default function FormPropsTextFields() {
   const classes = useStyles();
   const theme = useTheme();
+  const [inputAdornment, setInputAdornment] = React.useState('₹')
   const [personName, setPersonName] = React.useState([]);
   const [clientData, setClientdata] = React.useState([]);
   const [alert, setMessage] = React.useState({message:"",severity:""});
@@ -135,13 +139,12 @@ export default function FormPropsTextFields() {
   const [discount,setDiscount]= React.useState('0');
   const [amountPaid,setAmountPaid]= React.useState('0');
   const [balanceDue,setBalanceDue]= React.useState('0');
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
-  const [selectedDueDate, setSelectedDueDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = React.useState(new Date().toDateString());
+  const [selectedDueDate, setSelectedDueDate] = React.useState(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString());
   const [openDownloader, setOpenDownloader] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory,setInvoiceHistory] = React.useState([]);
   const [invoiceNumber,setInvoiceNumber] = React.useState(0);
-
 
   const [invoiceData,setState] = React.useState({
     client:'',
@@ -152,7 +155,7 @@ export default function FormPropsTextFields() {
     notes:'',
     terms:'',
     date:String(new Date().toDateString()),
-    due_date:String(new Date().toDateString()),
+    due_date:String(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString()),
     payment_terms:'',
     sub_total:'0',
     total:'0',
@@ -163,7 +166,9 @@ export default function FormPropsTextFields() {
     invoice_number:''
   });
 
-  
+  function inputAdornmentChange(e){
+    setInputAdornment(e.target.value) 
+  };
 
   function handleChange(event){
     if(event.target.value!==""){
@@ -179,6 +184,7 @@ export default function FormPropsTextFields() {
       setPersonName(event.target.value);
       setOpen(!open);
       settinginvoiceNumber(event.target.value);
+
     }
     
   };
@@ -186,6 +192,8 @@ export default function FormPropsTextFields() {
   React.useEffect(() => {
     fetchData();
   }, []);
+
+  
   
   const fetchData = () => {
     setOpen(true);
@@ -205,25 +213,29 @@ export default function FormPropsTextFields() {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpenAlert(false);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
     invoiceData.date = date.toDateString();
+    // setState({...invoiceData,date:date.toDateString()})
+
   };
   const handleDueDateChange = (date) => {
     setSelectedDueDate(date);
     invoiceData.due_date = date.toDateString();
+    // setState({...invoiceData,due_date:date.toDateString()})
+
   };
   //functions for invoice number
   function settinginvoiceNumber(id){
     const count = invoiceHistory.filter(data=>data.client ===id);
-    setInvoiceNumber(count.length +1);
+    const name=clientData.filter(data=>data._id ===id)
+    setInvoiceNumber(name[0].client_name +'-CU-'+(count.length +1));
     setOpen(false);
   }
-
+  
   //function for math calculations
   function updateInputFields(dType,tType,sTotal,ptax,pdiscount){
     let b;
@@ -335,8 +347,8 @@ export default function FormPropsTextFields() {
       items:[{}],
       notes:'',
       terms:'',
-      date:String(new Date()),
-      due_date:String(new Date()),
+      date:String(new Date().toDateString()),
+      due_date:String(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString()),
       payment_terms:'',
       sub_total:'0',
       total:'0',
@@ -345,6 +357,8 @@ export default function FormPropsTextFields() {
       amount_paid:'0',
       balance_due:0
     }
+    setSelectedDueDate(fieldValues.due_date)
+    setSelectedDate(fieldValues.date)
     setInvoiceNumber(0);
     setState(fieldValues);
     setFields([{ item: '' ,quantity: 0,rate:0,amount:0}]);
@@ -361,16 +375,29 @@ export default function FormPropsTextFields() {
     setOpenDownloader(!open);
     const data = invoiceData;
     data.items = fields;
-    data.sub_total = '₹'+subTotal;
-    data.total = '₹'+total;
+     if(inputAdornment==='$'){
+    data.sub_total ='US'+ inputAdornment+subTotal;
+    data.total = 'US'+ inputAdornment+total;
+    data.items[0].rate='US'+ inputAdornment +fields[0].rate
+    data.items[0].amount='US'+ inputAdornment +fields[0].amount
+    data.amount_paid = 'US'+ inputAdornment+amountPaid;
+    data.balance_due ='US'+  inputAdornment+balanceDue;
+    }
+    else{
+      data.sub_total = inputAdornment+subTotal;
+      data.total = inputAdornment+total;
+      data.items[0].rate=inputAdornment +fields[0].rate
+      data.items[0].amount=inputAdornment +fields[0].amount
+      data.amount_paid = inputAdornment+amountPaid;
+      data.balance_due = inputAdornment+balanceDue;
+    }
     if(taxType==='₹'){
       data.tax= '₹'+tax;
     }
     else{
       data.tax = tax+'%';
     }
-    data.amount_paid = '₹'+amountPaid;
-    data.balance_due = '₹'+balanceDue;
+    
     if(discountType === '₹'){
       data.discount= '₹'+discount;
     }
@@ -379,8 +406,7 @@ export default function FormPropsTextFields() {
     }
     data.invoice_number = invoiceNumber;
     setState(data);
-    console.log(invoiceData);
-   
+    console.log(invoiceData)
     axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenDownloader(false);
@@ -391,8 +417,6 @@ export default function FormPropsTextFields() {
       setOpenAlert(true);
       changeFieldValue();
       setPersonName([]);
-      console.log(response);
-      console.log(response.data.pdf);
       b64 = response.data.pdf;
       var link = document.createElement('a');
       link.innerHTML = 'Download PDF file';
@@ -405,7 +429,6 @@ export default function FormPropsTextFields() {
     })
     .catch(error => {
       if(error.response){
-        console.log(error.response);
         const message = alert;
         message.message = "invoice generation failed. "+ error.response.data.status.message;
         message.severity = "error"
@@ -423,8 +446,6 @@ export default function FormPropsTextFields() {
 
     })
   }
-
-
 
 
   return (
@@ -455,54 +476,68 @@ export default function FormPropsTextFields() {
                   ))}
                 </Select>
               </FormControl>
+              <FormControl className={classes.formControl}>
+                <InputLabel id="demo-mutiple-name-label">Currency</InputLabel>
+                <Select
+                  labelId="demo-mutiple-name-label"
+                  id="demo-mutiple-name"
+                  value={inputAdornment}
+                  onChange={e=>inputAdornmentChange(e)}
+                  input={<Input />}
+                  MenuProps={MenuProps}
+                >
+                  <MenuItem value='₹'>Rupee </MenuItem>
+                  <MenuItem value='$'>USD</MenuItem>
+                  <MenuItem value='£'>GBP</MenuItem>
+                </Select>
+              </FormControl>
               <div className={classes.invoiceNumber}>
                 <TextField
                   required
-                  label="Invoive Number"
+                  label="Invoice Number"
                   variant="outlined"
                   value={invoiceNumber}
                   onChange={e=>setInvoiceNumber(e.target.value)}
                 />
               </div>
-              
-          
               <form  noValidate autoComplete="off" style={{padding:"10px"}}>
                   <div className="leftDivision">
                     <div style={{ marginRight: '15px'}} >
-                        <TextField
+                        <TextareaAutosize
                           required
-                          placeholder="Who is invoice from (required)"
-                          fullWidth
-                          margin="normal"
-                          name="bill_from"
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                          variant="outlined"
                           value={invoiceData.bill_from}
+                          name="bill_from"
+                          minRows={3}
                           onChange={handleDataChange}
-                          
-                        />
+                          placeholder="Who is this invoice from (required)"
+                          style={{ width: 425,fontSize:19,padding: '5px',borderRadius: '5px',background: '#fafafa'}}
+                           />
                     </div>
                       <div style={{float:"left",marginRight :"15px",marginTop:'30px',marginBottom:'30px'}}>
-                        <TextField
-                        required
-                        label="Bill To"
-                        name="bill_to"
-                        variant="outlined"
-                        value={invoiceData.bill_to}
-                        onChange={handleDataChange}
-                        />
+                          <TextareaAutosize
+                          required
+                          label="Bill To"
+                          name="bill_to"
+                          variant="outlined"
+                          minRows={3}
+                          value={invoiceData.bill_to}
+                          onChange={handleDataChange}
+                          placeholder="Bill To"
+                          style={{ width: 225,fontSize:19,borderRadius: '5px',padding: '5px',background: '#fafafa'}}
+                           />
                       </div>
                       <div style={{float:"left",marginRight :"15px",marginTop:'30px',marginBottom:'30px'}}>
-                        <TextField
-                        required
-                        label="Ship To"
-                        name="ship_to"
-                        variant="outlined"
-                        value={invoiceData.ship_to}
-                        onChange={handleDataChange}
-                        />
+                         <TextareaAutosize
+                          required
+                          label="Ship To"
+                          name="ship_to"
+                          variant="outlined"
+                          minRows={3}
+                          value={invoiceData.ship_to}
+                          onChange={handleDataChange}
+                          placeholder="Ship To"
+                          style={{ width: 225,fontSize:19,borderRadius: '5px',padding: '5px',background: '#fafafa'}}
+                           />
                       </div>
                   </div>
                   <div className='rightDivision'>
@@ -541,16 +576,15 @@ export default function FormPropsTextFields() {
                         </MuiPickersUtilsProvider>
                       </div>
                       <div style={{float:'right',marginLeft :"45px",marginBottom:'10px',marginRight :"15px"}}>
-                        <TextField
-                            label="Payment Terms"
-                            multiline
-                            variant="outlined"
-                            name="payment_terms"
-                            onChange={handleDataChange}
-                            value = {invoiceData.payment_terms}
-                            inputProps={{className:classes.payment}}
-
-                          />
+                           <TextareaAutosize
+                          required
+                          name="payment_terms"
+                          value={invoiceData.payment_terms}
+                          minRows={2}
+                          onChange={handleDataChange}
+                          placeholder="Payment Terms"
+                          style={{ width: 225,fontSize:19,padding: '5px',borderRadius: '5px',background: '#fafafa'}}
+                           />
                       </div>
 
                   </div>
@@ -594,6 +628,7 @@ export default function FormPropsTextFields() {
                             InputLabelProps={{
                               shrink: true,
                             }}
+                            type='number'
                             inputProps={{
                               className:classes.quantity,
                             }}
@@ -610,6 +645,10 @@ export default function FormPropsTextFields() {
                             inputProps={{
                               className:classes.rate,
                             }}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                            }}
+                            type='number'
                             variant="outlined"
                             value={field.rate}
                             onChange={e => handleChangesforRate(idx, e)}
@@ -624,13 +663,16 @@ export default function FormPropsTextFields() {
                               className:classes.rate,
                               readOnly: true,
                             }}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                            }}
                             variant="outlined"
                             value={field.amount}
                             onChange={e => handleChangesforRate(idx, e)}
                           />
-                          <IconButton size ="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{marginTop:"6px"}}>
+                        {idx!==0 && <IconButton size ="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{marginTop:"6px"}}>
                             <DeleteIcon />
-                          </IconButton>
+                          </IconButton>} 
                         </div>
                         
                       );
@@ -646,44 +688,39 @@ export default function FormPropsTextFields() {
               
                 <div style={{float:'left',overflow:'hidden',padding:"10px"}}>
                   <div style={{marginTop:'15px'}}>
-                    <TextField
-                      id="outlined-textarea"
-                      label="Notes"
-                      placeholder="Notes - any relevant information already not covered"
-                      multiline
-                      variant="outlined"
-                      name="notes"
-                      value = {invoiceData.notes}
-                      onChange={handleDataChange}
-                      inputProps={{
-                        className:classes.multiline
-                      }}
-
-                    />
+                    <TextareaAutosize
+                          required
+                          name="notes"
+                          minRows={2}
+                          value={invoiceData.notes}
+                          onChange={handleDataChange}
+                          placeholder="Notes - any relevant information already not covered"
+                          style={{ width: 425,fontSize:19,padding: '5px',borderRadius: '5px',background: '#fafafa'}}
+                           />
                   </div>
                   <div style={{marginTop:"15px",marginBottom:'20px'}}>
-                    <TextField
-                      label="Terms"
-                      placeholder="Terms and conditions"
-                      multiline
-                      name="terms"
-                      variant="outlined"
-                      value = {invoiceData.terms}
-                      onChange={handleDataChange}
-                      inputProps={{
-                        className:classes.multiline
-                      }}
-                    />
+                     <TextareaAutosize
+                          required
+                          name="terms"
+                          value={invoiceData.terms}
+                          minRows={2}
+                          onChange={handleDataChange}
+                          placeholder="Terms and conditions"
+                          style={{ width: 425,fontSize:19,padding: '5px',borderRadius: '5px',background: '#fafafa'}}
+                           />
                   </div>
                 </div>
                <div className='rightDivision'>
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Sub total in ₹"
+                  label="Sub total"
                   inputProps={{
                     readOnly: true,
                     className:classes.math
+                  }}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
                   }}
                   value={subTotal}
                   variant="outlined"
@@ -745,8 +782,11 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Total in ₹"
+                  label="Total"
                   value={total}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                  }}
                   inputProps={{
                     readOnly: true,
                     className:classes.math
@@ -757,9 +797,12 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Amount paid in ₹"
+                  label="Amount paid"
                   value={amountPaid}
                   onChange={handlePaidChange}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                  }}
                   inputProps={{
                     className:classes.math
                   }}
@@ -769,7 +812,10 @@ export default function FormPropsTextFields() {
                 <div style={{float:'right',marginBottom:'10px',marginRight :"15px"}}>
                   <TextField
                   required
-                  label="Balance due in ₹"
+                  label="Balance due"
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                  }}
                   value={balanceDue}
                   inputProps={{
                     readOnly: true,
