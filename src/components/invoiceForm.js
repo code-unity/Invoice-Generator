@@ -192,6 +192,7 @@ export default function FormPropsTextFields() {
     axios.get(`${process.env.REACT_APP_API_URL}/client`)
     .then((res) => {
       setClientdata(res.data.data.results);
+      console.log(res.data.data.results)
     });
     axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
     .then((res) => {

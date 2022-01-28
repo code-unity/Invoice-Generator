@@ -3,6 +3,7 @@ import Home from './pages/home';
 import Client from './pages/addclient/addClient'
 import History  from './pages/history/history';
 import Header from './components/header'
+import ViewClient from './pages/viewClient/viewClient';
 import {Route,Router,Switch } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import history from './history'
@@ -16,6 +17,7 @@ function App() {
         <ProtectedRoute path="/home" component={Home} exact />
         <ProtectedRoute path="/client" component={Client}  exact/>
         <ProtectedRoute path="/history" component={History} exact />
+        <ProtectedRoute path="/view-client" component={ViewClient} exact />
         </Switch>
     </Router>
   );
