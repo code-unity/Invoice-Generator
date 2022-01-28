@@ -378,16 +378,20 @@ export default function FormPropsTextFields() {
      if(inputAdornment==='$'){
     data.sub_total ='US'+ inputAdornment+subTotal;
     data.total = 'US'+ inputAdornment+total;
-    data.items[0].rate='US'+ inputAdornment +fields[0].rate
-    data.items[0].amount='US'+ inputAdornment +fields[0].amount
+    for (let i = 0; i < data.items.length; i++) { 
+      data.items[i].rate='US'+ inputAdornment +fields[i].rate
+      data.items[i].amount='US'+ inputAdornment +fields[i].amount
+    }
     data.amount_paid = 'US'+ inputAdornment+amountPaid;
     data.balance_due ='US'+  inputAdornment+balanceDue;
     }
     else{
+    for (let i = 0; i < data.items.length; i++) { 
+      data.items[i].rate=inputAdornment +fields[i].rate
+      data.items[i].amount=inputAdornment +fields[i].amount
+    }
       data.sub_total = inputAdornment+subTotal;
       data.total = inputAdornment+total;
-      data.items[0].rate=inputAdornment +fields[0].rate
-      data.items[0].amount=inputAdornment +fields[0].amount
       data.amount_paid = inputAdornment+amountPaid;
       data.balance_due = inputAdornment+balanceDue;
     }
@@ -406,7 +410,6 @@ export default function FormPropsTextFields() {
     }
     data.invoice_number = invoiceNumber;
     setState(data);
-    console.log(invoiceData)
     axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData,{ headers: { 'Content-Type': 'application/json' } })
     .then(function (response) {
       setOpenDownloader(false);
@@ -848,7 +851,7 @@ export default function FormPropsTextFields() {
           <div>
           <CircularProgress color="primary" />
           </div>
-          <span>downloading invoice...</span>
+          <span>Downloading Invoice...</span>
         </Backdrop>
       </div>
 
