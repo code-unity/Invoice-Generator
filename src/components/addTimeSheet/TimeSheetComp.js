@@ -8,9 +8,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import axios from "axios";
+
 let sheet = [];
 const date = new Date();
 const TimeSheetComp = () => {
+  const [alert, setMessage] = useState({ message: "", severity: "" });
+  const [openLoader, setOpenLoader] = useState(false);
+  const [open, setOpen] = useState(false);
   const [timelen, setTimelen] = useState(1);
   const [duplicate, setDuplicate] = useState(false);
   const onChanged = (type, value, index) => {
@@ -89,6 +94,31 @@ const TimeSheetComp = () => {
         />
       );
   }
+  function printdata() {
+    setOpenLoader(true);
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/timesheet`, sheet, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(function (response) {
+        setOpenLoader(false);
+        const message = alert;
+        message.message = "TimeSHeet added successfully";
+        message.severity = "success";
+        setMessage(message);
+        setOpen(true);
+      })
+      .catch((error) => {
+        setOpenLoader(false);
+        const message = alert;
+        message.message = "add client unsuccessful";
+        message.severity = "error";
+        setMessage(message);
+        console.log("message", message);
+        setOpen(true);
+      });
+  }
+
   return (
     <>
       <div className="table_cont">
@@ -129,7 +159,7 @@ const TimeSheetComp = () => {
         </div>
       </div>
       <div className="sheet_container">
-        <button onClick={() => console.log(sheet)} className="submit_button">
+        <button onClick={printdata} className="submit_button">
           Submit
         </button>
       </div>
