@@ -47,18 +47,15 @@ function LoginForm() {
       username: details.username,
       password: details.password
     }
-    console.log(JSON.stringify(data));
 
     axios.post(`${process.env.REACT_APP_API_URL}/admin`,data,{ headers: { 'Content-Type': 'application/json' } })
     .then(res=>{
-      console.log(res);
       setOpen(false);
       localStorage.setItem('token',res.data.token);
       localStorage.setItem('signedin',res.data.status.success);
       history.push('/home');
     })
     .catch(err=>{
-      console.log(err);
       setOpen(false);
     })
   };
