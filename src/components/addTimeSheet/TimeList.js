@@ -9,11 +9,22 @@ import DateFnsUtils from "@date-io/date-fns";
 import Select from "@material-ui/core/Select";
 import { FormControl, MenuItem } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import { makeStyles , useTheme} from '@material-ui/core/styles';
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 150,
+    maxWidth: 300,
+  },
+}));
 const TimeList = (props) => {
   const [description, setDescription] = useState("");
   const [noOfHours, setNoOfHours] = useState("");
   const [changed, setChanged] = useState("");
-  const [attendance, setAttendance] = useState("Absent");
+  const classes = useStyles();
+  const [attendance, setAttendance] = useState("");
   const [selectedDate, setSelectedDate] = useState(props.date);
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -41,11 +52,9 @@ const TimeList = (props) => {
       props.onChanged("noOfHours", noOfHours, props.index);
   }, [description, noOfHours, selectedDate]);
   return (
-    <div className="moniesh_row">
-      <div className="moniesh_col">
-        <label className="labeled">Description </label>
-        <input
-          type="text"
+    <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+      <TableCell component="th" scope="row">
+        <Input
           className="input_text"
           value={description}
           onChange={(event) => {
@@ -53,34 +62,32 @@ const TimeList = (props) => {
             setDescription(event.target.value);
           }}
         />
-      </div>
-      <div className="moniesh_col">
-        <label className="labeled">No of Hours </label>
-        <input
-          type="text"
+      </TableCell>
+      <TableCell align="right">
+        <Input
           value={noOfHours}
-          className="input_text"
           onChange={async (event) => {
             setChanged("noOfHours");
             setNoOfHours(event.target.value);
           }}
         />
-      </div>
-      <div className="moniesh_col">
-        <FormControl>
+      </TableCell>
+      <TableCell align="right">
+        <FormControl className={classes.formControl}>
           <Select
-            defaultValue={"Absent"}
+            defaultValue="Absent"
             value={attendance}
-            onChange={(e) => setAttendance(e)}
+            onChange={(e) => {setAttendance(e.target.value)
+            }}
             input={<Input />}
             MenuProps={MenuProps}
           >
-            <MenuItem value="">Present</MenuItem>
-            <MenuItem>Absent</MenuItem>
+            <MenuItem value="Present">Present</MenuItem>
+            <MenuItem value="Absent">Absent</MenuItem>
           </Select>
         </FormControl>
-      </div>
-      <div className="date_cont">
+      </TableCell>
+      <TableCell align="right">
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDatePicker
             disableToolbar
@@ -95,8 +102,8 @@ const TimeList = (props) => {
             }}
           />
         </MuiPickersUtilsProvider>
-      </div>
-    </div>
+      </TableCell>
+    </TableRow>
   );
 };
 

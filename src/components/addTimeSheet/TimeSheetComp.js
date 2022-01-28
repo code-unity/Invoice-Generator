@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./TimeSheetCompstyle.css";
 import TimeList from "./TimeList";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 let sheet = [];
 const date = new Date();
 const TimeSheetComp = () => {
@@ -77,8 +84,20 @@ const TimeSheetComp = () => {
   }
   return (
     <>
-      <div className="outer_moniesh">
-        <div className="sheeted">{timeSheet}</div>
+      <div className="table_cont">
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Description</TableCell>
+                <TableCell align="right">Number of Hours</TableCell>
+                <TableCell align="right">Attendance</TableCell>
+                <TableCell align="right">Date</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>{timeSheet}</TableBody>
+          </Table>
+        </TableContainer>
       </div>
       <div className="sheet_container">
         <div className="btncont">
