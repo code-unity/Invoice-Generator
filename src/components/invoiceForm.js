@@ -145,6 +145,7 @@ export default function FormPropsTextFields() {
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory, setInvoiceHistory] = React.useState([]);
   const [invoiceNumber, setInvoiceNumber] = React.useState(0);
+  const currency=[{id:'Rupee',value:'₹'},{id:'USD',value:'$'},{id:'GBP',value:'£'}]
 
   const [invoiceData, setState] = React.useState({
     client: '',
@@ -239,9 +240,9 @@ export default function FormPropsTextFields() {
   //function for math calculations
   function updateInputFields(dType, tType, sTotal, ptax, pdiscount) {
     let b;
-    if (dType === '₹') {
+    if (dType === 'flat') {
       const a = (sTotal - parseInt(pdiscount));
-      if (tType === '₹') {
+      if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
       }
       else if (tType === '%') {
@@ -252,7 +253,7 @@ export default function FormPropsTextFields() {
     }
     else if (dType === '%') {
       const a = ((sTotal * (1 - pdiscount / 100)));
-      if (tType === '₹') {
+      if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
       }
       else if (tType === '%') {
@@ -262,7 +263,6 @@ export default function FormPropsTextFields() {
       setBalanceDue(b - amountPaid);
 
     }
-
   }
   //functions for discount and tax type change
   function handleDiscountTypeChange(e) {
@@ -396,8 +396,8 @@ export default function FormPropsTextFields() {
       data.balance_due = inputAdornment + balanceDue;
     }
     if (tax !==0 && tax !== '') {
-      if (taxType === '₹') {
-        data.tax = '₹' + tax;
+      if (taxType === 'flat') {
+        data.tax = inputAdornment + tax;
       }
       else {
         data.tax = tax + '%';
@@ -408,8 +408,8 @@ export default function FormPropsTextFields() {
     }
     console.log(discount!==0)
     if (discount!==0 && discount !== '') {
-      if (discountType === '₹') {
-        data.discount = '₹' + discount;
+      if (discountType === 'flat') {
+        data.discount = inputAdornment + discount;
       }
       else {
         data.discount = discount + '%';
@@ -498,10 +498,7 @@ export default function FormPropsTextFields() {
             onChange={e => inputAdornmentChange(e)}
             input={<Input />}
             MenuProps={MenuProps}
-          >
-            <MenuItem value='₹'>Rupee </MenuItem>
-            <MenuItem value='$'>USD</MenuItem>
-            <MenuItem value='£'>GBP</MenuItem>
+          >{currency.map(item=>(<MenuItem key={item.id} value={item.value}>{item.id}</MenuItem>))}
           </Select>
         </FormControl>
         <div className={classes.invoiceNumber}>
@@ -760,15 +757,13 @@ export default function FormPropsTextFields() {
                   className: classes.menu
                 }}
               >
-
-                <MenuItem value={'₹'}>₹</MenuItem>
+                <MenuItem value={'flat'}>{inputAdornment}</MenuItem>
                 <MenuItem value={'%'}>%</MenuItem>
               </Select>
             </FormControl>
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
               label="GST"
               variant="outlined"
               onChange={e => handleTaxChange(e)}
@@ -787,7 +782,7 @@ export default function FormPropsTextFields() {
                   className: classes.menu
                 }}
               >
-                <MenuItem value={'₹'}>₹</MenuItem>
+                <MenuItem value='flat'>{inputAdornment}</MenuItem>
                 <MenuItem value={'%'}>%</MenuItem>
               </Select>
             </FormControl>
