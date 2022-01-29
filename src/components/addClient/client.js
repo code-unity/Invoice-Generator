@@ -97,7 +97,7 @@ export default function FormPropsTextFields(props) {
     if (pageProp === 'edit') {
       fetchData()
     }
-  },[pageProp,clientId])  // eslint-disable-line react-hooks/exhaustive-deps
+  },[pageProp,clientId])
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
