@@ -18,6 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import AccessTimeRoundedIcon from '@material-ui/icons/AccessTimeRounded';
 import AssignmentRoundedIcon from '@material-ui/icons/AssignmentRounded';
 import AccountBoxRoundedIcon from '@material-ui/icons/AccountBoxRounded';
+import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 import history from '../history';
 
 
@@ -134,6 +135,11 @@ export default function PersistentDrawerLeft(props) {
             <ListItem button onClick ={()=> history.push('/home')}>
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Generate Invoice' />
+            </ListItem>
+
+            <ListItem button onClick ={()=> history.push('/view-client')}>
+              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+              <ListItemText primary='View Client' />
             </ListItem>
 
             <ListItem button onClick ={()=> {history.push('/');localStorage.clear()}}>
