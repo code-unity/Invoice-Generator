@@ -97,7 +97,7 @@ export default function FormPropsTextFields(props) {
     if (pageProp === 'edit') {
       fetchData()
     }
-  },[pageProp,clientId])
+  },[pageProp,clientId,alert])
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
