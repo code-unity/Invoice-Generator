@@ -406,7 +406,6 @@ export default function FormPropsTextFields() {
     else {
       data.tax = ''
     }
-    console.log(discount!==0)
     if (discount!==0 && discount !== '') {
       if (discountType === 'flat') {
         data.discount = inputAdornment + discount;
@@ -738,7 +737,6 @@ export default function FormPropsTextFields() {
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
               label="Discount"
               variant="outlined"
               value={discount}
@@ -804,7 +802,6 @@ export default function FormPropsTextFields() {
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
               label="Amount paid"
               value={amountPaid}
               onChange={handlePaidChange}
