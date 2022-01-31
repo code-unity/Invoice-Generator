@@ -123,6 +123,10 @@ function getStyles(name, personName, theme) {
 
 
 export default function FormPropsTextFields() {
+  const token = localStorage.getItem('token');
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }
+};
   const classes = useStyles();
   const theme = useTheme();
   const [inputAdornment, setInputAdornment] = React.useState('₹')
@@ -198,6 +202,10 @@ export default function FormPropsTextFields() {
 
   const fetchData = () => {
     setOpen(true);
+    axios.get(`${process.env.REACT_APP_API_URL}/admin/address`,config)
+    .then((res) => {
+      setState({...invoiceData,bill_from:res.data.address })
+      })
     axios.get(`${process.env.REACT_APP_API_URL}/client`)
       .then((res) => {
         setClientdata(res.data.data.results);
@@ -207,7 +215,6 @@ export default function FormPropsTextFields() {
         setOpen(false);
         setInvoiceHistory(res.data.data.results);
       })
-
   };
 
   const handleClose = (event, reason) => {
@@ -456,7 +463,6 @@ export default function FormPropsTextFields() {
     setState({
       ...invoiceData,
       [e.target.name]: e.target.value
-
     })
   }
 
