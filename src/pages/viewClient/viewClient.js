@@ -80,11 +80,11 @@ const ViewClient = () => {
     }
 
     return (
-        <div style={{ width: '100vw' }}>
-            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginLeft: '2.6%', marginBottom:'1%'}} onClick={() => history.push('/client')}>
+        <div style={{marginLeft: '50px'}}>
+            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginBottom:'1%'}} onClick={() => history.push('/client')}>
                 Add New Client
             </Button>
-            <TableContainer component={Paper} sx={{ ml: 5 }}>
+            <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>

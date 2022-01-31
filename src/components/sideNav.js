@@ -74,6 +74,8 @@ export default function PersistentDrawerLeft(props) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
+  const role = localStorage.getItem('role')
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -122,6 +124,8 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
+          {role==='admin' && (
+            <>
             <ListItem button onClick ={()=> history.push('/client')}>
               <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
               <ListItemText primary='Add Client' />
@@ -141,12 +145,13 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><ViewComfyIcon /></ListItemIcon>
               <ListItemText primary='View Client' />
             </ListItem>
-
+            </>
+            )}
+            
             <ListItem button onClick ={()=> {history.push('/');localStorage.clear()}}>
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Logout' />
-            </ListItem>
-            
+            </ListItem>   
         </List>
       </Drawer>
       <main

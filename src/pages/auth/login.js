@@ -50,9 +50,11 @@ function LoginForm() {
 
     axios.post(`${process.env.REACT_APP_API_URL}/admin`,data,{ headers: { 'Content-Type': 'application/json' } })
     .then(res=>{
+      console.log(res)
       setOpen(false);
-      localStorage.setItem('token',res.data.token);
+      localStorage.setItem('token',res.data.data.token);
       localStorage.setItem('signedin',res.data.status.success);
+      localStorage.setItem('role', res.data.data.role);
       history.push('/home');
     })
     .catch(err=>{
