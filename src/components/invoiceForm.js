@@ -124,9 +124,7 @@ function getStyles(name, personName, theme) {
 
 export default function FormPropsTextFields() {
   const token = localStorage.getItem('token');
-  const config = {
-    headers: { Authorization: `Bearer ${token}` }
-};
+  const config = { headers: { Authorization: `Bearer ${token}` }};
   const classes = useStyles();
   const theme = useTheme();
   const [inputAdornment, setInputAdornment] = React.useState('₹')
@@ -151,7 +149,7 @@ export default function FormPropsTextFields() {
   const [invoiceNumber, setInvoiceNumber] = React.useState(0);
   const currency=[{id:'Rupee',value:'₹'},{id:'USD',value:'$'},{id:'GBP',value:'£'}]
 
-  const [invoiceData, setState] = React.useState({
+  const [invoiceData, setInvoiceData] = React.useState({
     client: '',
     bill_from: '',
     bill_to: '',
@@ -185,7 +183,7 @@ export default function FormPropsTextFields() {
       tempDefault.terms = data[0].terms;
       tempDefault.notes = data[0].notes;
       tempDefault.payment_terms = data[0].payment_terms;
-      setState(tempDefault);
+      setInvoiceData(tempDefault);
       setPersonName(event.target.value);
       setOpen(!open);
       settinginvoiceNumber(event.target.value);
@@ -193,18 +191,12 @@ export default function FormPropsTextFields() {
     }
 
   };
-
-  React.useEffect(() => {
-    fetchData();
-  }, []);
-
-
-
+  
   const fetchData = () => {
     setOpen(true);
     axios.get(`${process.env.REACT_APP_API_URL}/admin/address`,config)
     .then((res) => {
-      setState({...invoiceData,bill_from:res.data.address })
+      setInvoiceData({...invoiceData,bill_from:res.data.address })
       })
     axios.get(`${process.env.REACT_APP_API_URL}/client`)
       .then((res) => {
@@ -217,6 +209,12 @@ export default function FormPropsTextFields() {
       })
   };
 
+  React.useEffect(() => {
+    fetchData();
+  }, []);// eslint-disable-line react-hooks/exhaustive-deps
+
+ 
+
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -227,13 +225,13 @@ export default function FormPropsTextFields() {
   const handleDateChange = (date) => {
     setSelectedDate(date);
     invoiceData.date = date.toDateString();
-    // setState({...invoiceData,date:date.toDateString()})
+    // setInvoiceData({...invoiceData,date:date.toDateString()})
 
   };
   const handleDueDateChange = (date) => {
     setSelectedDueDate(date);
     invoiceData.due_date = date.toDateString();
-    // setState({...invoiceData,due_date:date.toDateString()})
+    // setInvoiceData({...invoiceData,due_date:date.toDateString()})
 
   };
   //functions for invoice number
@@ -367,7 +365,7 @@ export default function FormPropsTextFields() {
     setSelectedDueDate(fieldValues.due_date)
     setSelectedDate(fieldValues.date)
     setInvoiceNumber(0);
-    setState(fieldValues);
+    setInvoiceData(fieldValues);
     setFields([{ item: '', quantity: 0, rate: 0, amount: 0 }]);
     setSubTotal(0);
     setTotal(0);
@@ -426,7 +424,7 @@ export default function FormPropsTextFields() {
     }
     data.invoice_number = invoiceNumber;
     
-    setState(data);
+    setInvoiceData(data);
     axios.post(`${process.env.REACT_APP_API_URL}/invoice`,invoiceData, { headers: { 'Content-Type': 'application/json' } })
       .then(function (response) {
         setOpenDownloader(false);
@@ -460,7 +458,7 @@ export default function FormPropsTextFields() {
   }
 
   const handleDataChange = e => {
-    setState({
+    setInvoiceData({
       ...invoiceData,
       [e.target.name]: e.target.value
     })
