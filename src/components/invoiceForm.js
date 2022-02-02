@@ -123,6 +123,8 @@ function getStyles(name, personName, theme) {
 
 
 export default function FormPropsTextFields() {
+  const token = localStorage.getItem('token');
+  const config = { headers: { Authorization: `Bearer ${token}` }};
   const classes = useStyles();
   const theme = useTheme();
   const [inputAdornment, setInputAdornment] = React.useState('₹')
@@ -136,7 +138,7 @@ export default function FormPropsTextFields() {
   const [tax, setTax] = React.useState(0);
   const [taxType, setTaxType] = React.useState('%');
   const [discountType, setDiscountType] = React.useState('%');
-  const [discount, setDiscount] = React.useState('0');
+  const [discount, setDiscount] = React.useState(0);
   const [amountPaid, setAmountPaid] = React.useState('0');
   const [balanceDue, setBalanceDue] = React.useState('0');
   const [selectedDate, setSelectedDate] = React.useState(new Date().toDateString());
@@ -145,8 +147,9 @@ export default function FormPropsTextFields() {
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory, setInvoiceHistory] = React.useState([]);
   const [invoiceNumber, setInvoiceNumber] = React.useState(0);
+  const currency=[{id:'Rupee',value:'₹'},{id:'USD',value:'$'},{id:'GBP',value:'£'}]
 
-  const [invoiceData, setState] = React.useState({
+  const [invoiceData, setInvoiceData] = React.useState({
     client: '',
     bill_from: '',
     bill_to: '',
@@ -180,7 +183,7 @@ export default function FormPropsTextFields() {
       tempDefault.terms = data[0].terms;
       tempDefault.notes = data[0].notes;
       tempDefault.payment_terms = data[0].payment_terms;
-      setState(tempDefault);
+      setInvoiceData(tempDefault);
       setPersonName(event.target.value);
       setOpen(!open);
       settinginvoiceNumber(event.target.value);
@@ -188,15 +191,13 @@ export default function FormPropsTextFields() {
     }
 
   };
-
-  React.useEffect(() => {
-    fetchData();
-  }, []);
-
-
-
+  
   const fetchData = () => {
     setOpen(true);
+    axios.get(`${process.env.REACT_APP_API_URL}/admin/address`,config)
+    .then((res) => {
+      setInvoiceData({...invoiceData,bill_from:res.data.address })
+      })
     axios.get(`${process.env.REACT_APP_API_URL}/client`)
       .then((res) => {
         setClientdata(res.data.data.results);
@@ -206,8 +207,13 @@ export default function FormPropsTextFields() {
         setOpen(false);
         setInvoiceHistory(res.data.data.results);
       })
-
   };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);// eslint-disable-line react-hooks/exhaustive-deps
+
+ 
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -219,13 +225,13 @@ export default function FormPropsTextFields() {
   const handleDateChange = (date) => {
     setSelectedDate(date);
     invoiceData.date = date.toDateString();
-    // setState({...invoiceData,date:date.toDateString()})
+    // setInvoiceData({...invoiceData,date:date.toDateString()})
 
   };
   const handleDueDateChange = (date) => {
     setSelectedDueDate(date);
     invoiceData.due_date = date.toDateString();
-    // setState({...invoiceData,due_date:date.toDateString()})
+    // setInvoiceData({...invoiceData,due_date:date.toDateString()})
 
   };
   //functions for invoice number
@@ -239,9 +245,9 @@ export default function FormPropsTextFields() {
   //function for math calculations
   function updateInputFields(dType, tType, sTotal, ptax, pdiscount) {
     let b;
-    if (dType === '₹') {
+    if (dType === 'flat') {
       const a = (sTotal - parseInt(pdiscount));
-      if (tType === '₹') {
+      if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
       }
       else if (tType === '%') {
@@ -252,7 +258,7 @@ export default function FormPropsTextFields() {
     }
     else if (dType === '%') {
       const a = ((sTotal * (1 - pdiscount / 100)));
-      if (tType === '₹') {
+      if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
       }
       else if (tType === '%') {
@@ -262,7 +268,6 @@ export default function FormPropsTextFields() {
       setBalanceDue(b - amountPaid);
 
     }
-
   }
   //functions for discount and tax type change
   function handleDiscountTypeChange(e) {
@@ -352,7 +357,7 @@ export default function FormPropsTextFields() {
       payment_terms: '',
       sub_total: '0',
       total: '0',
-      tax: '0',
+      tax: 0,
       discount: 0,
       amount_paid: '0',
       balance_due: 0
@@ -360,7 +365,7 @@ export default function FormPropsTextFields() {
     setSelectedDueDate(fieldValues.due_date)
     setSelectedDate(fieldValues.date)
     setInvoiceNumber(0);
-    setState(fieldValues);
+    setInvoiceData(fieldValues);
     setFields([{ item: '', quantity: 0, rate: 0, amount: 0 }]);
     setSubTotal(0);
     setTotal(0);
@@ -375,63 +380,71 @@ export default function FormPropsTextFields() {
     setOpenDownloader(!open);
     const data = invoiceData;
     data.items = fields;
-
-     if(inputAdornment==='$'){
-    data.sub_total ='US'+ inputAdornment+subTotal;
-    data.total = 'US'+ inputAdornment+total;
-    for (let i = 0; i < data.items.length; i++) { 
-      data.items[i].rate='US'+ inputAdornment +fields[i].rate
-      data.items[i].amount='US'+ inputAdornment +fields[i].amount
-    }
-    data.amount_paid = 'US'+ inputAdornment+amountPaid;
-    data.balance_due ='US'+  inputAdornment+balanceDue;
-    }
-    else{
-    for (let i = 0; i < data.items.length; i++) { 
-      data.items[i].rate=inputAdornment +fields[i].rate
-      data.items[i].amount=inputAdornment +fields[i].amount
-    }
-      data.sub_total = inputAdornment+subTotal;
-      data.total = inputAdornment+total;
-      data.amount_paid = inputAdornment+amountPaid;
-      data.balance_due = inputAdornment+balanceDue;
-    }
-    if (taxType === '₹') {
-      data.tax = '₹' + tax;
+    if (inputAdornment === '$') {
+      data.sub_total = 'US' + inputAdornment + subTotal;
+      data.total = 'US' + inputAdornment + total;
+      for (let i = 0; i < data.items.length; i++) {
+        data.items[i].rate = 'US' + inputAdornment + fields[i].rate
+        data.items[i].amount = 'US' + inputAdornment + fields[i].amount
+      }
+      data.amount_paid = 'US' + inputAdornment + amountPaid;
+      data.balance_due = 'US' + inputAdornment + balanceDue;
     }
     else {
-      data.tax = tax + '%';
+      for (let i = 0; i < data.items.length; i++) {
+        data.items[i].rate = inputAdornment + fields[i].rate
+        data.items[i].amount = inputAdornment + fields[i].amount
+      }
+      data.sub_total = inputAdornment + subTotal;
+      data.total = inputAdornment + total;
+      data.amount_paid = inputAdornment + amountPaid;
+      data.balance_due = inputAdornment + balanceDue;
     }
-
-    if (discountType === '₹') {
-      data.discount = '₹' + discount;
+    if (tax !==0 && tax !== '') {
+      if (taxType === 'flat') {
+        data.tax = inputAdornment + tax;
+      }
+      else {
+        data.tax = tax + '%';
+      }
     }
     else {
-      data.discount = discount + '%';
+      data.tax = ''
+    }
+    if (discount!==0 && discount !== '') {
+      if (discountType === 'flat') {
+        data.discount = inputAdornment + discount;
+      }
+      else {
+        data.discount = discount + '%';
+      }
+    }
+    else {
+      data.discount = ''
     }
     data.invoice_number = invoiceNumber;
-    setState(data);
+    
+    setInvoiceData(data);
+    axios.post(`${process.env.REACT_APP_API_URL}/invoice`,invoiceData, { headers: { 'Content-Type': 'application/json' } })
+      .then(function (response) {
+        setOpenDownloader(false);
+        const message = alert;
+        message.message = "invoice generated successfully";
+        message.severity = "success";
+        setMessage(message);
+        setOpenAlert(true);
+        changeFieldValue();
+        setPersonName([]);
+        b64 = response.data.pdf;
+        var link = document.createElement('a');
+        link.innerHTML = 'Download PDF file';
+        link.download = 'file.pdf';
+        link.href = 'data:application/octet-stream;base64,' + b64;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
 
-    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData,{ headers: { 'Content-Type': 'application/json' } })
-    .then(function (response) {
-      setOpenDownloader(false);
-      const message = alert;
-      message.message = "invoice generated successfully";
-      message.severity = "success";
-      setMessage(message);
-      setOpenAlert(true);
-      changeFieldValue();
-      setPersonName([]);
-      b64 = response.data.pdf;
-      var link = document.createElement('a');
-      link.innerHTML = 'Download PDF file';
-      link.download = 'file.pdf';
-      link.href = 'data:application/octet-stream;base64,' + b64;
-      document.body.appendChild(link);
-      link.click();    
-      link.remove();
-     
-    })
+      })
       .catch(error => {
         if (error.response) {
           const message = alert;
@@ -445,13 +458,11 @@ export default function FormPropsTextFields() {
   }
 
   const handleDataChange = e => {
-    setState({
+    setInvoiceData({
       ...invoiceData,
       [e.target.name]: e.target.value
-
     })
   }
-
 
   return (
     <div >
@@ -490,10 +501,7 @@ export default function FormPropsTextFields() {
             onChange={e => inputAdornmentChange(e)}
             input={<Input />}
             MenuProps={MenuProps}
-          >
-            <MenuItem value='₹'>Rupee </MenuItem>
-            <MenuItem value='$'>USD</MenuItem>
-            <MenuItem value='£'>GBP</MenuItem>
+          >{currency.map(item=>(<MenuItem key={item.id} value={item.value}>{item.id}</MenuItem>))}
           </Select>
         </FormControl>
         <div className={classes.invoiceNumber}>
@@ -733,7 +741,6 @@ export default function FormPropsTextFields() {
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
               label="Discount"
               variant="outlined"
               value={discount}
@@ -752,16 +759,14 @@ export default function FormPropsTextFields() {
                   className: classes.menu
                 }}
               >
-
-                <MenuItem value={'₹'}>₹</MenuItem>
+                <MenuItem value={'flat'}>{inputAdornment}</MenuItem>
                 <MenuItem value={'%'}>%</MenuItem>
               </Select>
             </FormControl>
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
-              label="Tax"
+              label="GST"
               variant="outlined"
               onChange={e => handleTaxChange(e)}
               value={tax}
@@ -779,7 +784,7 @@ export default function FormPropsTextFields() {
                   className: classes.menu
                 }}
               >
-                <MenuItem value={'₹'}>₹</MenuItem>
+                <MenuItem value='flat'>{inputAdornment}</MenuItem>
                 <MenuItem value={'%'}>%</MenuItem>
               </Select>
             </FormControl>
@@ -801,7 +806,6 @@ export default function FormPropsTextFields() {
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
-              required
               label="Amount paid"
               value={amountPaid}
               onChange={handlePaidChange}
