@@ -119,8 +119,7 @@ export default function FormPropsTextFields() {
         <h1 style={{marginLeft:'300px',marginTop:'50px'}}>
         Add Client
         </h1>
-        <Box className="form">
-            
+        <Box className="form">            
           <div style ={{marginLeft:'10px'}}>
               <form  noValidate autoComplete="off">
                   <div className="leftDivision">
@@ -132,8 +131,7 @@ export default function FormPropsTextFields() {
                           name="client_name"
                           value={clientData.client_name}
                           variant="outlined"
-                          onChange={handleChange}
-                          
+                          onChange={handleChange}                          
                         />
                     </div>
                       <div style={{float:"left",marginRight :"15px",marginTop:'30px',marginBottom:'30px'}}>
@@ -157,9 +155,7 @@ export default function FormPropsTextFields() {
                         value={clientData.shipping_address}
                         onChange={handleChange}
                         />
-                      </div>   
-                  
-             
+                      </div>                                  
                       <div style={{marginBottom:'10px',marginRight :"15px"}}>
                         <TextField
                             id="outlined-textarea"
