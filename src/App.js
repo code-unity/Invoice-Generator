@@ -1,14 +1,13 @@
 import Login from "./pages/auth/login";
 import Home from "./pages/home";
-import Client from "./pages/addclient/addClient";
+import Client from "./pages/addEditClient/addEditClient";
 import History from "./pages/history/history";
 import Header from "./components/header";
 import { Route, Router, Switch } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import history from "./history";
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewClient from './pages/viewClient/viewClient';
-import history from './history'
+import history from './history';
 
 function App() {
   return (
