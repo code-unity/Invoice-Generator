@@ -69,35 +69,35 @@ export default function FormPropsTextFields(props) {
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [openLoader, setOpenLoader] = React.useState(false);
 
+  const fetchData = () => {
+    axios.get(`${process.env.REACT_APP_API_URL}/client/${clientId}`)
+      .then((response) => {
+        setState({
+          client_name: response.data.data.client_name,
+          billing_address: response.data.data.billing_address,
+          shipping_address: response.data.data.shipping_address,
+          payment_terms: response.data.data.payment_terms,
+          notes: response.data.data.notes,
+          terms: response.data.data.terms,
+          date_of_contract: response.data.data.date_of_contract,
+        })
+      })
+      .catch((error) => {
+        const message = alert;
+        message.message = "Please check the client ID";
+        message.severity = "error"
+        setMessage(message);
+        setOpen(true);
+        setPageProp('add');
+        setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
+      })
+  }
 
   useEffect(() => {
-    const fetchData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/client/${clientId}`)
-        .then((response) => {
-          setState({
-            client_name: response.data.data.client_name,
-            billing_address: response.data.data.billing_address,
-            shipping_address: response.data.data.shipping_address,
-            payment_terms: response.data.data.payment_terms,
-            notes: response.data.data.notes,
-            terms: response.data.data.terms,
-            date_of_contract: response.data.data.date_of_contract,
-          })
-        })
-        .catch((error) => {
-          const message = alert;
-          message.message = "Please check the client ID";
-          message.severity = "error"
-          setMessage(message);
-          setOpen(true);
-          setPageProp('add');
-          setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
-        })
-    }
     if (pageProp === 'edit') {
       fetchData()
     }
-  },[pageProp,clientId,alert])
+  },[]);// eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
