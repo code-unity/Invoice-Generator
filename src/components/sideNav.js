@@ -126,7 +126,10 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
               <ListItemText primary='Add Client' />
             </ListItem>
-                       
+            <ListItem button onClick ={()=> history.push('/candidate')}>
+              <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
+              <ListItemText primary='Add Candidate' />
+            </ListItem>        
             <ListItem button onClick ={()=> history.push('/history')}>
               <ListItemIcon><AccessTimeRoundedIcon /></ListItemIcon>
               <ListItemText primary='Invoice History' />
@@ -140,6 +143,11 @@ export default function PersistentDrawerLeft(props) {
             <ListItem button onClick ={()=> history.push('/view-client')}>
               <ListItemIcon><ViewComfyIcon /></ListItemIcon>
               <ListItemText primary='View Client' />
+            </ListItem>
+
+            <ListItem button onClick ={()=> history.push('/view-candidate')}>
+              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+              <ListItemText primary='View Candidate' />
             </ListItem>
 
             <ListItem button onClick ={()=> {history.push('/');localStorage.clear()}}>

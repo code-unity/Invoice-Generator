@@ -14,8 +14,7 @@ import TableRow from '@mui/material/TableRow';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@mui/material/Paper';
 import history from '../../history';
-
-import Rows from '../../components/viewClientRows';
+import Rows from '../../components/viewCandidateRows';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -30,7 +29,7 @@ function Alert(props) {
       },
   }))
 
-const ViewClient = () => {
+const ViewCandidate = () => {
     const classes = useStyles();
     const [rows, setRows] = useState();
     const [open, setOpen] = React.useState(false);
@@ -38,10 +37,8 @@ const ViewClient = () => {
     const [openLoader, setOpenLoader] = React.useState(false);
 
     const fetchData = () => {
-        axios.get(`${process.env.REACT_APP_API_URL}/client`)
-            .then((res) => {
-                setRows(res.data.data.results)
-            });
+        axios.get(`${process.env.REACT_APP_API_URL}/candidate`)
+            .then((res) => {setRows(res.data.data)});
     }
 
     useEffect(() => {
@@ -52,26 +49,27 @@ const ViewClient = () => {
         if (reason === 'clickaway') {
           return;
         }
+    
         setOpen(false);
       };
     
 
     const deleteData = (id) => {
         setOpenLoader(true)
-        axios.delete(`${process.env.REACT_APP_API_URL}/client/${id}`)
+        axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
             .then((response) => {
                 setOpenLoader(false);
                 const message = alert;
-                message.message = "Client Details Deletion Successfully";
+                message.message = "Candidate Details Deletion Successfully";
                 message.severity = 'success';
                 setMessage(message);
                 setOpen(true);
-                history.push('/view-client')
+                history.push('/view-candidate')
             })
             .catch((error) => {
                 setOpenLoader(false);
                 const message = alert;
-                message.message = "Deletion Client Details Unsuccessful";
+                message.message = "Deletion Candidate Details Unsuccessful";
                 message.severity = "error"
                 setMessage(message);
                 setOpen(true);
@@ -80,16 +78,16 @@ const ViewClient = () => {
 
     return (
         <div style={{ width: '100vw' }}>
-            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginLeft: '2.6%', marginBottom:'1%'}} onClick={() => history.push('/client')}>
-                Add New Client
+            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginLeft: '2.6%', marginBottom:'1%'}} onClick={() => history.push('/candidate')}>
+                Add New Candidate
             </Button>
             <TableContainer component={Paper} sx={{ ml: 5 }}>
                 <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 'bold' }}>Details</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Client Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Date of Contract</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Date of Joining</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Edit</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Delete</TableCell>
                         </TableRow>
@@ -116,4 +114,4 @@ const ViewClient = () => {
     )
 }
 
-export default ViewClient
+export default ViewCandidate
