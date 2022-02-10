@@ -46,7 +46,11 @@ const ViewClient = () => {
 
     useEffect(() => {
         fetchData()
+<<<<<<< HEAD
     },[])
+=======
+    },[]);// eslint-disable-line react-hooks/exhaustive-deps
+>>>>>>> c98a254696f3df4cfc9bcddce9d278aba9d1a1bd
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
