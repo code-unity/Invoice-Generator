@@ -123,7 +123,6 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-<<<<<<< HEAD
             <ListItem button onClick ={()=> history.push('/client')}>
               <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
               <ListItemText primary='Add Client' />
@@ -141,7 +140,12 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Generate Invoice' />
             </ListItem>
-
+            <ListItem button onClick={() => history.push("/timesheet")}>
+            <ListItemIcon>
+              <ListAltIcon />
+            </ListItemIcon>
+            <ListItemText primary="Add Time Sheet" />
+          </ListItem>
             <ListItem button onClick ={()=> history.push('/view-client')}>
               <ListItemIcon><ViewComfyIcon /></ListItemIcon>
               <ListItemText primary='View Client' />
@@ -157,41 +161,6 @@ export default function PersistentDrawerLeft(props) {
               <ListItemText primary='Logout' />
             </ListItem>
             
-=======
-          <ListItem button onClick={() => history.push("/client")}>
-            <ListItemIcon>
-              <AccountBoxRoundedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Add Client" />
-          </ListItem>
-
-          <ListItem button onClick={() => history.push("/timesheet")}>
-            <ListItemIcon>
-              <ListAltIcon />
-            </ListItemIcon>
-            <ListItemText primary="Add Time Sheet" />
-          </ListItem>
-          <ListItem button onClick={() => history.push("/history")}>
-            <ListItemIcon>
-              <AccessTimeRoundedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Invoice History" />
-          </ListItem>
-          <ListItem button onClick={() => history.push("/home")}>
-            <ListItemIcon>
-              <AssignmentRoundedIcon />
-            </ListItemIcon>
-            <ListItemText primary="Generate Invoice" />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-client')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Client' />
-          </ListItem>
-          <ListItem button onClick={() => { history.push('/'); localStorage.clear() }}>
-            <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-            <ListItemText primary='Logout' />
-          </ListItem>
->>>>>>> c98a254696f3df4cfc9bcddce9d278aba9d1a1bd
         </List>
       </Drawer>
       <main
