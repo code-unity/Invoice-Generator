@@ -19,13 +19,13 @@ function App() {
       <Switch>
         <Route path="/" component={Login} exact />
         <ProtectedRoute path="/home" component={Home} exact />
-        <ProtectedRoute path="/client" component={Client} exact />
-        <ProtectedRoute path="/client/:id" component={Client} exact />
-        <ProtectedRoute path="/candidate" component={Candidate} exact />
-        <ProtectedRoute path="/candidate/:id" component={Candidate} exact />
+        <ProtectedRoute path="/client" key="add-client" component={Client} exact />
+        <ProtectedRoute path="/client/:id" key="edit-client" component={Client} exact />
+        <ProtectedRoute path="/candidate" key="add-candidate" component={Candidate} exact />
+        <ProtectedRoute path="/candidate/:id" key="edit-candidate" component={Candidate} exact />
         <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
         <ProtectedRoute path="/history" component={History} exact />
-        <ProtectedRoute path="/view-client" component={ViewClient} exact />
+        <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
       </Switch>
     </Router>

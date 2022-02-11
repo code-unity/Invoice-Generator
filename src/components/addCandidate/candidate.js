@@ -118,7 +118,6 @@ export default function FormPropsTextFields() {
     }
     setId(id)
     fetchClientData()
-    setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) })
     if (id) {
       fetchData()
     }

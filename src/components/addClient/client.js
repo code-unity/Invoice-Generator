@@ -94,7 +94,6 @@ export default function FormPropsTextFields() {
 
   useEffect(() => {
     setId(id)
-    setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) })
     if (id) {
       fetchData()
     }
