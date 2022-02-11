@@ -79,7 +79,6 @@ function Alert(props) {
 export default function FormPropsTextFields() {
   let { id } = useParams();
   const classes = useStyles();
-  const [Id, setId] = React.useState(id);
   const [clientData, setClientdata] = React.useState([]);
   const [candidateData, setState] = React.useState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
   const [open, setOpen] = React.useState(false);
@@ -89,7 +88,7 @@ export default function FormPropsTextFields() {
 
   useEffect(() => {
     const fetchData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${Id}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
         .then((response) => {
           setState({
             name: response.data.data.name,
@@ -101,13 +100,7 @@ export default function FormPropsTextFields() {
           })
         })
         .catch((error) => {
-          const message = alert;
-          message.message = "Please check the candidate ID";
-          message.severity = "error"
-          setMessage(message);
-          setOpen(true);
-          setId(null)
-          setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
+          history.push('/candidate')
         })
     }
     const fetchClientData = () => {
@@ -116,7 +109,6 @@ export default function FormPropsTextFields() {
           setClientdata(res.data.data.results);
         });
     }
-    setId(id)
     fetchClientData()
     if (id) {
       fetchData()
@@ -155,8 +147,8 @@ export default function FormPropsTextFields() {
       .catch(error => {
         setOpenLoader(false);
         const message = alert;
-        message.message = error.response.data.status.message;
-        message.severity = "error"
+        message.message = error?.response?.data?.status?.message;
+        message.severity = "error";
         setMessage(message);
         setOpen(true);
       })
@@ -178,7 +170,7 @@ export default function FormPropsTextFields() {
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = error.response.data.status.message;
+        message.message = error?.response?.data?.status?.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -187,7 +179,7 @@ export default function FormPropsTextFields() {
 
   const deleteData = () => {
     setOpenLoader(true)
-    axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${Id}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
@@ -200,7 +192,7 @@ export default function FormPropsTextFields() {
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = error.response.data.status.message;
+        message.message = error?.response?.data?.status?.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -216,7 +208,7 @@ export default function FormPropsTextFields() {
   return (
     <div>
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        {Id ? 'Edit Candidate Details' : 'Add Candidate'}
+        {id ? 'Edit Candidate Details' : 'Add Candidate'}
       </h1>
       <Box className="form">
 
@@ -311,11 +303,11 @@ export default function FormPropsTextFields() {
       </Box>
 
       <div style={{ marginLeft: "300px", marginTop: "10px" }}>
-        {!Id &&
+        {!id &&
           <Button type="reset" variant="contained" color="primary" onClick={printdata}>
             Add Candidate
           </Button>}
-        {Id &&
+        {id &&
           <div>
             <Button type="button" variant='contained' color="primary" onClick={updateData}>
               Save

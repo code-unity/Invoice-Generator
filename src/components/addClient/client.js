@@ -61,7 +61,6 @@ function Alert(props) {
 
 export default function FormPropsTextFields() {
   let { id } = useParams();
-  const [Id, setId] = React.useState(id);
   const classes = useStyles();
   const [clientData, setState] = React.useState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
   const [open, setOpen] = React.useState(false);
@@ -70,7 +69,7 @@ export default function FormPropsTextFields() {
   const [openLoader, setOpenLoader] = React.useState(false);
 
   const fetchData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client/${Id}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/client/${id}`)
       .then((response) => {
         setState({
           client_name: response.data.data.client_name,
@@ -83,17 +82,11 @@ export default function FormPropsTextFields() {
         })
       })
       .catch((error) => {
-        const message = alert;
-        message.message = "Please check the client ID";
-        message.severity = "error"
-        setMessage(message);
-        setOpen(true);
-        setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
+        history.push('/client')
       })
   }
 
   useEffect(() => {
-    setId(id)
     if (id) {
       fetchData()
     }
@@ -138,7 +131,7 @@ export default function FormPropsTextFields() {
 
   const updateData = () => {
     setOpenLoader(true);
-    axios.patch(`${process.env.REACT_APP_API_URL}/client/${Id}`, clientData, { headers: { 'Content-Type': 'application/json' } })
+    axios.patch(`${process.env.REACT_APP_API_URL}/client/${id}`, clientData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
@@ -160,7 +153,7 @@ export default function FormPropsTextFields() {
 
   const deleteData = () => {
     setOpenLoader(true)
-    axios.delete(`${process.env.REACT_APP_API_URL}/client/${Id}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/client/${id}`)
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
@@ -190,7 +183,7 @@ export default function FormPropsTextFields() {
   return (
     <div>
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        {Id ? 'Edit Client Details' : 'Add Client'}
+        {id ? 'Edit Client Details' : 'Add Client'}
       </h1>
       <Box className="form">
 
@@ -305,11 +298,11 @@ export default function FormPropsTextFields() {
       </Box>
 
       <div style={{ marginLeft: "300px", marginTop: "10px" }}>
-        {!Id &&
+        {!id &&
           <Button type="reset" variant="contained" color="primary" onClick={printdata}>
             Add Client
           </Button>}
-        {Id &&
+        {id &&
           <div>
             <Button type="button" variant='contained' color="primary" onClick={updateData}>
               Save
