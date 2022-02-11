@@ -19,16 +19,16 @@ import Rows from '../../components/viewClientRows';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-  }
+}
 
-  const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
     backdrop: {
         zIndex: theme.zIndex.drawer + 1,
         color: '#fff',
         display: 'flex',
         flexDirection: 'column'
-      },
-  }))
+    },
+}))
 
 const ViewClient = () => {
     const classes = useStyles();
@@ -46,15 +46,15 @@ const ViewClient = () => {
 
     useEffect(() => {
         fetchData()
-    },[])
+    }, [])
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
         setOpen(false);
-      };
-    
+    };
+
 
     const deleteData = (id) => {
         setOpenLoader(true)
@@ -80,7 +80,7 @@ const ViewClient = () => {
 
     return (
         <div style={{ width: '100vw' }}>
-            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginLeft: '2.6%', marginBottom:'1%'}} onClick={() => history.push('/client')}>
+            <Button type="button" variant='contained' color="primary" style={{ marginTop: '3%', marginLeft: '2.6%', marginBottom: '1%' }} onClick={() => history.push('/client')}>
                 Add New Client
             </Button>
             <TableContainer component={Paper} sx={{ ml: 5 }}>

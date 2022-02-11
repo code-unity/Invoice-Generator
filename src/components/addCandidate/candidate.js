@@ -15,6 +15,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
+import { useParams } from "react-router-dom";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -75,13 +76,10 @@ function Alert(props) {
 
 
 
-
-
-export default function FormPropsTextFields(props) {
-  const { candidateId } = props;
-
+export default function FormPropsTextFields() {
+  let { id } = useParams();
   const classes = useStyles();
-  const [pageProp, setPageProp] = React.useState(`${candidateId === 'none' ? 'add' : 'edit'}`);
+  const [Id, setId] = React.useState(id);
   const [clientData, setClientdata] = React.useState([]);
   const [candidateData, setState] = React.useState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
   const [open, setOpen] = React.useState(false);
@@ -91,7 +89,7 @@ export default function FormPropsTextFields(props) {
 
   useEffect(() => {
     const fetchData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${candidateId}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${Id}`)
         .then((response) => {
           setState({
             name: response.data.data.name,
@@ -108,7 +106,7 @@ export default function FormPropsTextFields(props) {
           message.severity = "error"
           setMessage(message);
           setOpen(true);
-          setPageProp('add');
+          setId(null)
           setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
         })
     }
@@ -118,14 +116,14 @@ export default function FormPropsTextFields(props) {
           setClientdata(res.data.data.results);
         });
     }
-    if (pageProp === 'edit') {
+    setId(id)
+    fetchClientData()
+    setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) })
+    if (id) {
       fetchData()
-    console.log("edit",pageProp)
-
     }
-    console.log(pageProp)
-    fetchClientData(pageProp)
-  }, [pageProp, candidateId, alert])
+  }, [id])// eslint-disable-line react-hooks/exhaustive-deps
+
 
   const birthDateChange = (date) => {
     setState({ ...candidateData, date_of_birth: String(date) })
@@ -158,7 +156,7 @@ export default function FormPropsTextFields(props) {
       .catch(error => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "add candidate unsuccessful";
+        message.message = error.response.data.status.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -168,7 +166,7 @@ export default function FormPropsTextFields(props) {
 
   const updateData = () => {
     setOpenLoader(true);
-    axios.put(`${process.env.REACT_APP_API_URL}/candidate/${candidateId}`, candidateData, { headers: { 'Content-Type': 'application/json' } })
+    axios.put(`${process.env.REACT_APP_API_URL}/candidate/${id}`, candidateData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
@@ -181,7 +179,7 @@ export default function FormPropsTextFields(props) {
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Updating Candidate Details Unsuccessful";
+        message.message = error.response.data.status.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -190,7 +188,7 @@ export default function FormPropsTextFields(props) {
 
   const deleteData = () => {
     setOpenLoader(true)
-    axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${candidateId}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${Id}`)
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
@@ -203,7 +201,7 @@ export default function FormPropsTextFields(props) {
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Deletion Candidate Details Unsuccessful";
+        message.message = error.response.data.status.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -219,8 +217,7 @@ export default function FormPropsTextFields(props) {
   return (
     <div>
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        {pageProp === 'add' && 'Add Candidate'}
-        {pageProp === 'edit' && 'Edit Candidate Details'}
+        {Id ? 'Edit Candidate Details' : 'Add Candidate'}
       </h1>
       <Box className="form">
 
@@ -315,11 +312,11 @@ export default function FormPropsTextFields(props) {
       </Box>
 
       <div style={{ marginLeft: "300px", marginTop: "10px" }}>
-        {pageProp === 'add' &&
+        {!Id &&
           <Button type="reset" variant="contained" color="primary" onClick={printdata}>
             Add Candidate
           </Button>}
-        {pageProp === 'edit' &&
+        {Id &&
           <div>
             <Button type="button" variant='contained' color="primary" onClick={updateData}>
               Save

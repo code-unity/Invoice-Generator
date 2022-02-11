@@ -18,16 +18,16 @@ import Rows from '../../components/viewCandidateRows';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-  }
+}
 
-  const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
     backdrop: {
         zIndex: theme.zIndex.drawer + 1,
         color: '#fff',
         display: 'flex',
         flexDirection: 'column'
-      },
-  }))
+    },
+}))
 
 const ViewCandidate = () => {
     const classes = useStyles();
@@ -38,21 +38,20 @@ const ViewCandidate = () => {
 
     const fetchData = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/candidate`)
-            .then((res) => {setRows(res.data.data)});
+            .then((res) => { setRows(res.data.data) });
     }
 
     useEffect(() => {
         fetchData()
-    },[])
+    }, [])
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
-    
         setOpen(false);
-      };
-    
+    };
+
 
     const deleteData = (id) => {
         setOpenLoader(true)
@@ -78,7 +77,7 @@ const ViewCandidate = () => {
 
     return (
         <div style={{ width: '100vw' }}>
-            <Button type="button" variant='contained' color="primary" style={{marginTop: '3%', marginLeft: '2.6%', marginBottom:'1%'}} onClick={() => history.push('/candidate')}>
+            <Button type="button" variant='contained' color="primary" style={{ marginTop: '3%', marginLeft: '2.6%', marginBottom: '1%' }} onClick={() => history.push('/candidate')}>
                 Add New Candidate
             </Button>
             <TableContainer component={Paper} sx={{ ml: 5 }}>

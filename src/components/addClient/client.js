@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import axios from 'axios'
+import axios from 'axios';
+import { useParams } from "react-router-dom";
 import { Box } from '@material-ui/core';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -58,11 +59,10 @@ function Alert(props) {
 
 
 
-export default function FormPropsTextFields(props) {
-  const { clientId } = props;
-
+export default function FormPropsTextFields() {
+  let { id } = useParams();
+  const [Id, setId] = React.useState(id);
   const classes = useStyles();
-  const [pageProp, setPageProp] = React.useState(`${clientId === 'none' ? 'add' : 'edit'}`);
   const [clientData, setState] = React.useState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
   const [open, setOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState(new Date());
@@ -70,7 +70,7 @@ export default function FormPropsTextFields(props) {
   const [openLoader, setOpenLoader] = React.useState(false);
 
   const fetchData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client/${clientId}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/client/${Id}`)
       .then((response) => {
         setState({
           client_name: response.data.data.client_name,
@@ -88,16 +88,17 @@ export default function FormPropsTextFields(props) {
         message.severity = "error"
         setMessage(message);
         setOpen(true);
-        setPageProp('add');
         setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
       })
   }
 
   useEffect(() => {
-    if (pageProp === 'edit') {
+    setId(id)
+    setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) })
+    if (id) {
       fetchData()
     }
-  },[]);// eslint-disable-line react-hooks/exhaustive-deps
+  }, [id]);// eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -138,46 +139,46 @@ export default function FormPropsTextFields(props) {
 
   const updateData = () => {
     setOpenLoader(true);
-    axios.patch(`${process.env.REACT_APP_API_URL}/client/${clientId}`, clientData,{ headers: { 'Content-Type': 'application/json' }})
-    .then((response) => {
-      setOpenLoader(false);
-      const message = alert;
-      message.message = "Client Details Updated Successfully";
-      message.severity = 'success';
-      setMessage(message);
-      setOpen(true);
-      history.push('/view-client')
-    })
-    .catch((error) => {
-      setOpenLoader(false);
+    axios.patch(`${process.env.REACT_APP_API_URL}/client/${Id}`, clientData, { headers: { 'Content-Type': 'application/json' } })
+      .then((response) => {
+        setOpenLoader(false);
+        const message = alert;
+        message.message = "Client Details Updated Successfully";
+        message.severity = 'success';
+        setMessage(message);
+        setOpen(true);
+        history.push('/view-client')
+      })
+      .catch((error) => {
+        setOpenLoader(false);
         const message = alert;
         message.message = "Updating Client Details Unsuccessful";
         message.severity = "error"
         setMessage(message);
-        setOpen(true);      
-    })
+        setOpen(true);
+      })
   }
 
   const deleteData = () => {
     setOpenLoader(true)
-    axios.delete(`${process.env.REACT_APP_API_URL}/client/${clientId}`)
-    .then((response) => {
-      setOpenLoader(false);
-      const message = alert;
-      message.message = "Client Details Deletion Successfully";
-      message.severity = 'success';
-      setMessage(message);
-      setOpen(true);
-      history.push('/view-client')
-    })
-    .catch((error) => {
-      setOpenLoader(false);
+    axios.delete(`${process.env.REACT_APP_API_URL}/client/${Id}`)
+      .then((response) => {
+        setOpenLoader(false);
+        const message = alert;
+        message.message = "Client Details Deletion Successfully";
+        message.severity = 'success';
+        setMessage(message);
+        setOpen(true);
+        history.push('/view-client')
+      })
+      .catch((error) => {
+        setOpenLoader(false);
         const message = alert;
         message.message = "Deletion Client Details Unsuccessful";
         message.severity = "error"
         setMessage(message);
-        setOpen(true);      
-    })
+        setOpen(true);
+      })
   }
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -190,8 +191,7 @@ export default function FormPropsTextFields(props) {
   return (
     <div>
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        {pageProp === 'add' && 'Add Client'}
-        {pageProp === 'edit' && 'Edit Client Details'}
+        {Id ? 'Edit Client Details' : 'Add Client'}
       </h1>
       <Box className="form">
 
@@ -306,11 +306,11 @@ export default function FormPropsTextFields(props) {
       </Box>
 
       <div style={{ marginLeft: "300px", marginTop: "10px" }}>
-        {pageProp === 'add' &&
+        {!Id &&
           <Button type="reset" variant="contained" color="primary" onClick={printdata}>
             Add Client
           </Button>}
-        {pageProp === 'edit' &&
+        {Id &&
           <div>
             <Button type="button" variant='contained' color="primary" onClick={updateData}>
               Save
