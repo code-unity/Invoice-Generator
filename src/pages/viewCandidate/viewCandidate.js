@@ -14,8 +14,7 @@ import TableRow from '@mui/material/TableRow';
 import MuiAlert from '@material-ui/lab/Alert';
 import Paper from '@mui/material/Paper';
 import history from '../../history';
-
-import Rows from '../../components/viewClientRows';
+import Rows from '../../components/viewCandidateRows';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -30,19 +29,32 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const ViewClient = () => {
+const ViewCandidate = () => {
     const classes = useStyles();
     const [rows, setRows] = useState();
     const [open, setOpen] = React.useState(false);
     const [alert, setMessage] = React.useState({ message: "", severity: "" });
     const [openLoader, setOpenLoader] = React.useState(false);
+    const [clientData, setClientdata] = React.useState([]);
+
 
     const fetchData = () => {
-        axios.get(`${process.env.REACT_APP_API_URL}/client`)
+        axios.get(`${process.env.REACT_APP_API_URL}/candidate`)
             .then((res) => {
-                setRows(res.data.data.results)
+                setRows(res.data.data)
+            })
+        axios.get(`${process.env.REACT_APP_API_URL}/client`)
+            .then((response) => {
+                setClientdata(response.data.data.results);
             });
+
     }
+    
+    const getName = (row, clientData) => {
+        const dummy = clientData.filter((item) =>  item._id === row.assigned_to)
+        return  dummy[0].client_name
+    }
+
 
     useEffect(() => {
         fetchData()
@@ -58,20 +70,20 @@ const ViewClient = () => {
 
     const deleteData = (id) => {
         setOpenLoader(true)
-        axios.delete(`${process.env.REACT_APP_API_URL}/client/${id}`)
+        axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
             .then((response) => {
                 setOpenLoader(false);
                 const message = alert;
-                message.message = "Client Details Deletion Successfully";
+                message.message = "Candidate Details Deletion Successfully";
                 message.severity = 'success';
                 setMessage(message);
                 setOpen(true);
-                history.push('/view-client')
+                history.push('/view-candidate')
             })
             .catch((error) => {
                 setOpenLoader(false);
                 const message = alert;
-                message.message = "Deletion Client Details Unsuccessful";
+                message.message = "Deletion Candidate Details Unsuccessful";
                 message.severity = "error"
                 setMessage(message);
                 setOpen(true);
@@ -80,23 +92,23 @@ const ViewClient = () => {
 
     return (
         <div style={{ width: '100vw' }}>
-            <Button type="button" variant='contained' color="primary" style={{ marginTop: '3%', marginLeft: '2.6%', marginBottom: '1%' }} onClick={() => history.push('/client')}>
-                Add New Client
+            <Button type="button" variant='contained' color="primary" style={{ marginTop: '3%', marginLeft: '2.6%', marginBottom: '1%' }} onClick={() => history.push('/candidate')}>
+                Add New Candidate
             </Button>
             <TableContainer component={Paper} sx={{ ml: 5 }}>
                 <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 'bold' }}>Details</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Client Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Date of Contract</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Date of Joining</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Edit</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows !== undefined && rows.map((row) => (
-                            <Rows key={row._id} row={row} deleteData={deleteData} />
+                        {rows !== undefined && clientData.length > 0 && rows.map((row) => (
+                            <Rows key={row._id} row={row} assignedTo={getName(row, clientData)} deleteData={deleteData} />
                         ))}
                     </TableBody>
                 </Table>
@@ -116,4 +128,4 @@ const ViewClient = () => {
     )
 }
 
-export default ViewClient
+export default ViewCandidate

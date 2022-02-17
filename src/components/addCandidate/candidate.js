@@ -3,7 +3,11 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
-import { useParams } from "react-router-dom";
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 import { Box } from '@material-ui/core';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -11,6 +15,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
+import { useParams } from "react-router-dom";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -48,8 +53,22 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column'
   },
+  formControl: {
+    marginBottom: theme.spacing(1),
+    minWidth: 250,
+    maxWidth: 300,
+  },
 }));
-
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 300,
+    },
+  },
+};
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -57,50 +76,57 @@ function Alert(props) {
 
 
 
-
-
 export default function FormPropsTextFields() {
   let { id } = useParams();
   const classes = useStyles();
-  const [clientData, setState] = React.useState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
+  const [clientData, setClientdata] = React.useState([]);
+  const [candidateData, setState] = React.useState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
   const [open, setOpen] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [openLoader, setOpenLoader] = React.useState(false);
 
-  const fetchData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client/${id}`)
-      .then((response) => {
-        setState({
-          client_name: response.data.data.client_name,
-          billing_address: response.data.data.billing_address,
-          shipping_address: response.data.data.shipping_address,
-          payment_terms: response.data.data.payment_terms,
-          notes: response.data.data.notes,
-          terms: response.data.data.terms,
-          date_of_contract: response.data.data.date_of_contract,
-        })
-      })
-      .catch((error) => {
-        history.push('/client')
-      })
-  }
 
   useEffect(() => {
+    const fetchData = () => {
+      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
+        .then((response) => {
+          setState({
+            name: response.data.data.name,
+            email: response.data.data.email,
+            assigned_to: response.data.data.assigned_to,
+            payment_terms: response.data.data.payment_terms,
+            date_of_birth: response.data.data.date_of_birth,
+            date_of_Joining: response.data.data.date_of_Joining
+          })
+        })
+        .catch((error) => {
+          history.push('/candidate')
+        })
+    }
+    const fetchClientData = () => {
+      axios.get(`${process.env.REACT_APP_API_URL}/client`)
+        .then((res) => {
+          setClientdata(res.data.data.results);
+        });
+    }
+    fetchClientData()
     if (id) {
       fetchData()
     }
-  }, []);// eslint-disable-line react-hooks/exhaustive-deps
+  }, [])// eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    clientData.date_of_contract = String(date);
+
+  const birthDateChange = (date) => {
+    setState({ ...candidateData, date_of_birth: String(date) })
   };
+  const joiningDateChange = (date) => {
+    setState({ ...candidateData, date_of_Joining: String(date) })
 
+  };
 
   const handleChange = e => {
     setState({
-      ...clientData,
+      ...candidateData,
       [e.target.name]: e.target.value,
     });
   }
@@ -108,21 +134,21 @@ export default function FormPropsTextFields() {
 
   function printdata() {
     setOpenLoader(true);
-    axios.post(`${process.env.REACT_APP_API_URL}/client`, clientData, { headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/candidate`, candidateData, { headers: { 'Content-Type': 'application/json' } })
       .then(function (response) {
         setOpenLoader(false);
         const message = alert;
-        message.message = "client added successfully";
+        message.message = "candidate added successfully";
         message.severity = "success"
         setMessage(message);
         setOpen(true);
-        setState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
+        setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
       })
       .catch(error => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "add client unsuccessful";
-        message.severity = "error"
+        message.message = error?.response?.data?.status?.message;
+        message.severity = "error";
         setMessage(message);
         setOpen(true);
       })
@@ -131,20 +157,20 @@ export default function FormPropsTextFields() {
 
   const updateData = () => {
     setOpenLoader(true);
-    axios.patch(`${process.env.REACT_APP_API_URL}/client/${id}`, clientData, { headers: { 'Content-Type': 'application/json' } })
+    axios.put(`${process.env.REACT_APP_API_URL}/candidate/${id}`, candidateData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Client Details Updated Successfully";
+        message.message = "Candidate Details Updated Successfully";
         message.severity = 'success';
         setMessage(message);
         setOpen(true);
-        history.push('/view-client')
+        history.push('/view-candidate')
       })
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Updating Client Details Unsuccessful";
+        message.message = error?.response?.data?.status?.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -153,20 +179,20 @@ export default function FormPropsTextFields() {
 
   const deleteData = () => {
     setOpenLoader(true)
-    axios.delete(`${process.env.REACT_APP_API_URL}/client/${id}`)
+    axios.delete(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
       .then((response) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Client Details Deletion Successfully";
+        message.message = "Candidate Details Deletion Successfully";
         message.severity = 'success';
         setMessage(message);
         setOpen(true);
-        history.push('/view-client')
+        history.push('/view-candidate')
       })
       .catch((error) => {
         setOpenLoader(false);
         const message = alert;
-        message.message = "Deletion Client Details Unsuccessful";
+        message.message = error?.response?.data?.status?.message;
         message.severity = "error"
         setMessage(message);
         setOpen(true);
@@ -176,14 +202,13 @@ export default function FormPropsTextFields() {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpen(false);
   };
 
   return (
     <div>
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        {id ? 'Edit Client Details' : 'Add Client'}
+        {id ? 'Edit Candidate Details' : 'Add Candidate'}
       </h1>
       <Box className="form">
 
@@ -194,47 +219,21 @@ export default function FormPropsTextFields() {
                 <TextField
                   id="outlined-required"
                   required
-                  label="Name of the client"
-                  name="client_name"
-                  value={clientData.client_name}
+                  label="Name of the candidate"
+                  name="name"
+                  value={candidateData.name}
                   variant="outlined"
                   onChange={handleChange}
-
                 />
               </div>
-              <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <div style={{ marginRight: "15px", marginTop: '30px', marginBottom: '15px' }}>
                 <TextField
                   required
                   id="outlined-required"
-                  label="Bill To"
+                  label="Email"
                   variant="outlined"
-                  name="billing_address"
-                  value={clientData.billing_address}
-                  onChange={handleChange}
-                />
-              </div>
-              <div style={{ float: "right", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
-                <TextField
-                  required
-                  id="outlined-required"
-                  label="Ship To"
-                  variant="outlined"
-                  name="shipping_address"
-                  value={clientData.shipping_address}
-                  onChange={handleChange}
-                />
-              </div>
-
-
-              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
-                <TextField
-                  id="outlined-textarea"
-                  label="Payment Terms"
-                  multiline
-                  variant="outlined"
-                  inputProps={{ className: classes.payment }}
-                  name="payment_terms"
-                  value={clientData.payment_terms}
+                  name="email"
+                  value={candidateData.email}
                   onChange={handleChange}
                 />
               </div>
@@ -246,61 +245,67 @@ export default function FormPropsTextFields() {
                     format="yyyy-MM-dd"
                     margin="normal"
                     id="date-picker-inline"
-                    label="Date of contract"
-                    value={selectedDate}
-                    onChange={handleDateChange}
+                    label="Date of Birth"
+                    value={candidateData.date_of_birth}
+                    onChange={birthDateChange}
                     KeyboardButtonProps={{
                       'aria-label': 'change date',
                     }}
                   />
                 </MuiPickersUtilsProvider>
               </div>
-
+              <FormControl className={classes.formControl}>
+                <InputLabel id="demo-mutiple-name-label">Assigned To</InputLabel>
+                <Select
+                  labelId="demo-mutiple-name-label"
+                  id="demo-mutiple-name"
+                  value={candidateData.assigned_to}
+                  onChange={handleChange}
+                  name="assigned_to"
+                  input={<Input />}
+                  MenuProps={MenuProps}
+                >{clientData.map((name) => (
+                  <MenuItem key={name._id} value={name._id}>{name.client_name}</MenuItem>
+                ))}</Select>
+              </FormControl>
+              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <KeyboardDatePicker
+                    disableToolbar
+                    variant="inline"
+                    format="yyyy-MM-dd"
+                    margin="normal"
+                    id="date-picker-inline"
+                    label="Date of Joining"
+                    value={candidateData.date_of_Joining}
+                    onChange={joiningDateChange}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                  />
+                </MuiPickersUtilsProvider>
+              </div>
+              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
+                <TextField
+                  id="outlined-textarea"
+                  label="Payment Terms"
+                  multiline
+                  variant="outlined"
+                  inputProps={{ className: classes.payment }}
+                  name="payment_terms"
+                  value={candidateData.payment_terms}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </form>
-          <div style={{ float: 'left', overflow: 'hidden' }}>
-            <div style={{ marginTop: '15px' }}>
-              <TextField
-                id="outlined-textarea"
-                label="Notes"
-                placeholder="Notes - any relevant information already not covered"
-                multiline
-                variant="outlined"
-                inputProps={{
-                  className: classes.multiline
-                }}
-                name="notes"
-                value={clientData.notes}
-                onChange={handleChange}
-
-
-              />
-            </div>
-            <div style={{ marginTop: "15px", marginBottom: "20px" }}>
-              <TextField
-                id="outlined-textarea"
-                label="Terms"
-                placeholder="Terms and conditions"
-                multiline
-                variant="outlined"
-                inputProps={{
-                  className: classes.multiline
-                }}
-                name="terms"
-                value={clientData.terms}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </div>
-        <div style={{ clear: 'both' }}>
         </div>
       </Box>
 
       <div style={{ marginLeft: "300px", marginTop: "10px" }}>
         {!id &&
           <Button type="reset" variant="contained" color="primary" onClick={printdata}>
-            Add Client
+            Add Candidate
           </Button>}
         {id &&
           <div>
