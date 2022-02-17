@@ -35,11 +35,26 @@ const ViewCandidate = () => {
     const [open, setOpen] = React.useState(false);
     const [alert, setMessage] = React.useState({ message: "", severity: "" });
     const [openLoader, setOpenLoader] = React.useState(false);
+    const [clientData, setClientdata] = React.useState([]);
+
 
     const fetchData = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/candidate`)
-            .then((res) => { setRows(res.data.data) });
+            .then((res) => {
+                setRows(res.data.data)
+            })
+        axios.get(`${process.env.REACT_APP_API_URL}/client`)
+            .then((response) => {
+                setClientdata(response.data.data.results);
+            });
+
     }
+    
+    const getName = (row, clientData) => {
+        const dummy = clientData.filter((item) =>  item._id === row.assigned_to)
+        return  dummy[0].client_name
+    }
+
 
     useEffect(() => {
         fetchData()
@@ -92,8 +107,8 @@ const ViewCandidate = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows !== undefined && rows.map((row) => (
-                            <Rows key={row._id} row={row} deleteData={deleteData} />
+                        {rows !== undefined && clientData.length > 0 && rows.map((row) => (
+                            <Rows key={row._id} row={row} assignedTo={getName(row, clientData)} deleteData={deleteData} />
                         ))}
                     </TableBody>
                 </Table>

@@ -16,14 +16,16 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { Row } from 'react-bootstrap';
 import history from '../history';
 
+
 const Rows = (props) => {
-    const { row } = props
+    const { row, assignedTo } = props
     const { deleteData } = props
     const [open, setOpen] = useState(false);
 
     const onDeleteData = () => {
         deleteData(row._id)
     }
+
     return (
         <React.Fragment>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -82,7 +84,7 @@ const Rows = (props) => {
                                         </TableCell>
                                         <TableCell>{row.date_of_birth.substr(0, 16)}</TableCell>
                                         <TableCell>{row.payment_terms}</TableCell>
-                                        <TableCell>{row.assigned_to}</TableCell>
+                                        <TableCell>{assignedTo}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>

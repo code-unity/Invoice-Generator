@@ -10,6 +10,8 @@ import { Route, Router, Switch } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
+import ViewTimeSheet from "./components/viewTimesheet";
+
 
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
         <ProtectedRoute path="/candidate" key="add-candidate" component={Candidate} exact />
         <ProtectedRoute path="/candidate/:id" key="edit-candidate" component={Candidate} exact />
         <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
+        <ProtectedRoute path="/view-timesheet" component={ViewTimeSheet} exact />
         <ProtectedRoute path="/history" component={History} exact />
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
