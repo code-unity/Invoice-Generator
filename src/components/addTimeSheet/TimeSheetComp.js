@@ -7,7 +7,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
 import axios from "axios";
-import './timeSheet.css'
+import './timeSheet.css';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker,
+} from '@material-ui/pickers';
 
 const useStyles = makeStyles((theme) => ({
   backdrop: {
@@ -25,11 +31,22 @@ function Alert(props) {
 const TimeSheetComp = () => {
   const classes = useStyles();
   const [sheet, setSheet] = useState([]);
-  const updatedsheet = [];
-  const [updatedIndex, setUpdatedIndex] = useState({});
+  const [updatedsheet,setUpdatedsheet] = useState([]);
   const [duplicateData, setDuplicateData] = useState({ description: '', no_of_hours: '', attendance: 'Present', date: '' });
   const [open, setOpen] = useState(false);
   const [openLoader, setOpenLoader] = useState(false);
+  const [dates, setDates] = useState({
+    from_date:new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    to_date:new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+  })
+
+    const fromDateChange = (date) => {
+        setDates({...dates, from_date: date })
+    };
+    const toDateChange = (date) => {
+        setDates({...dates, to_date: date })
+    };
+
   const columns = [
     { title: 'Descrition', field: 'description', type: 'string', align: 'left' },
     { title: 'Number of Hours', field: 'no_of_hours', type: 'numeric', align: 'left' },
@@ -41,7 +58,6 @@ const TimeSheetComp = () => {
     new Promise((resolve, reject) => {
       setDuplicateData({ description: '', no_of_hours: '', attendance: 'Present', date: '' })
       setTimeout(() => {
-        console.log(newData)
         setSheet([...sheet, newData]);
         resolve();
       }, 1000)
@@ -54,7 +70,7 @@ const TimeSheetComp = () => {
         const index = oldData.tableData.id;
         dataUpdate[index] = newData;
         if (newData._id) {
-          setUpdatedIndex({ ...updatedIndex, [index]: index })
+          setUpdatedsheet([...updatedsheet,newData._id])
         }
         setSheet([...dataUpdate]);
         setDuplicateData({})
@@ -76,7 +92,20 @@ const TimeSheetComp = () => {
   const onRowAddCancelled = () => {
     setDuplicateData({ description: '', no_of_hours: '', attendance: 'Present', date: '' })
   }
+  const onClickDuplicate = (event, rowData) => {
+    const id= rowData.tableData.id+1
+    const date=new Date(rowData.date)
+    date.setDate(date.getDate() + 1)
 
+    const newData = {
+      description: rowData.description, no_of_hours: rowData.no_of_hours,
+      attendance: rowData.attendance, date:new Date(date).toISOString()
+    }
+
+   sheet.splice(id, 0, newData)
+    setSheet([...sheet])
+
+  }
   const options = {
     actionsColumnIndex: -1,
     search: false,
@@ -97,14 +126,7 @@ const TimeSheetComp = () => {
     setOpen(false);
   };
 
-  const onClickDuplicate = (event, rowData) => {
-    const newData = {
-      description: rowData.description, no_of_hours: rowData.no_of_hours,
-      attendance: rowData.attendance, date: rowData.date, tableData: { id: sheet.length }
-    }
-    setSheet([...sheet, newData])
-  }
-  function submitData() {
+  const submitData=()=> {
     if (sheet.length === 0) {
       const message = alert;
       message.message = "Please Add Atleast One Entry";
@@ -113,13 +135,11 @@ const TimeSheetComp = () => {
       setOpen(true);
       return
     }
-    setOpenLoader(true);
-    for (var key in updatedIndex) {
-      updatedsheet.push(sheet[key])
-    }
-    setOpenLoader(false);
     if (updatedsheet.length) {
-      axios.put(`${process.env.REACT_APP_API_URL}/timesheet`, updatedsheet, {
+    const unique=[...new Set(updatedsheet)]
+    const putSheet=sheet.filter((data,i)=>data._id===unique[i])
+    console.log(putSheet)
+      axios.put(`${process.env.REACT_APP_API_URL}/timesheet`, putSheet, {
         headers: { "Content-Type": "application/json" },
       })
         .then(function (response) {
@@ -162,13 +182,31 @@ const TimeSheetComp = () => {
         });
     }
   }
+  function searchData() {
+    axios.get(`${process.env.REACT_APP_API_URL}/timesheet?from_date=${dates.from_date}&&to_date=${dates.to_date}`, {
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(function (response) {
+        response.data.status.data.sort((a,b) =>  new Date(a.date) - new Date(b.date))
+        setSheet(response.data.status.data)
 
+      })
+      .catch((error) => {
+        setOpenLoader(false);
+        const message = alert;
+        message.message = "Submission Failed";
+        message.severity = "error";
+        setMessage(message);
+        setOpen(!open);
+      });
+  }
   useEffect(() => {
     const fetchData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/timesheet`, {
+      axios.get(`${process.env.REACT_APP_API_URL}/timesheet?from_date=${dates.from_date}&&to_date=${dates.to_date}`, {
         headers: { "Content-Type": "application/json" },
       })
         .then(function (response) {
+        response.data.status.data.sort((a,b) =>  new Date(a.date) - new Date(b.date))
           setSheet(response.data.status.data)
         })
         .catch((error) => {
@@ -184,6 +222,48 @@ const TimeSheetComp = () => {
   }, [open])// eslint-disable-line react-hooks/exhaustive-deps
 
   return (<div  className="bg-container">
+    <div className="first-row">
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                format="yyyy-MM-dd"
+                margin="normal"
+                id="date-picker-inline"
+                label="From"
+                value={dates.from_date}
+                onChange={fromDateChange}
+                KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                }}
+            />
+        </MuiPickersUtilsProvider>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                format="yyyy-MM-dd"
+                margin="normal"
+                id="date-picker-inline"
+                label="To"
+                value={dates.to_date}
+                onChange={toDateChange}
+                KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                }}
+            />
+        </MuiPickersUtilsProvider>
+    <div className="search-container">
+      <Button
+        type="button"
+        variant='contained'
+        color="primary"
+        onClick={searchData}
+      >
+        Search
+      </Button>
+      </div>
+      </div>
     <MaterialTable
       title='Time Sheet Table'
       data={sheet}
