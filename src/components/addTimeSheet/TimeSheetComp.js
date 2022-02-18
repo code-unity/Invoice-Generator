@@ -137,8 +137,7 @@ const TimeSheetComp = () => {
     }
     if (updatedsheet.length) {
     const unique=[...new Set(updatedsheet)]
-    const putSheet=sheet.filter((data,i)=>data._id===unique[i])
-    console.log(putSheet)
+    const putSheet=sheet.filter((data)=>unique.includes(data._id))
       axios.put(`${process.env.REACT_APP_API_URL}/timesheet`, putSheet, {
         headers: { "Content-Type": "application/json" },
       })
