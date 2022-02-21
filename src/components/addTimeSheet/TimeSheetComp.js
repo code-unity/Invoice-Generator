@@ -83,6 +83,10 @@ const TimeSheetComp = () => {
       setTimeout(() => {
         const dataDelete = [...sheet];
         const index = oldData.tableData.id;
+        console.log(oldData)
+        if(oldData._id){
+        axios.delete(`${process.env.REACT_APP_API_URL}/timesheet/${oldData._id}`)
+      }
         dataDelete.splice(index, 1);
         setSheet([...dataDelete]);
         resolve()
