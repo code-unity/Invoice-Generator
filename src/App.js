@@ -11,7 +11,7 @@ import ProtectedRoute from './ProtectedRoute';
 import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
-
+import ViewScheduledInvoice from './pages/ViewScheduledInvoice';
 
 
 function App() {
@@ -30,6 +30,7 @@ function App() {
         <ProtectedRoute path="/history" component={History} exact />
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
+        <ProtectedRoute path="/view-scheduled-invoice" component={ViewScheduledInvoice} exact />
       </Switch>
     </Router>
   );
