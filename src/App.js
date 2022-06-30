@@ -11,7 +11,7 @@ import ProtectedRoute from './ProtectedRoute';
 import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
-import ScheduleInvoice from './components/ScheduleInvoice';
+import ScheduleInvoice from './components/scheduleInvoice/ScheduleInvoice';
 
 
 function App() {

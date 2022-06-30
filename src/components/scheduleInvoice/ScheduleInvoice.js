@@ -1,24 +1,18 @@
 import React from "react";
 import './ScheduleInvoice.css';
-import TextField from '@material-ui/core/TextField';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
-//import DeleteIcon from '@material-ui/icons/Delete';
-//import IconButton from '@material-ui/core/IconButton';
-//import CircularProgress from '@material-ui/core/CircularProgress';
-//import Backdrop from '@material-ui/core/Backdrop';
 import axios from 'axios';
-import './invoiceForm.css'
+import '.././invoiceForm.css'
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
-//import Snackbar from '@material-ui/core/Snackbar';
-//import InputAdornment from '@mui/material/InputAdornment';
-//import TextareaAutosize from '@mui/material/TextareaAutosize';
+import TimePicker from 'react-time-picker-input';
+import "react-time-picker-input/dist/components/TimeInput.css"
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -106,86 +100,69 @@ const useStyles = makeStyles((theme) => ({
     },
   };
   
-
-  
-  
-  function getStyles(name, personName, theme) {
-    return {
-      fontWeight:
-        personName.indexOf(name) === -1
-          ? theme.typography.fontWeightRegular
-          : theme.typography.fontWeightMedium,
-    };
-  }
-  
 export default function ScheduleInvoice () {
     const classes = useStyles();
-    const [personName, setPersonName] = React.useState('');
-  const [clientData, setClientData] = React.useState([]);
-  const theme = useTheme();
-  const [open,setOpen]=React.useState(false)
-  const [invoiceNumber, setInvoiceNumber] = React.useState('0');
-  const [selectedDate, setSelectedDate] = React.useState(new Date().toDateString());
-  const [selectedTime, setSelectedTime] = React.useState('10:00');
-  const [invoiceHistory, setInvoiceHistory] = React.useState([]);
-  const [frequency, setFrequency] = React.useState('');
-  const frequencyList = [{item : 'Daily'},{item : 'Weekly'},{item : 'Monthly'},{item : 'Anually'}]
-  const [time, setTime] = React.useState();
-  const timeList = [{item : '9.00 AM'},{item : '10.00 AM'},{item : '11.00 AM'},{item : '12.00 PM'}]
-  {frequencyList.map((temp) =>{
-    console.log(temp.item);
-  })}
-  const handleTime = (e) => {
-    setTime(e.target.value);
-    ScheduleData.time=e.target.value;
-  }
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    ScheduleData.date=date;
-  };
-  const handleFrequency = (e) => {
-    setFrequency(e.target.value);
-    ScheduleData.frequency=e.target.value;
-  }
-  const fetchData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client`)
-      .then((res) => {
-        setOpen(false)
-        setClientData(res.data.data.results);
-        //{res.data.data.results.map((name) => {console.log(name)})}
-      });
-      axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
-      .then((res) => {
-        setOpen(false);
-        setInvoiceHistory(res.data.data.results);
-      });
-  };
-  const [ScheduleData, setScheduleData] = React.useState({
-    client: '',
-    invoiceNumber:'0',
-    date: String(new Date().toDateString()),
-    frequency : '',
-    time : '9.00 AM',
-  });
-  {clientData.map((temp) => {
-    console.log('thisis sample test',temp)
-  })}
-  {invoiceHistory.map((temp) => {
-    console.log('thisis sample invoice',temp.invoice_number)
-  })}
-  function handleChange(event) {
-    if (event.target.value !== "") {
-      ScheduleData.client = event.target.value;
+    const [clientId, setClientId] = React.useState([]);
+    const [invoiceNumber, setInvoiceNumber] = React.useState('');
+    const [selectedDate, setSelectedDate] = React.useState(Date.now());
+    const [invoiceHistory, setInvoiceHistory] = React.useState([]);
+    const [frequency, setFrequency] = React.useState('');
+    const frequencyList = [{item : 'Daily'},{item : 'Weekly'},{item : 'Monthly'},{item : 'Anually'}];
+    const [selectedTime, setSelectedTime] = React.useState('');
+    const [scheduleData, setScheduledData] = React.useState({
+        client: '',
+        invoiceNumber:'0',
+        date: String(new Date().toDateString()),
+        frequency : '',
+        time : '9.00 AM',
+    });
+
+    const handleTime = (e) => {
+        setSelectedTime(e);
+        scheduleData.time=e;
+    };
+    
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        scheduleData.date=date;
+    };
+    
+    const handleFrequency = (e) => {
+        setFrequency(e.target.value);
+        scheduleData.frequency=e.target.value;
+    };
+ 
+    function handleChange(event) {
+        if (event.target.value !== "") {
+            scheduleData.client = event.target.value;
+        }
+    };
+    function handleInvoiceChange(e) {
+        setInvoiceNumber(e.target.value);
+        scheduleData.invoiceNumber=e.target.value;
     }
-    console.log(ScheduleData);
-  };
-  function handleInvoiceChange(e) {
-    setInvoiceNumber(e.target.value);
-    ScheduleData.invoiceNumber=e.target.value;
-  }
-  React.useEffect(() => {
-    fetchData();
-  }, []);
+
+    const fetchData = () => {
+        try {
+            axios.get(`${process.env.REACT_APP_API_URL}/client`)
+            .then((res) => {
+            setClientId(res.data.data.results);});
+        }
+        catch(err) {
+            // To be filled
+        }
+        try{
+            axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
+            .then((res) => {
+            setInvoiceHistory(res.data.data.results);});
+        }
+        catch(err){
+            // To be filled 
+        }
+    };
+    React.useEffect(() => {
+        fetchData();
+    }, []);
     return(
         <>
             <div className="Main-box">
@@ -202,12 +179,12 @@ export default function ScheduleInvoice () {
                             MenuProps={MenuProps}
                         >
                             <MenuItem value="">
-                            <em>None</em>
+                                <em>None</em>
                             </MenuItem>
-                            {clientData.map((king) => (
-                            <MenuItem key={king._id} value={king._id} style={getStyles(king.client_name, personName, theme)}>
-                                {king.client_name}
-                            </MenuItem>
+                            {clientId.map((client) => (
+                                <MenuItem key={client._id} value={client._id} >
+                                    {client.client_name}
+                                </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
@@ -222,12 +199,12 @@ export default function ScheduleInvoice () {
                             MenuProps={MenuProps}
                         >
                             <MenuItem value="">
-                            <em>None</em>
+                                <em>None</em>
                             </MenuItem>
-                            {invoiceHistory.map((king) => (
-                            <MenuItem key={king.invoice_number} value={king.invoice_number} >
-                                {king.invoice_number}
-                            </MenuItem>
+                            {invoiceHistory.map((item) => (
+                                <MenuItem key={item.invoice_number} value={item.invoice_number} >
+                                    {item.invoice_number}
+                                </MenuItem>
                             ))}
                             
                         </Select>
@@ -261,46 +238,34 @@ export default function ScheduleInvoice () {
                             MenuProps={MenuProps}
                         >
                             <MenuItem value="">
-                            <em>None</em>
+                                <em>None</em>
                             </MenuItem>
-                            {frequencyList.map((temp) => (
-                                <MenuItem key = {temp.item} value={temp.item} >
-                                    {temp.item}
-                                </MenuItem>
-                            ))}
+                                {frequencyList.map((temp) => (
+                                    <MenuItem key = {temp.item} value={temp.item} >
+                                        {temp.item}
+                                    </MenuItem>
+                                ))}
                         </Select>
                     </FormControl>
-                    <div className="leftDivision" style={{width:'100%',display:'flex'}}>
-                    <FormControl className={classes.formControl} style={{float:'left',marginLeft:'40px',marginTop:'45px',}}>
-                        <InputLabel id="demo-mutiple-name-label">Select Time</InputLabel>
-                        <Select
-                            labelId="demo-mutiple-name-label"
-                            id="demo-mutiple-name"
-                            defaultValue={""}
-                            onChange={(e) => {handleTime(e)}}
-                            input={<Input />}
-                            MenuProps={MenuProps}
-                        >
-                            <MenuItem value="">
-                            <em>None</em>
-                            </MenuItem>
-                            {timeList.map((temp) => (
-                                <MenuItem key = {temp.item} value={temp.item} >
-                                    {temp.item}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <div className='time-picker-div'>
+                        Pick Time
+                        <TimePicker
+                            value={selectedTime}
+                            onChange={(e)=>handleTime(e)} 
+                        />
                     </div>
-                    
-                    
+                    <div style={{float:'left' ,marginTop:'150px'}}>
+                    <Button type="submit" className='button-schedule-page' variant="contained" color="primary">
+                        Create Invoice
+                    </Button>
+                </div>
+                <div style={{float:'right', marginTop:'150px'}}>
+                    <Button type="submit" className='button-schedule-page' variant="contained" color="primary" onClick={ console.log(scheduleData)}>
+                        Submit Schedule
+                    </Button>
+                </div>
                 </div>
             </div>
-            <div style={{marginLeft:'300px',marginTop:'10px'}}>
-                    <Button type="submit" variant="contained" color="primary" onClick={ console.log(ScheduleData)}>
-            Submit Schedule
-          </Button>
-                    </div>
         </>
     )
 }
