@@ -110,6 +110,7 @@ export default function ScheduleInvoice () {
     const frequencyList = [{item : 'Daily'},{item : 'Weekly'},{item : 'Monthly'},{item : 'Anually'}];
     const [selectedTime, setSelectedTime] = React.useState('');
     const [scheduleData, setScheduledData] = React.useState({
+        is_active: true ,
         client: '',
         invoiceNumber:'0',
         date: String(new Date().toDateString()),
