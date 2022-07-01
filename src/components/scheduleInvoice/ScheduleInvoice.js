@@ -114,17 +114,23 @@ export default function ScheduleInvoice () {
         invoiceNumber:'0',
         date: String(new Date().toDateString()),
         frequency : '',
-        time : '9.00 AM',
+        time : '',
     });
-
+    const convert = (str) => {
+        var date = new Date(str),
+        mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+        day = ("0" + date.getDate()).slice(-2);
+        return [date.getFullYear(), mnth, day].join("-");
+    }
     const handleTime = (e) => {
         setSelectedTime(e);
         scheduleData.time=e;
     };
     
     const handleDateChange = (date) => {
-        setSelectedDate(date);
-        scheduleData.date=date;
+        const dateInReqFormat=convert(date);
+        setSelectedDate(dateInReqFormat);
+        scheduleData.date=dateInReqFormat;
     };
     
     const handleFrequency = (e) => {
