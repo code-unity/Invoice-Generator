@@ -140,10 +140,6 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Generate Invoice' />
             </ListItem>
-            <ListItem button onClick ={()=> history.push('/Addpayroll')}>
-            <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Generate PaySlip' />
-            </ListItem>
             <ListItem button onClick={() => history.push("/timesheet")}>
             <ListItemIcon>
               <ListAltIcon />
@@ -166,7 +162,6 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Logout' />
             </ListItem>
-
             
         </List>
       </Drawer>

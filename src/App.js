@@ -11,8 +11,6 @@ import ProtectedRoute from './ProtectedRoute';
 import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
-import Addpayroll from "./pages/Addpayroll"
-
 
 
 
@@ -32,7 +30,6 @@ function App() {
         <ProtectedRoute path="/history" component={History} exact />
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
-        <ProtectedRoute path="/Addpayroll" component={Addpayroll} exact />
       </Switch>
     </Router>
   );
