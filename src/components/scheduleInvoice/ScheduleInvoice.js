@@ -12,7 +12,7 @@ import '.././invoiceForm.css'
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import TimePicker from 'react-time-picker-input';
-import "react-time-picker-input/dist/components/TimeInput.css"
+import "react-time-picker-input/dist/components/TimeInput.css";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -112,7 +112,7 @@ export default function ScheduleInvoice () {
     const [scheduleData, setScheduledData] = React.useState({
         is_active: true ,
         client: '',
-        invoiceNumber:'0',
+        invoiceNumber:'',
         date: String(new Date().toDateString()),
         frequency : '',
         time : '',
@@ -167,6 +167,15 @@ export default function ScheduleInvoice () {
             // To be filled 
         }
     };
+
+    function validateData () {
+        if(scheduleData.client_name!=='' && scheduleData.frequency!=='' && scheduleData.invoiceNumber!==''){
+            console.log(scheduleData);
+        }
+        else{
+            window.alert("Enter all the Mandatory fields");
+        }
+    }
     React.useEffect(() => {
         fetchData();
     }, []);
@@ -262,15 +271,15 @@ export default function ScheduleInvoice () {
                         />
                     </div>
                     <div style={{float:'left' ,marginTop:'150px'}}>
-                    <Button type="submit" className='button-schedule-page' variant="contained" color="primary">
-                        Create Invoice
-                    </Button>
-                </div>
-                <div style={{float:'right', marginTop:'150px'}}>
-                    <Button type="submit" className='button-schedule-page' variant="contained" color="primary" onClick={ console.log(scheduleData)}>
-                        Submit Schedule
-                    </Button>
-                </div>
+                        <Button variant="contained" color="primary" className='button-schedule-page' >
+                            Create Invoice
+                        </Button>
+                    </div>
+                    <div style={{float:'right', marginTop:'150px'}}>
+                        <Button type="submit" className='button-schedule-page' variant="contained" color="primary"onClick={ () => {validateData();}}>
+                            Submit Schedule
+                        </Button>
+                    </div>
                 </div>
             </div>
         </>
