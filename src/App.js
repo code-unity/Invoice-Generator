@@ -12,6 +12,7 @@ import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
 import ScheduleInvoice from './components/scheduleInvoice/ScheduleInvoice';
+import ViewSchedule from './pages/schedule/viewSchedule';
 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
         <ProtectedRoute path="/schedule-invoice"  component={ScheduleInvoice} exact />
+        <ProtectedRoute path="/view-schedule"  component={ViewSchedule} exact />
+        <ProtectedRoute path="/schedule/:id"  key="edit-schedule" component={ScheduleInvoice} exact />
       </Switch>
     </Router>
   );
