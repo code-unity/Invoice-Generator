@@ -61,3 +61,8 @@ form{
     margin-left:10px;
     float:left;
 }
+
+.savebtn{
+    margin-left: 2%;
+    display: inline-block;
+}
