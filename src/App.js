@@ -9,9 +9,10 @@ import ViewCandidate from './pages/viewCandidate/viewCandidate';
 import { Route, Router, Switch } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import history from './history'
+import Paysliphistory from './pages/history/paysliphistory';
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
-import Addpayroll from "./pages/Addpayroll"
+import payslip from "./pages/payslip"
 
 
 function App() {
@@ -25,11 +26,13 @@ function App() {
         <ProtectedRoute path="/client/:id" key="edit-client" component={Client} exact />
         <ProtectedRoute path="/candidate" key="add-candidate" component={Candidate} exact />
         <ProtectedRoute path="/candidate/:id" key="edit-candidate" component={Candidate} exact />
+        <ProtectedRoute path="/payslip" key="add-payslip" component={payslip} exact />
+        <ProtectedRoute path="/payslip/:id" key="edit-payslip" component={payslip} exact />
         <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
         <ProtectedRoute path="/view-timesheet" component={ViewTimeSheet} exact />
         <ProtectedRoute path="/history" component={History} exact />
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
-        <ProtectedRoute path="/Addpayroll" component={Addpayroll} exact />
+        <ProtectedRoute path="/paysliphistory" component={Paysliphistory} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
       </Switch>
     </Router>

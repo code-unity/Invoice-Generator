@@ -11,17 +11,21 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 import axios from 'axios';
 import './payslipform.css'
+import { useParams } from "react-router-dom";
+import history from '../history';
 import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextareaAutosize from '@mui/material/TextareaAutosize'
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import "react-datepicker/dist/react-datepicker.css";
 
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import { id } from 'date-fns/locale';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     margin: 2,
   },
-  invoiceNumber: {
+  assignedto: {
     marginRight: '10px',
     float: 'right',
     width: '150px',
@@ -123,8 +127,9 @@ function getStyles(name, personName, theme) {
 export default function FormPropsTextFields() {
   const classes = useStyles();
   const theme = useTheme();
-  const [inputAdornment, setInputAdornment] = React.useState('₹')
-  const [personName, setPersonName] = React.useState([]);
+  let { id } = useParams();
+  const inputAdornment= '₹'
+  const [personName, setPersonName] = React.useState('');
   const [candidateData, setCandidatedata] = React.useState([]);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -132,11 +137,19 @@ export default function FormPropsTextFields() {
   const [netsalary , setNetsalary]=React.useState(0);
   const [netearnings , setNetearnings]=React.useState(0);
   const [netdeductions , setNetdeductions]=React.useState(0);
+  const [totaltax , setTotaltax]=React.useState(0);
   const [openDownloader, setOpenDownloader] = React.useState(false);
+  const [openuploader, setOpenuploader] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-
-  const [payslipData, setpaySlipData] = React.useState({
+  const [openLoader, setOpenLoader] = React.useState(false);
+  const [date, setDate] = React.useState(Date.now());
+  const year = (new Date().getFullYear());
+  const month =(new Date().toLocaleString('default',{month:'long'}));
+  const [payslipData, setState] = React.useState({
+    isActive:'true',
     candidate:'',
+    candidate_id:'',
+    date: month + ' '+year,
     Designation: '',
     assigned:'',
     Basic: 0,
@@ -154,29 +167,26 @@ export default function FormPropsTextFields() {
     other_tax:0, 
     net_deductions:0,
     net_salary:0,
-    remarks:0,
+    remarks:'',
   });
-
- 
 
   function handleChange(event) {
     if (event.target.value !== "") {
       let data = candidateData.filter(eachObj => eachObj._id === event.target.value);
       const tempDefault = payslipData;
-      const temp2=clientData.filter(eachObj => eachObj._id ===data[0].assigned_to )
-      console.log(temp2,'this is temp2');
+      const temp2=clientData.filter(eachObj => eachObj._id === data[0].assigned_to )
       tempDefault.Designation="Software Developer I";
       tempDefault.Basic = 20000;
       tempDefault.D_allow = 6000;
       tempDefault.HR_allow = 9000;
       tempDefault.candidate=data[0].name
+      tempDefault.candidate_id=event.target.value;
       tempDefault.assigned=temp2[0].client_name;
       tempDefault.conveyance=7000;
       tempDefault.prof_tax=200;
       tempDefault.p_f_employee=1800;
       tempDefault.p_f_employer=3120;
       tempDefault.td_S=4400;
-      tempDefault.remarks=data[0].payment_terms;
       tempDefault.total_earnings=tempDefault.Basic+tempDefault.D_allow+tempDefault.HR_allow+tempDefault.conveyance+tempDefault.Bonus+tempDefault.others;
       tempDefault.total_tax=tempDefault.prof_tax+tempDefault.p_f_employer;
       tempDefault.net_deductions=tempDefault.total_tax+tempDefault.td_S+tempDefault.other_tax;
@@ -185,6 +195,7 @@ export default function FormPropsTextFields() {
       setPersonName(event.target.value);
       setNetearnings(payslipData.total_earnings);
       setNetdeductions(payslipData.net_deductions);
+      setTotaltax(tempDefault.total_tax);
     }
 
   };
@@ -199,17 +210,57 @@ export default function FormPropsTextFields() {
       axios.get(`${process.env.REACT_APP_API_URL}/client`)
       .then((res) => {
         setClientdata(res.data.data.results);
-      });
-      
-
-      
+        setOpen(false);
+        
+      }); 
   };
+  const fetchpayslipData = () => {
+    axios.get(`${process.env.REACT_APP_API_URL}/payslip/${id}`)
+      .then((response) => {
+        console.log(response.data.data)
+        setNetdeductions(response.data.data.net_deductions)
+        setNetearnings(response.data.data.total_earnings)
+        setNetsalary(response.data.data.net_salary)
+        setPersonName(response.data.data.candidate_id)
+        setState({
+          Bonus:response.data.data.Bonus,
+          Basic: response.data.data.Basic,
+          Designation:response.data.data.Designation,
+          assigned:response.data.data.assigned,
+          D_allow:response.data.data.D_allow,
+          candidate:response.data.data.candidate,
+          HR_allow:response.data.data.HR_allow,
+          conveyance:response.data.data.conveyance,
+          others:response.data.data.others,
+          total_earnings:response.data.data.total_earnings,
+          prof_tax:response.data.data.prof_tax,
+          p_f_employer:response.data.data.p_f_employer,
+          p_f_employee:response.data.data.p_f_employee,
+          total_tax:response.data.data.total_tax,
+          td_S:response.data.data.td_S,
+          other_tax:response.data.data.other_tax,
+          net_deductions:response.data.data.net_deductions,
+          net_salary:response.data.data.net_salary,
+          remarks:response.data.data.remarks,
+        })
+      })
+      
+      .catch((error) => {
+        console.log("failed")
+        history.push('/payslip')
+      })
+  }
 
   React.useEffect(() => {
-    fetchData();
+    {        
+      fetchData();
+    }
   }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
- 
+  React.useEffect(() => {
+    if(id){
+      fetchpayslipData()}
+   }, []);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -218,15 +269,80 @@ export default function FormPropsTextFields() {
     setOpenAlert(false);
   };
 
+
+
+
   ///functions for Calculations
-  
+  function handleChangesforBasic(event) {
+    payslipData.net_salary-=payslipData.Basic;
+    payslipData.total_earnings-=payslipData.Basic;
+
+    if (event.target.value === ""){
+    payslipData.Basic=0;}
+    else{
+    payslipData.Basic=parseInt(event.target.value);}
+
+    payslipData.net_salary+=payslipData.Basic;
+    payslipData.total_earnings+=payslipData.Basic;
+
+    setNetsalary(payslipData.net_salary);
+    setNetearnings(payslipData.total_earnings);
+  }
+
+  function handleChangesforD_allow(event) {
+    payslipData.net_salary-=payslipData.D_allow;
+    payslipData.total_earnings-=payslipData.D_allow;
+
+    if (event.target.value === ""){
+    payslipData.D_allow=0;}
+    else{
+    payslipData.D_allow=parseInt(event.target.value);}
+
+    payslipData.net_salary+=payslipData.D_allow;
+    payslipData.total_earnings+=payslipData.D_allow;
+
+    setNetsalary(payslipData.net_salary);
+    setNetearnings(payslipData.total_earnings);
+  }
+
+  function handleChangesforHR_allow(event) {
+    payslipData.net_salary-=payslipData.HR_allow;
+    payslipData.total_earnings-=payslipData.HR_allow;
+
+    if (event.target.value === ""){
+    payslipData.HR_allow=0;}
+    else{
+    payslipData.HR_allow=parseInt(event.target.value);}
+
+    payslipData.net_salary+=payslipData.HR_allow;
+    payslipData.total_earnings+=payslipData.HR_allow;
+
+    setNetsalary(payslipData.net_salary);
+    setNetearnings(payslipData.total_earnings);
+  }
+
+  function handleChangesforconveyance(event) {
+    payslipData.net_salary-=payslipData.conveyance;
+    payslipData.total_earnings-=payslipData.conveyance;
+
+    if (event.target.value === ""){
+    payslipData.conveyance=0;}
+    else{
+    payslipData.conveyance=parseInt(event.target.value);}
+
+    payslipData.net_salary+=payslipData.conveyance;
+    payslipData.total_earnings+=payslipData.conveyance;
+
+    setNetsalary(payslipData.net_salary);
+    setNetearnings(payslipData.total_earnings);
+  }
+
   function handleChangesforBonus(event) {
     if (event.target.value !== ""){
     payslipData.net_salary-=payslipData.Bonus;
     payslipData.total_earnings-=payslipData.Bonus;
 
     payslipData.Bonus=parseInt(event.target.value);
-    console.log(payslipData.Bonus)
 
     payslipData.net_salary+=payslipData.Bonus;
     payslipData.total_earnings+=payslipData.Bonus;
@@ -234,7 +350,7 @@ export default function FormPropsTextFields() {
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
   }}
-
+  
   function handleChangesforOthers(event) {
     if (event.target.value !== ""){
     payslipData.net_salary-=payslipData.others;
@@ -249,6 +365,61 @@ export default function FormPropsTextFields() {
     setNetearnings(payslipData.total_earnings);
   }}
 
+  function handleChangesforprof_tax(event) {
+    payslipData.net_salary+=payslipData.prof_tax;
+    payslipData.net_deductions-=payslipData.prof_tax;
+    payslipData.total_tax-=payslipData.prof_tax;
+
+    if (event.target.value === ""){
+    payslipData.prof_tax=0;}
+    else{
+    payslipData.prof_tax=parseInt(event.target.value);}
+
+    payslipData.net_salary-=payslipData.prof_tax;
+    payslipData.net_deductions+=payslipData.prof_tax;
+    payslipData.total_tax+=payslipData.prof_tax;
+
+    setNetsalary(payslipData.net_salary);
+    setNetdeductions(payslipData.net_deductions);
+    setTotaltax(payslipData.total_tax)
+  }
+
+  function handleChangesforp_femployer(event) {
+    payslipData.net_salary+=payslipData.p_f_employer;
+    payslipData.net_deductions-=payslipData.p_f_employer;
+    payslipData.total_tax-=payslipData.p_f_employer;
+
+    if (event.target.value === ""){
+    payslipData.p_f_employer=0;}
+    else{
+    payslipData.p_f_employer=parseInt(event.target.value);}
+
+    payslipData.net_salary-=payslipData.p_f_employer;
+    payslipData.net_deductions+=payslipData.p_f_employer;
+    payslipData.total_tax+=payslipData.p_f_employer;
+
+    setNetsalary(payslipData.net_salary);
+    setNetdeductions(payslipData.net_deductions);
+    setTotaltax(payslipData.total_tax)
+  }
+
+  function handleChangesforTDS(event) {
+    payslipData.net_salary+=payslipData.td_S;
+    payslipData.net_deductions-=payslipData.td_S;
+
+    if (event.target.value === ""){
+    payslipData.td_S=0;}
+    else{
+    payslipData.td_S=parseInt(event.target.value);}
+
+    payslipData.net_salary-=payslipData.td_S;
+    payslipData.net_deductions+=payslipData.td_S;
+
+    setNetsalary(payslipData.net_salary);
+    setNetdeductions(payslipData.net_deductions);
+  }
+
+
   function handleChangesforOthertaxes(event) {
     if (event.target.value !== ""){
     payslipData.net_salary+=payslipData.other_tax;
@@ -262,21 +433,151 @@ export default function FormPropsTextFields() {
     setNetsalary(payslipData.net_salary);
     setNetdeductions(payslipData.net_deductions);
   }}
-  const handleDataChange = e => {
-    setpaySlipData({
+  
+  const convert = (str) => {
+    var date = new Date(str),
+    mnth = (date.getMonth().toLocaleString('default',{month:'long'}));
+    
+    return [date.getFullYear(), mnth].join("-");
+}
+  const handleDateChange = (date) => {
+    const dateInReqFormat=convert(date);
+    setDate(dateInReqFormat);
+    payslipData.date=dateInReqFormat;
+};
+
+  function handleDatachange(event){
+    setState({
       ...payslipData,
-      [e.target.name]: e.target.value
+      [event.target.name]: event.target.value
     })
+}
+
+let b64;
+function uploadandprintData(){  
+  setOpenDownloader(!open);
+  axios.post(`${process.env.REACT_APP_API_URL}/payslip`,payslipData, { headers: { 'Content-Type': 'application/json' } })
+  .then((response) => {
+    console.log(response)
+    setOpenDownloader(false);
+    setOpen(false);
+    const message = alert;
+    message.message = "Payslip generated successfully";
+    message.severity = "success";
+    setMessage(message);
+    setOpenAlert(true);
+    changeFieldValue();
+    b64 = response.data.pdf;
+    var link = document.createElement('a');
+    link.innerHTML = 'Download PDF file';
+    link.download = 'file.pdf';
+    link.href = 'data:application/octet-stream;base64,' + b64;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  })
+
+  
+  .catch(error => {console.log("fail")})
+  
+}
+
+function uploadData(){  
+  setOpenuploader(!open);
+  axios.post(`${process.env.REACT_APP_API_URL}/payslip`,payslipData, { headers: { 'Content-Type': 'application/json' } })
+  .then((response) => {
+    console.log(response)
+    setOpenuploader(false);
+    setOpen(false);
+    const message = alert;
+    changeFieldValue();
+    message.message = "Payslip saved successfully";
+    message.severity = "success";
+    setMessage(message);
+    setOpenAlert(true);
+  })
+
+  
+  .catch(error => {console.log("failed to upload")})
+  
+}
+
+function changeFieldValue() {
+  const fieldValues = {
+    isActive:'true',
+    candidate:'',
+    candidate_id:'',
+    date:year + '-' + (month+1),
+    Designation: '',
+    assigned:'',
+    Basic: 0,
+    D_allow: 0,
+    HR_allow: 0,
+    Bonus: 0,
+    conveyance:0,
+    others:0,
+    total_earnings:0,
+    prof_tax:0,
+    p_f_employer:0,
+    p_f_employee:0,
+    total_tax:0,
+    td_S:0,
+    other_tax:0, 
+    net_deductions:0,
+    net_salary:0,
+    remarks:'',
   }
+
+  setState(fieldValues);
+  setNetearnings(0);
+  setNetdeductions(0);
+  setNetsalary(0);
+  setTotaltax(0);
+  setPersonName('');
+}
+const deleteData = () => {
+  setOpenLoader(true)
+  axios.delete(`${process.env.REACT_APP_API_URL}/payslip/${id}`)
+    .then((response) => {
+      setOpenLoader(false);
+      const message = alert;
+      message.message = "Paysilp Details Deletion Successfully";
+      message.severity = 'success';
+      setMessage(message);
+      setOpen(false);
+      history.push('/paysliphistory')
+    })
+    .catch((error) => {
+      setOpenLoader(false);
+      const message = alert;
+      message.message = "Deletion Payslip Details Unsuccessful";
+      message.severity = "error"
+      setMessage(message);
+      setOpen(false);
+    })
+}
+
+function updateData () {
+  axios.patch(`${process.env.REACT_APP_API_URL}/payslip/${id}`, payslipData, { headers: { 'Content-Type': 'application/json' } })
+    .then((response) => {
+      window.alert('successfully updated Payslip');
+      history.push('/paysliphistory');
+    })
+    .catch((error) => {
+     window.alert('Failed to update Payslip');
+    })
+}
+
 
   return (
     <div >
       <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
-        Generate Payslip
+        {id? 'Edit Payslip ' : 'Generate Payslip'}
       </h1>
       <div className="form">
 
-
+        <div className='top' style={{ display:"flex" }}>
+          <div className='candidate'style={{ marginLeft:"20px"}}>
         <FormControl className={classes.formControl}>
           <InputLabel id="demo-mutiple-name-label">Select Candidate</InputLabel>
           <Select
@@ -298,19 +599,39 @@ export default function FormPropsTextFields() {
             ))}
           </Select>
         </FormControl> 
+        </div>
+  
         
-        <div className={classes.invoiceNumber} style={{width:'150px', textalign:'center'}}>
+        <div className={classes.assignedto} style={{width:'150px', textalign:'center',flexGrow:"1",marginLeft:"50px"}}>
           <TextField
             required
             label="Assigned to"
             variant="outlined"
             value={payslipData.assigned}
-            onChange={handleDataChange}
+
             inputProps={{
               readOnly: true,
 
             }}
           />
+        </div>
+        <div style={{ float: "right", width:"150px",textalign:'center'}}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  variant="inline"
+                  views={["year", "month"]}
+                  format="MMMM/yyyy"
+                  margin="normal"
+                  label="Month/Year"
+                  value={date}
+                  onChange={handleDateChange}
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
+                />
+              </MuiPickersUtilsProvider>
+          </div>
         </div>
 
         <form noValidate autoComplete="off" style={{ padding: "10px" }}>
@@ -321,11 +642,11 @@ export default function FormPropsTextFields() {
               required
               label="Designation"
               value={payslipData.Designation}
-              onChange={handleDataChange}
               placeholder="Designation"
               variant="outlined"
               inputProps={{
                 readOnly: true,
+
 
               }}
             />
@@ -333,18 +654,16 @@ export default function FormPropsTextFields() {
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
             <TextField
               required
+              name='Basic'
               label="Basic Salary"
               value={payslipData.Basic}
-              onChange={handleDataChange}
+              onChange={handleChangesforBasic}
               placeholder="Basic Salary"
-
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
-
               }}
               variant="outlined"
             />
@@ -354,14 +673,13 @@ export default function FormPropsTextFields() {
               required
               label="DA"
               value={payslipData.D_allow}
-              onChange={handleDataChange}
+              onChange={handleChangesforD_allow}
               placeholder="DA"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
               }}
               variant="outlined"
@@ -373,14 +691,13 @@ export default function FormPropsTextFields() {
               required
               label="HR_allow"
               value={payslipData.HR_allow}
-              onChange={handleDataChange}
               placeholder="Hr-allowance"
+              onChange={handleChangesforHR_allow}
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
               }}
               variant="outlined"
@@ -392,16 +709,13 @@ export default function FormPropsTextFields() {
               required
               label="Conveyance"
               value={payslipData.conveyance}
-              onChange={handleDataChange}
               placeholder="conveyance"
+              onChange={handleChangesforconveyance}
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
-
-
               }}
               variant="outlined"
             />
@@ -445,14 +759,14 @@ export default function FormPropsTextFields() {
               required
               label="Total Earnings"
               value={netearnings}
-              onChange={handleDataChange}
               placeholder="Total Earnings"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
+                className: classes.math,
                 readOnly: true,
-                className: classes.math
+
               }}
               variant="outlined"
             />
@@ -467,7 +781,7 @@ export default function FormPropsTextFields() {
               required
               label="Professional tax"
               value={payslipData.prof_tax}
-              onChange={handleDataChange}
+              onChange={handleChangesforprof_tax}
               placeholder="Professional tax"
 
               InputProps={{
@@ -475,7 +789,6 @@ export default function FormPropsTextFields() {
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
                 
               }}
@@ -487,14 +800,13 @@ export default function FormPropsTextFields() {
               required
               label="Employer PF"
               value={payslipData.p_f_employer}
-              onChange={handleDataChange}
+              onChange={handleChangesforp_femployer}
               placeholder="Employer PF"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
               }}
               variant="outlined"
@@ -504,15 +816,15 @@ export default function FormPropsTextFields() {
             <TextField
               required
               label="Employee PF"
+              name='p_f_employee'
               value={payslipData.p_f_employee}
-              onChange={handleDataChange}
+              onChange={e=>{handleDatachange(e)}}
               placeholder="Employee PF"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
               }}
               variant="outlined"
@@ -522,8 +834,7 @@ export default function FormPropsTextFields() {
             <TextField
               required
               label="Total Tax"
-              value={payslipData.total_tax}
-              onChange={handleDataChange}
+              value={totaltax}
               placeholder="Total Tax"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -531,6 +842,7 @@ export default function FormPropsTextFields() {
               inputProps={{
                 className: classes.math,
                 readOnly: true,
+
 
               }}
               variant="outlined"
@@ -541,14 +853,13 @@ export default function FormPropsTextFields() {
               required
               label="Advance TAX/TDS"
               value={payslipData.td_S}
-              onChange={handleDataChange}
+              onChange={handleChangesforTDS}
               placeholder="TDS"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
                 className: classes.math,
-                readOnly: true,
 
               }}
               variant="outlined"
@@ -578,7 +889,6 @@ export default function FormPropsTextFields() {
               required
               label="Net Deductions"
               value={netdeductions}
-              onChange={handleDataChange}
               placeholder="Net Deductions"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -586,6 +896,7 @@ export default function FormPropsTextFields() {
               inputProps={{
                 className: classes.math,
                 readOnly: true,
+
 
               }}
               variant="outlined"
@@ -598,9 +909,10 @@ export default function FormPropsTextFields() {
         <div className='remarks'>
         <div style={{ marginRight: '15px' }} >
               <TextareaAutosize
-                name="Remarks"
+                name="remarks"
                 minRows={3}
-                onChange={handleDataChange}
+                value={payslipData.remarks}
+                onChange={e=>{handleDatachange(e)}}
                 placeholder="Remarks"
                 style={{ width: 425, fontSize: 19, padding: '5px', borderRadius: '5px', background: '#fafafa' }}
               />
@@ -615,9 +927,10 @@ export default function FormPropsTextFields() {
               value={netearnings}
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                readOnly: true,
+
               }}
               inputProps={{
-                readOnly: true,
                 className: classes.math
               }}
               variant="outlined"
@@ -625,13 +938,15 @@ export default function FormPropsTextFields() {
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
+            required
               label="Net Deductions"
               value={netdeductions}
-              onChange={handleDataChange}
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                
               }}
               inputProps={{
+                readOnly: true,
                 className: classes.math
               }}
               variant="outlined"
@@ -642,14 +957,14 @@ export default function FormPropsTextFields() {
               required
               label="Net Salary"
               value={netsalary}
-              onChange={handleDataChange}
               placeholder="Net Salary"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
               inputProps={{
+                className: classes.math,
                 readOnly: true,
-                className: classes.math
+
               }}
               variant="outlined"
             />
@@ -660,10 +975,33 @@ export default function FormPropsTextFields() {
         </div>
 
       </div>
-      <div style={{ marginLeft: "300px", marginBottom: "30px", marginTop: "10px" }}>
-        <Button variant="contained" color="primary" onClick={() => {console.log(payslipData); setOpen(false)}}>
-          Download Pay Slip
-        </Button>
+      <div style={{ marginLeft: "300px", marginTop: "20px", marginBottom:"30px"}}>
+        {!id &&
+        <div>
+          <Button type="reset" variant="contained" color="primary" onClick={()=>{console.log(payslipData);uploadandprintData();}}>
+          Save and Download
+
+          </Button>
+          <div className='savebtn'>
+          <Button type="reset" variant="contained" color="primary" onClick={()=>{console.log(payslipData);uploadData();}}>
+          Save
+
+          </Button>
+          </div>
+          </div>
+          
+          }
+        {id &&
+          <div>
+            <Button type="button" variant='contained' color="primary" onClick={updateData}>
+              Save
+            </Button>
+            <Button type="button" variant='contained' color="primary" style={{ marginLeft: '10px' }} onClick={deleteData}>
+              Delete
+            </Button>
+          </div>
+        }
+
         <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
           <Alert onClose={handleClose} severity={alert.severity}>
             {alert.message}
@@ -678,7 +1016,13 @@ export default function FormPropsTextFields() {
           <div>
             <CircularProgress color="primary" />
           </div>
-          <span>Downloading Invoice...</span>
+          <span>Saving & Downloading Payslip...</span>
+        </Backdrop>
+        <Backdrop className={classes.backdrop} open={openuploader} >
+          <div>
+            <CircularProgress color="primary" />
+          </div>
+          <span>Saving Payslip...</span>
         </Backdrop>
       </div>
     </div>
