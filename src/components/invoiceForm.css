@@ -3,9 +3,8 @@
     float: left;
     width: 10%;
 }
-
 .form{
-    margin-left: 300px;
+    margin-left: 250px;
     margin-right: 150px;
     left: 15%;
     border-style: groove;
@@ -23,34 +22,58 @@
 .rightDivision{
     width: 30%;
     float: right;
-    margin-top: -32px;
+    margin-top: 0px;
 }
 
 .addItem{
     background-color: black;
     float: left;
     color: rgb(222, 235, 232);
-    width: 800px;
+    width: 900px;
+    height: 30px;
     /* border-style: groove; */
     border-radius: 4px;
     padding-left: 5px;
-    
+    display: flex;
+    align-items: center;
 }
 .item{
   padding-left: 10px;
   float: left;
-  width: 520px;
+  padding-right: 445px;
+  display: flex;
+  
 }
 .quantity{
     float: left;
-    width: 90px;
+    width: 80px;
+    
 }
 .rate{
     float: left;
     padding-right: 90px;
     width: 50px;
 }
+.amount{
+    float: left;
+    padding-left: 75px;
+    width: 50px;
+}
 
 .itemInput{
   width: fit-content;
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+@media screen and (max-width: 480px) {
+    .form {
+      width: 374px;
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+    .addItem{
+        display: none;
+        
+    }
 }
