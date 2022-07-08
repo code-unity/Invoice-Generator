@@ -22,6 +22,7 @@ import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 import history from '../history';
 import './sideNav.css';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const drawerWidth = 240;
 
@@ -130,7 +131,7 @@ export default function PersistentDrawerLeft(props) {
           <div className={openb ? "sidebar-item open" : "sidebar-item"}>
             <ListItem button className="sidebar-title" onClick={() => setOpenb(!openb)}>
               <ListItemText primary='Client' />
-              <i className="bi-chevron-down toggle-btn" onClick={() => setOpenb(!openb)}></i>
+              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenb(!openb)} ></KeyboardArrowDownIcon>
             </ListItem>
             <div className="sidebar-content">
               <ListItem button onClick={() => history.push('/client')}>
@@ -147,7 +148,7 @@ export default function PersistentDrawerLeft(props) {
             <div className={openc ? "sidebar-item open" : "sidebar-item"}>
               <ListItem button className="sidebar-title" onClick={() => setOpenc(!openc)}>
                 <ListItemText primary='Candidate' />
-                <i className="bi-chevron-down toggle-btn" onClick={() => setOpenc(!openc)}></i>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenc(!openc)} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/candidate')}>
@@ -164,7 +165,7 @@ export default function PersistentDrawerLeft(props) {
             <div className={opent ? "sidebar-item open" : "sidebar-item"}>
               <ListItem button className="sidebar-title" onClick={() => setOpent(!opent)}>
                 <ListItemText primary='Time Sheet' />
-                <i className="bi-chevron-down toggle-btn" onClick={() => setOpent(!opent)}></i>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpent(!opent)} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push("/timesheet")}>
@@ -183,7 +184,7 @@ export default function PersistentDrawerLeft(props) {
             <div className={openi ? "sidebar-item open" : "sidebar-item"}>
               <ListItem button className="sidebar-title" onClick={() => setOpeni(!openi)}>
                 <ListItemText primary='Invoice' />
-                <i className="bi-chevron-down toggle-btn" onClick={() => setOpeni(!openi)}></i>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpeni(!openi)} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/home')}>
