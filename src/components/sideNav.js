@@ -21,7 +21,7 @@ import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 import history from '../history';
-
+import './sideNav.css';
 
 const drawerWidth = 240;
 
@@ -70,6 +70,10 @@ export default function PersistentDrawerLeft(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [openb, setOpenb] = React.useState(false)
+  const [openc, setOpenc] = React.useState(false)
+  const [opent, setOpent] = React.useState(false)
+  const [openi, setOpeni] = React.useState(false)
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -123,50 +127,78 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-            <ListItem button onClick ={()=> history.push('/client')}>
-              <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Add Client' />
+          <div className={openb ? "sidebar-item open" : "sidebar-item"}>
+            <ListItem button className="sidebar-title" onClick={() => setOpenb(!openb)}>
+              <ListItemText primary='Client' />
+              <i className="bi-chevron-down toggle-btn" onClick={() => setOpenb(!openb)}></i>
             </ListItem>
-            <ListItem button onClick ={()=> history.push('/candidate')}>
-              <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Add Candidate' />
-            </ListItem>        
-            <ListItem button onClick ={()=> history.push('/history')}>
-              <ListItemIcon><AccessTimeRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Invoice History' />
-            </ListItem>
-
-            <ListItem button onClick ={()=> history.push('/home')}>
-              <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Generate Invoice' />
-            </ListItem>
-            <ListItem button onClick ={()=> history.push('/Addpayroll')}>
-            <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Generate PaySlip' />
-            </ListItem>
-            <ListItem button onClick={() => history.push("/timesheet")}>
-            <ListItemIcon>
-              <ListAltIcon />
-            </ListItemIcon>
-            <ListItemText primary="Add Time Sheet" />
+            <div className="sidebar-content">
+              <ListItem button onClick={() => history.push('/client')}>
+                <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
+                <ListItemText primary='Add Client' />
+              </ListItem>
+              <ListItem button onClick={() => history.push('/view-client')}>
+                <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+                <ListItemText primary='View Client' />
+              </ListItem>
+            </div>
+          </div >
+          <div style={{ marginTop: -10 }}>
+            <div className={openc ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" onClick={() => setOpenc(!openc)}>
+                <ListItemText primary='Candidate' />
+                <i className="bi-chevron-down toggle-btn" onClick={() => setOpenc(!openc)}></i>
+              </ListItem>
+              <div className="sidebar-content">
+                <ListItem button onClick={() => history.push('/candidate')}>
+                  <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
+                  <ListItemText primary='Add Candidate' />
+                </ListItem>
+                <ListItem button onClick={() => history.push('/view-candidate')}>
+                  <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+                  <ListItemText primary='View Candidate' />
+                </ListItem>
+              </div>
+            </div></div>
+          <div style={{ marginTop: -10 }}>
+            <div className={opent ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" onClick={() => setOpent(!opent)}>
+                <ListItemText primary='Time Sheet' />
+                <i className="bi-chevron-down toggle-btn" onClick={() => setOpent(!opent)}></i>
+              </ListItem>
+              <div className="sidebar-content">
+                <ListItem button onClick={() => history.push("/timesheet")}>
+                  <ListItemIcon>
+                    <ListAltIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Add Time Sheet" />
+                </ListItem>
+                <ListItem button onClick={() => history.push('/view-timesheet')}>
+                  <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+                  <ListItemText primary='View Time Sheet' />
+                </ListItem>
+              </div>
+            </div></div>
+          <div style={{ marginTop: -10 }}>
+            <div className={openi ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" onClick={() => setOpeni(!openi)}>
+                <ListItemText primary='Invoice' />
+                <i className="bi-chevron-down toggle-btn" onClick={() => setOpeni(!openi)}></i>
+              </ListItem>
+              <div className="sidebar-content">
+                <ListItem button onClick={() => history.push('/home')}>
+                  <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
+                  <ListItemText primary='Generate Invoice' />
+                </ListItem>
+                <ListItem button onClick={() => history.push('/history')}>
+                  <ListItemIcon><AccessTimeRoundedIcon /></ListItemIcon>
+                  <ListItemText primary='Invoice History' />
+                </ListItem>
+              </div>
+            </div></div>
+          <ListItem button style={{ marginTop: -10 }} onClick={() => { history.push('/'); localStorage.clear() }}>
+            <ListItemText primary='Logout' />
           </ListItem>
-            <ListItem button onClick ={()=> history.push('/view-client')}>
-              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-              <ListItemText primary='View Client' />
-            </ListItem>
-            <ListItem button onClick ={()=> history.push('/view-candidate')}>
-              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-              <ListItemText primary='View Candidate' />
-            </ListItem>
-            <ListItem button onClick ={()=> history.push('/view-timesheet')}>
-              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-              <ListItemText primary='View Time Sheet' />
-            </ListItem>
-            <ListItem button onClick ={()=> {history.push('/');localStorage.clear()}}>
-              <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-              <ListItemText primary='Logout' />
-            </ListItem>
-            
         </List>
       </Drawer>
       <main
