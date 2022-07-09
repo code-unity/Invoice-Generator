@@ -20,6 +20,7 @@ import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import history from '../history';
 
 
@@ -140,6 +141,10 @@ export default function PersistentDrawerLeft(props) {
               <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
               <ListItemText primary='Generate Invoice' />
             </ListItem>
+            <ListItem button onClick ={()=> history.push('/schedule-invoice')}>
+              <ListItemIcon><CalendarMonthIcon /></ListItemIcon>
+              <ListItemText primary='Schedule Invoice' />
+            </ListItem>
             <ListItem button onClick={() => history.push("/timesheet")}>
             <ListItemIcon>
               <ListAltIcon />
@@ -157,10 +162,6 @@ export default function PersistentDrawerLeft(props) {
             <ListItem button onClick ={()=> history.push('/view-timesheet')}>
               <ListItemIcon><ViewComfyIcon /></ListItemIcon>
               <ListItemText primary='View Time Sheet' />
-            </ListItem>
-            <ListItem button onClick ={()=> history.push('/schedule-invoice')}>
-              <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-              <ListItemText primary='Schedule Invoice' />
             </ListItem>
             <ListItem button onClick ={()=> history.push('/view-schedule')}>
               <ListItemIcon><ViewComfyIcon /></ListItemIcon>
