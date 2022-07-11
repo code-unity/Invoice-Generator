@@ -83,7 +83,14 @@ const useStyles = makeStyles((theme) => ({
     width: '400px',
   },
   payment: {
-    width: '195px',
+    width: 225,
+    fontSize: 19,
+    borderRadius: '5px',
+    padding: '5px',
+    background: '#fafafa',
+    [theme.breakpoints.down("sm")]: {
+      width: '324px',
+    },
   },
 
   formControl: {
@@ -257,6 +264,7 @@ const useStyles = makeStyles((theme) => ({
   },
   bill: {
     width: 225,
+    height: 150,
     fontSize: 19,
     borderRadius: '5px',
     padding: '5px',
@@ -816,7 +824,7 @@ export default function FormPropsTextFields() {
                 minRows={6}
                 onChange={handleDataChange}
                 placeholder="Payment Terms"
-                className={classes.ship}
+                className={classes.payment}
               />
             </div>
 
