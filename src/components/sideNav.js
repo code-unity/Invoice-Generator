@@ -21,6 +21,7 @@ import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 import history from '../history';
+import Box from '@mui/material/Box';
 import './sideNav.css';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
@@ -71,10 +72,23 @@ export default function PersistentDrawerLeft(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [openb, setOpenb] = React.useState(false)
-  const [openc, setOpenc] = React.useState(false)
-  const [opent, setOpent] = React.useState(false)
-  const [openi, setOpeni] = React.useState(false)
+  const [state, setState] = React.useState({
+    client: false,
+    candidate: false,
+    timesheet: false,
+    invoice: false,
+  });
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+
+  const handleListItemClick = (e, index) => {
+    setSelectedIndex(index);
+  };
+
+
+  const handleChange = (e) => {
+    setState({ ...state, [e]: !state[e] });
+  };
+  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -128,76 +142,85 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-          <div className={openb ? "sidebar-item open" : "sidebar-item"}>
-            <ListItem button className="sidebar-title" onClick={() => setOpenb(!openb)}>
+          <div onChange={(e) => handleChange('client')} className={state.client ? "sidebar-item open" : "sidebar-item"} >
+            <ListItem button selected={selectedIndex === 0}  className="sidebar-title" onClick={(e) => {
+              handleChange('client') 
+              handleListItemClick(e, 0) }}>
               <ListItemText primary='Client' />
-              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenb(!openb)} ></KeyboardArrowDownIcon>
+              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('client')} ></KeyboardArrowDownIcon>
             </ListItem>
             <div className="sidebar-content">
               <ListItem button onClick={() => history.push('/client')}>
-                <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
-                <ListItemText primary='Add Client' />
+                <ListItemIcon style={{marginLeft: '15px'}}><AccountBoxRoundedIcon /></ListItemIcon>
+                <ListItemText style={{marginLeft: '-10px'}} primary='Add Client' />
               </ListItem>
               <ListItem button onClick={() => history.push('/view-client')}>
-                <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-                <ListItemText primary='View Client' />
+                <ListItemIcon style={{marginLeft: '15px'}}><ViewComfyIcon /></ListItemIcon>
+                <ListItemText style={{marginLeft: '-10px'}} primary='View Client' />
               </ListItem>
             </div>
           </div >
-          <div style={{ marginTop: -10 }}>
-            <div className={openc ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpenc(!openc)}>
+          <div style={{ marginTop: -5 }}>
+            <div onChange={(e) => handleChange('candidate')} className={state.candidate ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button selected={selectedIndex === 1} className="sidebar-title" onClick={(e) => {
+                handleChange('candidate')
+                handleListItemClick(e, 1)}}>
                 <ListItemText primary='Candidate' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenc(!openc)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => handleChange('candidate')}></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/candidate')}>
-                  <ListItemIcon><AccountBoxRoundedIcon /></ListItemIcon>
-                  <ListItemText primary='Add Candidate' />
+                  <ListItemIcon style={{marginLeft: '15px'}}><AccountBoxRoundedIcon /></ListItemIcon>
+                  <ListItemText style={{marginLeft: '-10px'}}  primary='Add Candidate' />
                 </ListItem>
                 <ListItem button onClick={() => history.push('/view-candidate')}>
-                  <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-                  <ListItemText primary='View Candidate' />
+                  <ListItemIcon style={{marginLeft: '15px'}}><ViewComfyIcon /></ListItemIcon>
+                  <ListItemText style={{marginLeft: '-10px'}}  primary='View Candidate' />
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -10 }}>
-            <div className={opent ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpent(!opent)}>
+          <div style={{ marginTop: -5 }}>
+            <div onChange={(e) => handleChange('timesheet')} className={state.timesheet ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button selected={selectedIndex === 2} className="sidebar-title" onClick={(e) => {
+                handleChange('timesheet')
+                handleListItemClick(e, 2)}}>
                 <ListItemText primary='Time Sheet' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpent(!opent)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('timesheet')} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push("/timesheet")}>
-                  <ListItemIcon>
+                  <ListItemIcon style={{marginLeft: '15px'}}>
                     <ListAltIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Add Time Sheet" />
+                  <ListItemText style={{marginLeft: '-10px'}}  primary="Add Time Sheet" />
                 </ListItem>
                 <ListItem button onClick={() => history.push('/view-timesheet')}>
-                  <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-                  <ListItemText primary='View Time Sheet' />
+                  <ListItemIcon style={{marginLeft: '15px'}} ><ViewComfyIcon /></ListItemIcon>
+                  <ListItemText style={{marginLeft: '-10px'}}  primary='View Time Sheet' />
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -10 }}>
-            <div className={openi ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpeni(!openi)}>
+          <div style={{ marginTop: -5 }}>
+            <div onChange={(e) => handleChange('invoice')} className={state.invoice ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button selected={selectedIndex === 3} className="sidebar-title" onClick={(e) => {
+                handleChange('invoice')
+                handleListItemClick(e, 3)}}>
                 <ListItemText primary='Invoice' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpeni(!openi)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('invoice')} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/home')}>
-                  <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-                  <ListItemText primary='Generate Invoice' />
+                  <ListItemIcon style={{marginLeft: '15px'}}><AssignmentRoundedIcon /></ListItemIcon>
+                  <ListItemText style={{marginLeft: '-10px'}}  primary='Generate Invoice' />
                 </ListItem>
                 <ListItem button onClick={() => history.push('/history')}>
-                  <ListItemIcon><AccessTimeRoundedIcon /></ListItemIcon>
-                  <ListItemText primary='Invoice History' />
+                  <ListItemIcon style={{marginLeft: '15px'}}><AccessTimeRoundedIcon /></ListItemIcon>
+                  <ListItemText style={{marginLeft: '-10px'}}  primary='Invoice History' />
                 </ListItem>
               </div>
             </div></div>
-          <ListItem button style={{ marginTop: -10 }} onClick={() => { history.push('/'); localStorage.clear() }}>
+          
+          <ListItem button style={{ marginTop: 0 }} onClick={() => { history.push('/'); localStorage.clear() }}>
             <ListItemText primary='Logout' />
           </ListItem>
         </List>
