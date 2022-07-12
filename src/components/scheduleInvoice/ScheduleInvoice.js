@@ -1,6 +1,6 @@
 import React from 'react';
 import './ScheduleInvoice.css';
-import { makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Input from '@material-ui/core/Input';
@@ -62,82 +62,79 @@ function Alert(props) {
 export default function ScheduleInvoice() {
   const { id } = useParams();
   const classes = useStyles();
-  const [clientData, setClientData] = React.useState([]); // TODO:: remove this
-  const [invoiceHistory, setInvoiceHistory] = React.useState([]); // TODO:: remove this
+  const [clientData, setClientData] = React.useState([]);
+  const [invoiceHistory, setInvoiceHistory] = React.useState([]);
   const history = useHistory();
   const [schedulesList, setSchedulesList] = React.useState([])
   const [openAlert, setOpenAlert] = React.useState(false);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
-  const [isLoading, setLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
   const frequencyList = [{ item: 'Daily' }, { item: 'Weekly' }, { item: 'Monthly' }, { item: 'Anually' }];
   const [scheduleData, setScheduleData] = React.useState({
     isDisabled: false,
-    scheduleName:'',
+    scheduleName: '',
     clientId: '',
     invoiceNumber: '',
-    date:null,
+    date: null,
     frequency: '',
     time: null,
   });
 
-  const handleTime = (e) => {
-      const temp={...scheduleData};
-      temp.time = e;
-      setScheduleData(temp);
+  const handleTimeChange = (e) => {
+    const temp = { ...scheduleData };
+    temp.time = e;
+    setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
   const handleDateChange = (date) => {
-      const temp ={...scheduleData};
-      temp.date = date;
-      setScheduleData(temp);
+    const temp = { ...scheduleData };
+    temp.date = date;
+    setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
-  const handleFrequency = (event) => {
-      const temp ={...scheduleData};
-      temp.frequency = event.target.value;
-      setScheduleData(temp);
+  const handleFrequencyChange = (event) => {
+    const temp = { ...scheduleData };
+    temp.frequency = event.target.value;
+    setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
-  function handleChange(event) {
-    if (event.target.value !== '') {
-        const temp ={...scheduleData};
-        temp.clientId = event.target.value;
-        setScheduleData(temp);
+  function handleClientChange(event) {
+    if (!event.target.value) {
+      const temp = { ...scheduleData };
+      temp.clientId = event.target.value;
+      setScheduleData(temp);
     }
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
   function handleInvoiceChange(e) {
-        const temp ={...scheduleData};
-        temp.invoiceNumber = e.target.value;
-        setScheduleData(temp);
+    const temp = { ...scheduleData };
+    temp.invoiceNumber = e.target.value;
+    setScheduleData(temp);
   }
-  
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenAlert(false);
-  };
 
-  function setFields(){
-    const temp={...scheduleData};
-    temp.isDisabled=false
-    temp.scheduleName=''
-    temp.clientId=''
-    temp.date=null
-    temp.time=null
-    temp.invoiceNumber=''
-    temp.frequency=''
+  function resetFields() {
+    const temp = { ...scheduleData };
+    temp.isDisabled = false
+    temp.scheduleName = ''
+    temp.clientId = ''
+    temp.date = null
+    temp.time = null
+    temp.invoiceNumber = ''
+    temp.frequency = ''
     setScheduleData(temp)
   }
 
-  function fillScheduleName(clientName){
-    const count = schedulesList.filter(data => data.clientId === clientName);
-    scheduleData.scheduleName=clientData.filter(data => data._id === clientName)[0].client_name + '-CU-' + (count.length + 1);
+  function fillScheduleName(clientId) {
+    const count = schedulesList.reduce((accumulator, data) => {
+      if (data.clientId === clientId) {
+        return accumulator + 1;
+      }
+      return accumulator;
+    }, 0);
+    const scheduleName = `${clientData.find(data => data._id === clientId).client_name}-CU-${(count + 1)}`;
+    const newScheduleData = { ...scheduleData };
+    newScheduleData.scheduleName = scheduleName;
+    setScheduleData(newScheduleData);
   }
 
   function uploadDetails() {
@@ -149,7 +146,7 @@ export default function ScheduleInvoice() {
         message.severity = "success";
         setMessage(message);
         setOpenAlert(true);
-        setFields();
+        resetFields();
       })
       .catch(error => {
         const message = alert;
@@ -164,51 +161,51 @@ export default function ScheduleInvoice() {
     history.push('/home');
   }
 
+  async function fetchInitalData() {
+    try {
+      const clientData = await axios.get(`${process.env.REACT_APP_API_URL}/client`);
+      if (clientData) {
+        setClientData(clientData.data.data.results);
+      }
+    } catch (error) {
+      const message = alert;
+      message.message = "Failed to fetch details. Please try again";
+      message.severity = "error";
+      setMessage(message);
+      setOpenAlert(true);
+    }
+
+    const invoiceHistory = await axios.get(`${process.env.REACT_APP_API_URL}/invoice`).catch(
+      (error) => {
+        const message = alert;
+        message.message = "Failed to fetch details. Please try again";
+        message.severity = "error";
+        setMessage(message);
+        setOpenAlert(true);
+      }
+    )
+    if (invoiceHistory) {
+      setInvoiceHistory(invoiceHistory.data.data.results);
+    }
+
+    const schedule = await axios.get(`${process.env.REACT_APP_API_URL}/schedule`).catch(
+      (error) => {
+        const message = alert;
+        message.message = "Failed to fetch details. Please try again";
+        message.severity = "error";
+        setMessage(message);
+        setOpenAlert(true);
+      }
+    )
+    if (schedule) {
+      setSchedulesList(schedule.data.data.results);
+    }
+    setIsLoading(false);
+  }
+
   React.useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client`)
-      .then((res) => {
-        setClientData(res.data.data.results);
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-    axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
-      .then((res) => {
-        setInvoiceHistory(res.data.data.results);
-        // TODO:: use a common setLoading of false for both the fetch api calls
-        // Whatever is resolved last should set the loading to false.
-        // and use only one variable
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-      axios.get(`${process.env.REACT_APP_API_URL}/schedule`)
-      .then((res) => {
-        setSchedulesList(res.data.data.results);
-        setLoading(!isLoading);
-        // TODO:: use a common setLoading of false for both the fetch api calls
-        // Whatever is resolved last should set the loading to false.
-        // and use only one variable
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchInitalData();
+  }, []);
 
 
   React.useEffect(() => {
@@ -223,7 +220,6 @@ export default function ScheduleInvoice() {
           message.severity = "error";
           setMessage(message);
           setOpenAlert(true);
-          // TODO:: Show error msg in the snack bar.; Done
         })
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -264,7 +260,6 @@ export default function ScheduleInvoice() {
       })
   }
 
-  
   function buttonsBar() {
     return (
       <div>
@@ -300,7 +295,6 @@ export default function ScheduleInvoice() {
     )
   }
 
-  // TODO:: update the submit button to do only submit and validations needs to be handled only via React forms
   return (
     <div className='Main-box'>
       <h1 className='Main-box-h1'>{id ? 'Edit Schedule ' : 'Add New Schedule'}</h1>
@@ -313,7 +307,7 @@ export default function ScheduleInvoice() {
             id='demo-multiple-name'
             defaultValue=''
             value={scheduleData.clientId}
-            onChange={handleChange}
+            onChange={handleClientChange}
             input={<Input />}
             MenuProps={MenuProps}
           >
@@ -374,7 +368,7 @@ export default function ScheduleInvoice() {
             id='demo-multiple-name'
             defaultValue={''}
             value={scheduleData.frequency}
-            onChange={(e) => { handleFrequency(e) }}
+            onChange={(e) => { handleFrequencyChange(e) }}
             input={<Input />}
             MenuProps={MenuProps}
           >
@@ -395,16 +389,16 @@ export default function ScheduleInvoice() {
               mask='__:__ _M'
               label='Select Time'
               value={scheduleData.time}
-              onChange={(e) => handleTime(e)}
+              onChange={(e) => handleTimeChange(e)}
             />
           </MuiPickersUtilsProvider>
         </div>
         {buttonsBar()}
-        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={alert.severity}>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={setOpenAlert(false)}>
+          <Alert onClose={setOpenAlert(false)} severity={alert.severity}>
             {alert.message}
           </Alert>
-      </Snackbar>
+        </Snackbar>
       </div>}
     </div>
   )
