@@ -71,10 +71,32 @@ export default function PersistentDrawerLeft(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [openb, setOpenb] = React.useState(false)
-  const [openc, setOpenc] = React.useState(false)
-  const [opent, setOpent] = React.useState(false)
-  const [openi, setOpeni] = React.useState(false)
+  const [state, setState] = React.useState({ client: false, candidate: false,timesheet:false,invoice:false,});
+  const handleClient = e => {
+    const { name } = e.target;
+    setState(() => ({
+      client: true
+    }));
+  };
+  const handleCandidate = e => {
+    const { name } = e.target;
+    setState(() => ({
+        candidate: true
+    }));
+  };
+
+  const timesheet = e => {
+    const { name } = e.target;
+    setState(() => ({
+        timesheet: true
+    }));
+  };
+  const invoice = e => {
+    const { name } = e.target;
+    setState(() => ({
+        invoice: true
+    }));
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -128,10 +150,14 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-          <div className={openb ? "sidebar-item open" : "sidebar-item"}>
-            <ListItem button className="sidebar-title" onClick={() => setOpenb(!openb)}>
+          <div className={state.client ? "sidebar-item open" :"sidebar-item"}>
+            <ListItem button className="sidebar-title" value={state.client}
+              onClick={handleClient}
+              name="client">
               <ListItemText primary='Client' />
-              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenb(!openb)} ></KeyboardArrowDownIcon>
+              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" value={state.client}
+                onClick={handleClient}
+                name="client" ></KeyboardArrowDownIcon>
             </ListItem>
             <div className="sidebar-content">
               <ListItem button onClick={() => history.push('/client')}>
@@ -144,11 +170,11 @@ export default function PersistentDrawerLeft(props) {
               </ListItem>
             </div>
           </div >
-          <div style={{ marginTop: -10 }}>
-            <div className={openc ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpenc(!openc)}>
+          <div style={{ marginTop: -5 }}>
+            <div className={state.candidate ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" value={state.candidate} onClick={handleCandidate} name="candidate">
                 <ListItemText primary='Candidate' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpenc(!openc)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" value={state.candidate} onClick={handleCandidate} name="candidate" ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/candidate')}>
@@ -161,11 +187,11 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -10 }}>
-            <div className={opent ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpent(!opent)}>
+          <div style={{ marginTop: -5 }}>
+            <div className={state.timesheet ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" value={state.timesheet} onClick={timesheet} name="timesheet">
                 <ListItemText primary='Time Sheet' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpent(!opent)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" value={state.timesheet} onClick={timesheet} name="timesheet" ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push("/timesheet")}>
@@ -180,11 +206,11 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -10 }}>
-            <div className={openi ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={() => setOpeni(!openi)}>
+          <div style={{ marginTop: -5 }}>
+            <div className={state.invoice ? "sidebar-item open" : "sidebar-item"}>
+              <ListItem button className="sidebar-title" value={state.invoice} onClick={invoice} name="invoice">
                 <ListItemText primary='Invoice' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => setOpeni(!openi)} ></KeyboardArrowDownIcon>
+                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" value={state.invoice} onClick={invoice} name="invoice" ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
                 <ListItem button onClick={() => history.push('/home')}>
@@ -197,7 +223,8 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-          <ListItem button style={{ marginTop: -10 }} onClick={() => { history.push('/'); localStorage.clear() }}>
+
+          <ListItem button style={{ marginTop: -5 }} onClick={() => { history.push('/'); localStorage.clear() }}>
             <ListItemText primary='Logout' />
           </ListItem>
         </List>
