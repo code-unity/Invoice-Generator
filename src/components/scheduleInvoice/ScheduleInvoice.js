@@ -394,8 +394,8 @@ export default function ScheduleInvoice() {
           </MuiPickersUtilsProvider>
         </div>
         {buttonsBar()}
-        <Snackbar open={openAlert} autoHideDuration={6000} onClose={setOpenAlert(false)}>
-          <Alert onClose={setOpenAlert(false)} severity={alert.severity}>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={() => setOpenAlert(false)}>
+          <Alert onClose={() => setOpenAlert(false)} severity={alert.severity}>
             {alert.message}
           </Alert>
         </Snackbar>
