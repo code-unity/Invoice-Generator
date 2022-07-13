@@ -79,7 +79,6 @@ export default function ScheduleInvoice() {
     time: null,
   };
   const [scheduleData, setScheduleData] = React.useState(INTIAL_STATE);
-  
   React.useEffect(() => {
     fetchRequiredData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -165,8 +164,8 @@ export default function ScheduleInvoice() {
     setScheduleData(temp);
   }
 
-  function resetFields(){
-    setScheduleData(INTIAL_STATE);
+  function resetFields() {
+    setScheduleData(INTIAL_STATE)
   }
 
   const uploadDetails = () => {

@@ -1,0 +1,28 @@
+.container {
+  border: 2px solid black;
+  width: 35%;
+  margin: auto;
+  margin-top: 2rem;
+  height: 15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  font-weight: bold;
+  border-radius: 12px;
+}
+.container .date {
+  text-align: center;
+}
+label {
+  margin-right: 0.5rem;
+}
+.email {
+  display: flex;
+  justify-content: space-around;
+}
+
+h2 {
+  margin-top: 5rem;
+  margin-left: 40%;
+  font-weight: normal;
+}
