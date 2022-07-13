@@ -35,9 +35,7 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 300,
   },
   invoiceNumber: {
-    float: 'right',
     marginTop: '10px',
-    marginLeft: '10px',
     marginRight: '10px',
     width: '150px',
     height: '50px',
@@ -208,12 +206,12 @@ export default function ScheduleInvoice() {
       <div>
         {!id &&
           <>
-            <div style={{ float: 'left', marginTop: '150px' }}>
+            <div style={{ display:'inline-block', marginTop: '10px' ,marginLeft: '300px',marginRight : '30px'}}>
               <Button variant='contained' color='primary' className='button-schedule-page' onClick={() => { goToGenerateInvoice(); }}>
                 Create Invoice
               </Button>
             </div>
-            <div style={{ float: 'right', marginTop: '150px' }}>
+            <div style={{display:'inline-block',marginTop: '10px' ,marginLeft:'0px'}}>
               <Button type='submit' className='button-schedule-page' variant='contained' color='primary' onClick={() => { uploadDetails(); }}>
                 Submit Schedule
               </Button>
@@ -222,14 +220,14 @@ export default function ScheduleInvoice() {
         }
         {id &&
           <>
-            <div style={{ float: 'left', marginTop: '150px' }}>
-              <Button type='submit' className='button-schedule-page' variant='contained' color='primary' onClick={deleteData}>
-                Delete
-              </Button>
-            </div>
-            <div style={{ float: 'right', marginTop: '150px' }}>
+            <div style={{ display:'inline-block',marginTop: '10px' ,marginLeft:'300px',marginRight:'30px'}}>
               <Button variant='contained' color='primary' className='button-schedule-page' onClick={updateData}>
                 Save
+              </Button>
+            </div>
+            <div style={{  display:'inline-block',marginTop: '10px' ,marginLeft: '0px'}}>
+              <Button type='submit' className='button-schedule-page' variant='contained' color='primary' onClick={deleteData}>
+                Delete
               </Button>
             </div>
           </>
@@ -242,107 +240,117 @@ export default function ScheduleInvoice() {
     <div className='Main-box'>
       <h1 className='Main-box-h1'>{id ? 'Edit Schedule ' : 'Add New Schedule'}</h1>
       {isLoading && <div>loading...</div>}
-      {!isLoading && <div className='form form-for-schedule'>
-        <FormControl className={classes.formControl} style={{ marginLeft: '40px' }}>
-          <InputLabel id='demo-multiple-name-label'>Select Client</InputLabel>
-          <Select
-            labelId='demo-multiple-name-label'
-            id='demo-multiple-name'
-            defaultValue=''
-            value={scheduleData.clientId}
-            onChange={handleClientChange}
-            input={<Input />}
-            MenuProps={MenuProps}
-          >
-            <MenuItem value=''>
-              <em>None</em>
-            </MenuItem>
-            {clientData.map((client) => (
-              <MenuItem key={client._id} value={client._id} >
-                {client.client_name}
+      {!isLoading && 
+      <div className='form-for-schedule box'>
+        <div style={{display:'flex' , justifyContent:'space-between'}}> 
+          <FormControl className={classes.formControl} style={{ marginLeft: '40px' }}>
+            <InputLabel id='demo-multiple-name-label'>Select Client</InputLabel>
+            <Select
+              labelId='demo-multiple-name-label'
+              id='demo-multiple-name'
+              defaultValue=''
+              value={scheduleData.clientId}
+              onChange={handleClientChange}
+              input={<Input />}
+              MenuProps={MenuProps}
+            >
+              <MenuItem value=''>
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl className={classes.formControl} style={{ float: 'right', marginLeft: '50px', marginRight: '40px' }}>
-          <InputLabel id='demo-multiple-name-label'>Invoice Number</InputLabel>
-          <Select
-            labelId='demo-multiple-name-label'
-            id='demo-multiple-name'
-            defaultValue={''}
-            value={scheduleData.invoiceNumber}
-            onChange={(e) => { handleInvoiceChange(e) }}
-            input={<Input />}
-            MenuProps={MenuProps}
-          >
-            <MenuItem value=''>
-              <em>None</em>
-            </MenuItem>
-            {invoiceHistory.map((item) => (
-              <MenuItem key={item._id} value={item.invoice_number} >
-                {item.invoice_number}
+              {clientData.map((client) => (
+                <MenuItem key={client._id} value={client._id} >
+                  {client.client_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl className={classes.formControl} style={{ marginLeft: '40px' ,marginRight:'40px'}}>
+            <InputLabel id='demo-multiple-name-label'>Invoice Number</InputLabel>
+            <Select
+              labelId='demo-multiple-name-label'
+              id='demo-multiple-name'
+              defaultValue={''}
+              value={scheduleData.invoiceNumber}
+              onChange={(e) => { handleInvoiceChange(e) }}
+              input={<Input />}
+              MenuProps={MenuProps}
+            >
+              <MenuItem value=''>
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {invoiceHistory.map((item) => (
+                <MenuItem key={item._id} value={item.invoice_number} >
+                  {item.invoice_number}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
         <br></br>
-        <div style={{ float: 'left', marginTop: '30px', marginRight: '15px', marginBottom: '10px', marginLeft: '40px' }}>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
-              disableToolbar
-              format='yyyy-MM-dd'
-              openTo='year'
-              variant='inline'
-              margin='normal'
-              label='Starting Date'
-              minDate={Date.now()}
-              value={scheduleData.date}
-              onChange={handleDateChange}
-              KeyboardButtonProps={{
-                'aria-label': 'change date',
-              }}
-            />
-          </MuiPickersUtilsProvider>
+        <div style={{display:'flex', justifyContent:'space-between'}}>
+          <div style={{ marginLeft: '40px' }}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils} style={{marginTop:'0px'}}>
+              <KeyboardDatePicker
+                disableToolbar
+                format='yyyy-MM-dd'
+                openTo='year'
+                variant='inline'
+                margin='normal'
+                label='Starting Date'
+                minDate={Date.now()}
+                value={scheduleData.date}
+                onChange={handleDateChange}
+                style={{marginTop:'0px'}}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
+            <FormControl className={classes.formControl} style={{ marginLeft: '40px' , marginRight:'40px',marginTop:'0px'}}>
+              <InputLabel id='demo-multiple-name-label' style={{marginTop:'0px'}}>Set Frequency</InputLabel>
+              <Select
+                labelId='demo-multiple-name-label'
+                id='demo-multiple-name'
+                defaultValue={''}
+                value={scheduleData.frequency}
+                onChange={(e) => { handleFrequencyChange(e) }}
+                input={<Input />}
+                MenuProps={MenuProps}
+              >
+                <MenuItem value=''>
+                  <em>None</em>
+                </MenuItem>
+                {frequencyList.map((temp) => (
+                  <MenuItem key={temp.item} value={temp.item} >
+                    {temp.item}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
         </div>
-        <FormControl className={classes.formControl} style={{ float: 'right', marginLeft: '50px', marginTop: '45px', marginRight: '40px' }}>
-          <InputLabel id='demo-multiple-name-label'>Set Frequency</InputLabel>
-          <Select
-            labelId='demo-multiple-name-label'
-            id='demo-multiple-name'
-            defaultValue={''}
-            value={scheduleData.frequency}
-            onChange={(e) => { handleFrequencyChange(e) }}
-            input={<Input />}
-            MenuProps={MenuProps}
-          >
-            <MenuItem value=''>
-              <em>None</em>
-            </MenuItem>
-            {frequencyList.map((temp) => (
-              <MenuItem key={temp.item} value={temp.item} >
-                {temp.item}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <div className='time-picker-div'>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardTimePicker
-              format='hh:mm a'
-              mask='__:__ _M'
-              label='Select Time'
-              value={scheduleData.time}
-              onChange={(e) => handleTimeChange(e)}
-            />
-          </MuiPickersUtilsProvider>
+        <br></br>
+        <div style={{display:'flex' , justifyContent:'space-between'}}> 
+          <div style={{ marginLeft: '40px',marginRight:'40px' }}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils} style={{marginTop:'0px'}}>
+                <KeyboardTimePicker
+                  format='hh:mm a'
+                  mask='__:__ _M'
+                  label='Select Time'
+                  value={scheduleData.time}
+                  onChange={(e) => handleTimeChange(e)}
+                  style={{marginTop:'0px'}}
+                />
+              </MuiPickersUtilsProvider>
+          </div>
         </div>
-        {buttonsBar()}
         <Snackbar open={openAlert} autoHideDuration={6000} onClose={() => setOpenAlert(false)}>
           <Alert onClose={() => setOpenAlert(false)} severity={alert.severity}>
             {alert.message}
           </Alert>
         </Snackbar>
       </div>}
+      {buttonsBar()}
     </div>
   )
 }
