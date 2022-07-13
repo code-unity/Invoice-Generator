@@ -77,7 +77,7 @@ const ViewSchedule = () => {
         try {
             const deleteScheduleData = await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${value}`)
             if (deleteScheduleData) {
-                handleResponse('Schedule enabled successfully.','success');
+                handleResponse('Schedule deleted successfully.','success');
             }
         } 
         catch (error) {
