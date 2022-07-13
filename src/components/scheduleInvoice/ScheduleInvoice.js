@@ -69,7 +69,6 @@ export default function ScheduleInvoice() {
   const frequencyList = [{ item: 'Daily' }, { item: 'Weekly' }, { item: 'Monthly' }, { item: 'Anually' }];
   const INTIAL_STATE = {
     isDisabled: false,
-    scheduleName: '',
     clientId: '',
     invoiceNumber: '',
     date: null,
@@ -142,16 +141,6 @@ export default function ScheduleInvoice() {
       const clientIdNew=event.target.value;
       const temp ={...scheduleData};
       temp.clientId = clientIdNew;
-      try{
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule/getCountByClientId/${clientIdNew}`)
-        const count = response.data.data
-        if(response){
-          temp.scheduleName = `${clientData.find(data => data._id === clientIdNew).client_name}-CU-${(count + 1)}`;
-        }
-      }
-      catch(error) {
-        handleResponse('Failed to fetch details. Please try again.','error');
-      }
       setScheduleData(temp);
     }
   };
