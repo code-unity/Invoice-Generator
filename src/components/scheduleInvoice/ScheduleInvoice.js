@@ -192,8 +192,8 @@ export default function ScheduleInvoice() {
 
   
 
-  const uploadDetails = async () => {
-    await axios.post(`${process.env.REACT_APP_API_URL}/schedule`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
+  const uploadDetails = () => {
+    axios.post(`${process.env.REACT_APP_API_URL}/schedule`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         const message = alert;
         message.message = "Schedule details uploaded successfully";
@@ -216,8 +216,8 @@ export default function ScheduleInvoice() {
   }
   
 
-  async function updateData() {
-    await axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${id}`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
+  function updateData() {
+    axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${id}`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         const message = alert;
         message.message = "Schedule details updated successfully";
@@ -234,8 +234,8 @@ export default function ScheduleInvoice() {
       })
   }
 
-  async function deleteData() {
-    await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
+  function deleteData() {
+    axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
       .then((response) => {
         const message = alert;
         message.message = "Schedule details deleted successfully";
