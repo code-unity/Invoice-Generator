@@ -12,7 +12,7 @@ import history from './history'
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
 import Addpayroll from "./pages/Addpayroll"
-
+import InvoiceFilter from './pages/InvoiceFilter/InvoiceFilter'
 
 function App() {
   return (
@@ -28,9 +28,10 @@ function App() {
         <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
         <ProtectedRoute path="/view-timesheet" component={ViewTimeSheet} exact />
         <ProtectedRoute path="/history" component={History} exact />
-        <ProtectedRoute path="/view-client"  component={ViewClient} exact />
+        <ProtectedRoute path="/view-client" component={ViewClient} exact />
         <ProtectedRoute path="/Addpayroll" component={Addpayroll} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
+        <ProtectedRoute path="/invoice-filter" component={InvoiceFilter} exact />
       </Switch>
     </Router>
   );
