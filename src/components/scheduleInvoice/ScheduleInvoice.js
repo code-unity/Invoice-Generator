@@ -62,8 +62,8 @@ function Alert(props) {
 export default function ScheduleInvoice() {
   const { id } = useParams();
   const classes = useStyles();
-  const [clientData, setClientData] = React.useState([]); // TODO:: remove this
-  const [invoiceHistory, setInvoiceHistory] = React.useState([]); // TODO:: remove this
+  const [clientData, setClientData] = React.useState([]); 
+  const [invoiceHistory, setInvoiceHistory] = React.useState([]); 
   const history = useHistory();
   const [schedulesList, setSchedulesList] = React.useState([])
   const [openAlert, setOpenAlert] = React.useState(false);
@@ -79,51 +79,106 @@ export default function ScheduleInvoice() {
     frequency: '',
     time: null,
   });
+  React.useEffect(() => {
+    fetchRequiredData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleTime = (e) => {
+  const fetchRequiredData = async () => {
+    try {
+      const clientData = await axios.get(`${process.env.REACT_APP_API_URL}/client`);
+      if (clientData) {
+        setClientData(clientData.data.data.results);
+      }
+    } catch (error) {
+      const message = alert;
+      message.message = "Failed to fetch details. Please try again";
+      message.severity = "error";
+      setMessage(message);
+      setOpenAlert(true);
+    }
+    try {
+      const invoiceData = await axios.get(`${process.env.REACT_APP_API_URL}/invoice`);
+      if (invoiceData) {
+        setInvoiceHistory(invoiceData.data.data.results);
+      }
+    } catch (error) {
+      const message = alert;
+      message.message = "Failed to fetch details. Please try again";
+      message.severity = "error";
+      setMessage(message);
+      setOpenAlert(true);
+    }
+
+    try {
+      const schedulesData = await axios.get(`${process.env.REACT_APP_API_URL}/schedule`);
+      if (schedulesData) {
+        setSchedulesList(schedulesData.data.data.results);
+      }
+    } catch (error) {
+      const message = alert;
+      message.message = "Failed to fetch details. Please try again";
+      message.severity = "error";
+      setMessage(message);
+      setOpenAlert(true);
+      setLoading(false)
+    }
+    if(id){
+      try {
+        const scheduledData = await axios.get(`${process.env.REACT_APP_API_URL}/schedule/${id}`);
+        if (scheduledData) {
+          setScheduleData(scheduledData.data.data);
+        }
+      } catch (error) {
+        const message = alert;
+        message.message = "Failed to fetch details. Please try again";
+        message.severity = "error";
+        setMessage(message);
+        setOpenAlert(true);
+      }
+    }
+  }
+
+  const handleTimeChange = (e) => {
       const temp={...scheduleData};
       temp.time = e;
       setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
   const handleDateChange = (date) => {
       const temp ={...scheduleData};
       temp.date = date;
       setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
-  const handleFrequency = (event) => {
+  const handleFrequencyChange = (event) => {
       const temp ={...scheduleData};
       temp.frequency = event.target.value;
       setScheduleData(temp);
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
-  function handleChange(event) {
+  function handleClientChange(event) {
     if (event.target.value !== '') {
-        const temp ={...scheduleData};
-        temp.clientId = event.target.value;
-        setScheduleData(temp);
+      const clientIdNew=event.target.value;
+      const temp ={...scheduleData};
+      temp.clientId = clientIdNew;
+      const count = schedulesList.reduce((accumulator, data) => {
+        if (data.clientId === clientIdNew) {
+          return accumulator + 1;
+        }
+        return accumulator;
+      }, 0);
+      temp.scheduleName = `${clientData.find(data => data._id === clientIdNew).client_name}-CU-${(count + 1)}`;
+      setScheduleData(temp);
     }
   };
 
-  // TODO:: update the state properly, this will not update the state in React; Done
   function handleInvoiceChange(e) {
         const temp ={...scheduleData};
         temp.invoiceNumber = e.target.value;
         setScheduleData(temp);
   }
-  
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenAlert(false);
-  };
 
-  function setFields(){
+  function resetFields(){
     const temp={...scheduleData};
     temp.isDisabled=false
     temp.scheduleName=''
@@ -135,23 +190,19 @@ export default function ScheduleInvoice() {
     setScheduleData(temp)
   }
 
-  function fillScheduleName(clientName){
-    const count = schedulesList.filter(data => data.clientId === clientName);
-    scheduleData.scheduleName=clientData.filter(data => data._id === clientName)[0].client_name + '-CU-' + (count.length + 1);
-  }
+  
 
-  function uploadDetails() {
-    fillScheduleName(scheduleData.clientId);
-    axios.post(`${process.env.REACT_APP_API_URL}/schedule`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
+  const uploadDetails = async () => {
+    await axios.post(`${process.env.REACT_APP_API_URL}/schedule`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         const message = alert;
         message.message = "Schedule details uploaded successfully";
         message.severity = "success";
         setMessage(message);
         setOpenAlert(true);
-        setFields();
+        resetFields();
       })
-      .catch(error => {
+      .catch((error) => {
         const message = alert;
         message.message = "Failed to upload Schedule details. Please try again";
         message.severity = "error";
@@ -163,73 +214,10 @@ export default function ScheduleInvoice() {
   function goToGenerateInvoice() {
     history.push('/home');
   }
+  
 
-  React.useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/client`)
-      .then((res) => {
-        setClientData(res.data.data.results);
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-    axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
-      .then((res) => {
-        setInvoiceHistory(res.data.data.results);
-        // TODO:: use a common setLoading of false for both the fetch api calls
-        // Whatever is resolved last should set the loading to false.
-        // and use only one variable
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-      axios.get(`${process.env.REACT_APP_API_URL}/schedule`)
-      .then((res) => {
-        setSchedulesList(res.data.data.results);
-        setLoading(!isLoading);
-        // TODO:: use a common setLoading of false for both the fetch api calls
-        // Whatever is resolved last should set the loading to false.
-        // and use only one variable
-      })
-      .catch((error) => {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
-        // TODO:: Show error msg in the snack bar.; Done
-      })
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-
-  React.useEffect(() => {
-    if (id) {
-      axios.get(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
-        .then((response) => {
-          setScheduleData(response.data.data);
-        })
-        .catch((error) => {
-          const message = alert;
-          message.message = "Schedule details does not exist / May be deleted";
-          message.severity = "error";
-          setMessage(message);
-          setOpenAlert(true);
-          // TODO:: Show error msg in the snack bar.; Done
-        })
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function updateData() {
-    axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${id}`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
+  async function updateData() {
+    await axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${id}`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
         const message = alert;
         message.message = "Schedule details updated successfully";
@@ -246,8 +234,8 @@ export default function ScheduleInvoice() {
       })
   }
 
-  function deleteData() {
-    axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
+  async function deleteData() {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
       .then((response) => {
         const message = alert;
         message.message = "Schedule details deleted successfully";
@@ -300,12 +288,11 @@ export default function ScheduleInvoice() {
     )
   }
 
-  // TODO:: update the submit button to do only submit and validations needs to be handled only via React forms
   return (
     <div className='Main-box'>
       <h1 className='Main-box-h1'>{id ? 'Edit Schedule ' : 'Add New Schedule'}</h1>
-      {isLoading && <div>loading...</div>}
-      {!isLoading && <div className='form form-for-schedule'>
+      {!isLoading && <div>loading...</div>}
+      {isLoading && <div className='form form-for-schedule'>
         <FormControl className={classes.formControl} style={{ marginLeft: '40px' }}>
           <InputLabel id='demo-multiple-name-label'>Select Client</InputLabel>
           <Select
@@ -313,7 +300,7 @@ export default function ScheduleInvoice() {
             id='demo-multiple-name'
             defaultValue=''
             value={scheduleData.clientId}
-            onChange={handleChange}
+            onChange={handleClientChange}
             input={<Input />}
             MenuProps={MenuProps}
           >
@@ -374,7 +361,7 @@ export default function ScheduleInvoice() {
             id='demo-multiple-name'
             defaultValue={''}
             value={scheduleData.frequency}
-            onChange={(e) => { handleFrequency(e) }}
+            onChange={(e) => { handleFrequencyChange(e) }}
             input={<Input />}
             MenuProps={MenuProps}
           >
@@ -395,13 +382,13 @@ export default function ScheduleInvoice() {
               mask='__:__ _M'
               label='Select Time'
               value={scheduleData.time}
-              onChange={(e) => handleTime(e)}
+              onChange={(e) => handleTimeChange(e)}
             />
           </MuiPickersUtilsProvider>
         </div>
         {buttonsBar()}
-        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={alert.severity}>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={() => setOpenAlert(false)}>
+          <Alert onClose={() => setOpenAlert(false)} severity={alert.severity}>
             {alert.message}
           </Alert>
       </Snackbar>
