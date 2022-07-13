@@ -70,7 +70,7 @@ export default function ScheduleInvoice() {
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [isLoading, setIsLoading] = React.useState(false);
   const frequencyList = [{ item: 'Daily' }, { item: 'Weekly' }, { item: 'Monthly' }, { item: 'Anually' }];
-  const [scheduleData, setScheduleData] = React.useState({
+  const INTIAL_STATE = {
     isDisabled: false,
     scheduleName: '',
     clientId: '',
@@ -78,7 +78,8 @@ export default function ScheduleInvoice() {
     date: null,
     frequency: '',
     time: null,
-  });
+  };
+  const [scheduleData, setScheduleData] = React.useState(INTIAL_STATE);
 
   const handleTimeChange = (e) => {
     const temp = { ...scheduleData };
@@ -113,15 +114,7 @@ export default function ScheduleInvoice() {
   }
 
   function resetFields() {
-    const temp = { ...scheduleData };
-    temp.isDisabled = false
-    temp.scheduleName = ''
-    temp.clientId = ''
-    temp.date = null
-    temp.time = null
-    temp.invoiceNumber = ''
-    temp.frequency = ''
-    setScheduleData(temp)
+    setScheduleData(INTIAL_STATE)
   }
 
   function fillScheduleName(clientId) {
