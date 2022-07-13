@@ -14,6 +14,8 @@ import ViewTimeSheet from "./components/viewTimesheet";
 import ScheduleInvoice from './components/scheduleInvoice/ScheduleInvoice';
 import ViewSchedule from './pages/schedule/viewSchedule';
 
+import Addpayroll from "./pages/Addpayroll"
+import InvoiceFilter from './pages/InvoiceFilter/InvoiceFilter'
 
 function App() {
   return (
@@ -29,11 +31,13 @@ function App() {
         <ProtectedRoute path="/timesheet" component={TimeSheetComp} exact />
         <ProtectedRoute path="/view-timesheet" component={ViewTimeSheet} exact />
         <ProtectedRoute path="/history" component={History} exact />
-        <ProtectedRoute path="/view-client"  component={ViewClient} exact />
+        <ProtectedRoute path="/view-client" component={ViewClient} exact />
+        <ProtectedRoute path="/Addpayroll" component={Addpayroll} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
         <ProtectedRoute path="/schedule-invoice"  component={ScheduleInvoice} exact />
         <ProtectedRoute path="/view-schedule"  component={ViewSchedule} exact />
         <ProtectedRoute path="/schedule/:id"  key="edit-schedule" component={ScheduleInvoice} exact />
+        <ProtectedRoute path="/invoice-filter" component={InvoiceFilter} exact />
       </Switch>
     </Router>
   );

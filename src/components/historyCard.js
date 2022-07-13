@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ShareIcon from '@material-ui/icons/Share';
 import { Divider } from '@material-ui/core';
-
+import axios from "axios";
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -59,6 +59,10 @@ const useStyles = makeStyles((theme)=>({
 
 export default function OutlinedCard(props) {
   const classes = useStyles();
+    function deleteInvoice() {
+      axios.delete(`${process.env.REACT_APP_API_URL}/invoice/${props.data._id}`)
+
+    }
   return (
     <Card className={classes.root} variant="outlined">
       <CardContent>
@@ -129,8 +133,9 @@ export default function OutlinedCard(props) {
         
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton size ="small" aria-label="Delete">
-          <DeleteIcon />
+        <IconButton size ="small" aria-label="Delete" onClick= {deleteInvoice} >
+         
+        <DeleteIcon/>
         </IconButton>
         <IconButton size ="small" aria-label="share">
           <ShareIcon />
