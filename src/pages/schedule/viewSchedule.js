@@ -28,78 +28,61 @@ const ViewSchedule = () => {
     const [alert, setMessage] = React.useState({ message: "", severity: "" });
     const [isLoading, setLoading] = useState(true);
     
+    function handleResponse(newMessage,newSeverity){
+        const message = alert;
+        message.message = newMessage;
+        message.severity = newSeverity;
+        setMessage(message);
+        setOpenAlert(true);
+      }
+
     const fetchData = async () => {
-        await axios.get(`${process.env.REACT_APP_API_URL}/schedule`)
-            .then((data) => {
-                setSchedulesList(data.data.data.results)
-            })
-            .catch((error) => {
-                const message = alert;
-                message.message = "Failed to fetch details. Please try again ";
-                message.severity = "error";
-                setMessage(message);
-                setOpenAlert(true);
-            });
-        await axios.get(`${process.env.REACT_APP_API_URL}/client`)
-            .then((data) => {
-                setClientData(data.data.data.results)
+        try {
+            const fetchScheduleData = await axios.get(`${process.env.REACT_APP_API_URL}/schedule`)
+            if (fetchScheduleData) {
+                setSchedulesList(fetchScheduleData.data.data.results)
+            }
+          } catch (error) {
+            handleResponse('Failed to fetch details. Please try again.','error');
+          }
+          try {
+            const fetchClientData = await axios.get(`${process.env.REACT_APP_API_URL}/client`)
+            if (fetchClientData) {
+                setClientData(fetchClientData.data.data.results)
                 setLoading(false)
-            })
-            .catch((error) => {
-                const message = alert;
-                message.message = "Failed to fetch details. Please try again ";
-                message.severity = "error";
-                setMessage(message);
-                setOpenAlert(true);
-            });
+            }
+          } catch (error) {
+            handleResponse('Failed to fetch details. Please try again.','error');
+          }
     }
     
     async function disableSchedule (value) {
         value.isDisabled= !value.isDisabled
-        await axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${value._id}`, value, { headers: { 'Content-Type': 'application/json' } })
-        .then((response) => {
-            if(!value.isDisabled){
-                const message = alert;
-                message.message = "Schedule enabled successfully. ";
-                message.severity = "success";
-                setMessage(message);
-                setOpenAlert(true);
+        try {
+            const disableData = await axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${value._id}`, value, { headers: { 'Content-Type': 'application/json' } })
+            if (disableData) {
+                if(!value.isDisabled){
+                    handleResponse('Schedule enabled successfully.','success');
+                }
+                else{
+                    handleResponse('Schedule disabled successfully.','error');
+                }
             }
-            else{
-                const message = alert;
-                message.message = "Schedule disabled successfully. ";
-                message.severity = "error";
-                setMessage(message);
-                setOpenAlert(true);
-            }
-            
-          })
-          .catch((error) => {
-            const message = alert;
-            message.message = "Error caused while disabling the schedule. Please try again";
-            message.severity = "error";
-            setMessage(message);
-            setOpenAlert(true);
-          })
+          } catch (error) {
+            handleResponse('Error caused while disabling the schedule. Please try again','error');
+          }
       }
     
     async function deleteData(value) {
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${value}`)
-            .then((response) => {
-                const message = alert;
-                message.message = "Schedule details deleted successfully. ";
-                message.severity = "success";
-                setMessage(message);
-                setOpenAlert(true);
-              })
-          } catch (error) {
-            const message = alert;
-            message.message = "Failed to fetch details. Please try again";
-            message.severity = "error";
-            setMessage(message);
-            setOpenAlert(true);
-          }
+            const deleteScheduleData = await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${value}`)
+            if (deleteScheduleData) {
+                handleResponse('Schedule enabled successfully.','success');
+            }
+        } 
+        catch (error) {
+            handleResponse('Failed to delete details. Please try again.','error');
+        }
     }
     const handleClose = (event, reason) => {
         setOpenAlert(false);

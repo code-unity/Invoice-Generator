@@ -65,12 +65,11 @@ export default function ScheduleInvoice() {
   const [clientData, setClientData] = React.useState([]); 
   const [invoiceHistory, setInvoiceHistory] = React.useState([]); 
   const history = useHistory();
-  const [schedulesList, setSchedulesList] = React.useState([])
   const [openAlert, setOpenAlert] = React.useState(false);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [isLoading, setIsLoading] = React.useState(true);
   const frequencyList = [{ item: 'Daily' }, { item: 'Weekly' }, { item: 'Monthly' }, { item: 'Anually' }];
-  const [scheduleData, setScheduleData] = React.useState({
+  const INTIAL_STATE = {
     isDisabled: false,
     scheduleName: '',
     clientId: '',
@@ -78,7 +77,9 @@ export default function ScheduleInvoice() {
     date: null,
     frequency: '',
     time: null,
-  });
+  };
+  const [scheduleData, setScheduleData] = React.useState(INTIAL_STATE);
+  
   React.useEffect(() => {
     fetchRequiredData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -90,37 +91,16 @@ export default function ScheduleInvoice() {
         setClientData(clientData.data.data.results);
       }
     } catch (error) {
-      const message = alert;
-      message.message = "Failed to fetch details. Please try again";
-      message.severity = "error";
-      setMessage(message);
-      setOpenAlert(true);
+      handleResponse('Failed to fetch details. Please try again.','error');
     }
     try {
       const invoiceData = await axios.get(`${process.env.REACT_APP_API_URL}/invoice`);
       if (invoiceData) {
         setInvoiceHistory(invoiceData.data.data.results);
+        setIsLoading(false)
       }
     } catch (error) {
-      const message = alert;
-      message.message = "Failed to fetch details. Please try again";
-      message.severity = "error";
-      setMessage(message);
-      setOpenAlert(true);
-    }
-
-    try {
-      const schedulesData = await axios.get(`${process.env.REACT_APP_API_URL}/schedule`);
-      if (schedulesData) {
-        setSchedulesList(schedulesData.data.data.results);
-      }
-    } catch (error) {
-      const message = alert;
-      message.message = "Failed to fetch details. Please try again";
-      message.severity = "error";
-      setMessage(message);
-      setOpenAlert(true);
-      setIsLoading(false)
+      handleResponse('Failed to fetch details. Please try again.','error');
     }
     if(id){
       try {
@@ -129,24 +109,28 @@ export default function ScheduleInvoice() {
           setScheduleData(scheduledData.data.data);
         }
       } catch (error) {
-        const message = alert;
-        message.message = "Failed to fetch details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Failed to fetch details. Please try again.','error');
       }
     }
   }
 
-  const handleTimeChange = (e) => {
+  function handleResponse(newMessage,newSeverity){
+    const message = alert;
+    message.message = newMessage;
+    message.severity = newSeverity;
+    setMessage(message);
+    setOpenAlert(true);
+  }
+
+  const handleTimeChange = (selectedTime) => {
       const temp={...scheduleData};
-      temp.time = e;
+      temp.time = selectedTime;
       setScheduleData(temp);
   };
 
-  const handleDateChange = (date) => {
+  const handleDateChange = (selectedDate) => {
     const temp = { ...scheduleData };
-    temp.date = date;
+    temp.date = selectedDate;
     setScheduleData(temp);
   };
 
@@ -156,99 +140,67 @@ export default function ScheduleInvoice() {
       setScheduleData(temp);
   };
 
-  function handleClientChange(event) {
+  async function handleClientChange(event) {
     if (event.target.value !== '') {
       const clientIdNew=event.target.value;
       const temp ={...scheduleData};
       temp.clientId = clientIdNew;
-      const count = schedulesList.reduce((accumulator, data) => {
-        if (data.clientId === clientIdNew) {
-          return accumulator + 1;
+      try{
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/schedule/getCountByClientId/${clientIdNew}`)
+        const count = response.data.data
+        if(response){
+          temp.scheduleName = `${clientData.find(data => data._id === clientIdNew).client_name}-CU-${(count + 1)}`;
         }
-        return accumulator;
-      }, 0);
-      temp.scheduleName = `${clientData.find(data => data._id === clientIdNew).client_name}-CU-${(count + 1)}`;
+      }
+      catch(error) {
+        handleResponse('Failed to fetch details. Please try again.','error');
+      }
       setScheduleData(temp);
     }
   };
 
-  function handleInvoiceChange(e) {
+  function handleInvoiceChange(event) {
     const temp = { ...scheduleData };
-    temp.invoiceNumber = e.target.value;
+    temp.invoiceNumber = event.target.value;
     setScheduleData(temp);
   }
 
   function resetFields(){
-    const temp={...scheduleData};
-    temp.isDisabled=false
-    temp.scheduleName=''
-    temp.clientId=''
-    temp.date=null
-    temp.time=null
-    temp.invoiceNumber=''
-    temp.frequency=''
-    setScheduleData(temp)
+    setScheduleData(INTIAL_STATE);
   }
-
-  
 
   const uploadDetails = () => {
     axios.post(`${process.env.REACT_APP_API_URL}/schedule`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
-        const message = alert;
-        message.message = "Schedule details uploaded successfully";
-        message.severity = "success";
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Schedule details uploaded successfully','success');
         resetFields();
       })
       .catch((error) => {
-        const message = alert;
-        message.message = "Failed to upload Schedule details. Please try again";
-        message.severity = "error";
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Failed to upload details. Please try again.','error');
       })
   }
 
   function goToGenerateInvoice() {
     history.push('/home');
   }
-  
 
   function updateData() {
     axios.patch(`${process.env.REACT_APP_API_URL}/schedule/${id}`, scheduleData, { headers: { 'Content-Type': 'application/json' } })
       .then((response) => {
-        const message = alert;
-        message.message = "Schedule details updated successfully";
-        message.severity = "success";
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Schedule details updated successfully','success');
       })
       .catch((error) => {
-        const message = alert;
-        message.message = "Failed to update schedule details. Please try again. ";
-        message.severity = "error"
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Failed to update details. Please try again.','error');
       })
   }
 
   function deleteData() {
     axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${id}`)
       .then((response) => {
-        const message = alert;
-        message.message = "Schedule details deleted successfully";
-        message.severity = "success";
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Schedule details deleted successfully','success');
       })
       .catch((error) => {
-        const message = alert;
-        message.message = "Failed to delete schedule details. Please try again. ";
-        message.severity = "error"
-        setMessage(message);
-        setOpenAlert(true);
+        handleResponse('Failed to delete details. Please try again.','error');
       })
   }
 
@@ -290,8 +242,8 @@ export default function ScheduleInvoice() {
   return (
     <div className='Main-box'>
       <h1 className='Main-box-h1'>{id ? 'Edit Schedule ' : 'Add New Schedule'}</h1>
-      {!isLoading && <div>loading...</div>}
-      {isLoading && <div className='form form-for-schedule'>
+      {isLoading && <div>loading...</div>}
+      {!isLoading && <div className='form form-for-schedule'>
         <FormControl className={classes.formControl} style={{ marginLeft: '40px' }}>
           <InputLabel id='demo-multiple-name-label'>Select Client</InputLabel>
           <Select
