@@ -1,6 +1,6 @@
 import React from 'react';
 import './ScheduleInvoice.css';
-import { makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import Input from '@material-ui/core/Input';
@@ -68,14 +68,14 @@ export default function ScheduleInvoice() {
   const [schedulesList, setSchedulesList] = React.useState([])
   const [openAlert, setOpenAlert] = React.useState(false);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
-  const [isLoading, setLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(true);
   const frequencyList = [{ item: 'Daily' }, { item: 'Weekly' }, { item: 'Monthly' }, { item: 'Anually' }];
   const [scheduleData, setScheduleData] = React.useState({
     isDisabled: false,
-    scheduleName:'',
+    scheduleName: '',
     clientId: '',
     invoiceNumber: '',
-    date:null,
+    date: null,
     frequency: '',
     time: null,
   });
@@ -120,7 +120,7 @@ export default function ScheduleInvoice() {
       message.severity = "error";
       setMessage(message);
       setOpenAlert(true);
-      setLoading(false)
+      setIsLoading(false)
     }
     if(id){
       try {
@@ -145,9 +145,9 @@ export default function ScheduleInvoice() {
   };
 
   const handleDateChange = (date) => {
-      const temp ={...scheduleData};
-      temp.date = date;
-      setScheduleData(temp);
+    const temp = { ...scheduleData };
+    temp.date = date;
+    setScheduleData(temp);
   };
 
   const handleFrequencyChange = (event) => {
@@ -173,9 +173,9 @@ export default function ScheduleInvoice() {
   };
 
   function handleInvoiceChange(e) {
-        const temp ={...scheduleData};
-        temp.invoiceNumber = e.target.value;
-        setScheduleData(temp);
+    const temp = { ...scheduleData };
+    temp.invoiceNumber = e.target.value;
+    setScheduleData(temp);
   }
 
   function resetFields(){
@@ -252,7 +252,6 @@ export default function ScheduleInvoice() {
       })
   }
 
-  
   function buttonsBar() {
     return (
       <div>
@@ -391,7 +390,7 @@ export default function ScheduleInvoice() {
           <Alert onClose={() => setOpenAlert(false)} severity={alert.severity}>
             {alert.message}
           </Alert>
-      </Snackbar>
+        </Snackbar>
       </div>}
     </div>
   )
