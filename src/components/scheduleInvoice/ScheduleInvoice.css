@@ -1,0 +1,15 @@
+.Main-box-h1{
+    color: black;
+    margin: 50px 0px 0px 300px;
+}
+.form-for-schedule{
+    margin-left: 300px;
+    margin-right: 150px;
+    border-style: groove;
+    border-radius: 7px;
+    min-height: 400px;
+    width: fit-content;
+    padding-top: 10px;
+}
+
+

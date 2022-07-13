@@ -20,6 +20,7 @@ import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import history from '../history';
 import Box from '@mui/material/Box';
 import './sideNav.css';
@@ -228,6 +229,36 @@ export default function PersistentDrawerLeft(props) {
               </div>
             </div></div>
 
+          <ListItem button onClick={() => history.push('/home')}>
+            <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
+            <ListItemText primary='Generate Invoice' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/schedule-invoice')}>
+            <ListItemIcon><CalendarMonthIcon /></ListItemIcon>
+            <ListItemText primary='Schedule Invoice' />
+          </ListItem>
+          <ListItem button onClick={() => history.push("/timesheet")}>
+            <ListItemIcon>
+              <ListAltIcon />
+            </ListItemIcon>
+            <ListItemText primary="Add Time Sheet" />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-client')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Client' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-candidate')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Candidate' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-timesheet')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Time Sheet' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-schedule')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Schedule' />
+          </ListItem>
           <ListItem button style={{ marginTop: 0 }} onClick={() => { history.push('/'); localStorage.clear() }}>
             <ListItemText primary='Logout' />
           </ListItem>
