@@ -148,6 +148,12 @@ export default function PersistentDrawerLeft(props) {
             <ListItemIcon><AccessTimeRoundedIcon /></ListItemIcon>
               <ListItemText primary='PaySlip History' />
             </ListItem>
+
+            <ListItem button onClick ={()=> history.push('/view-payslip')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+              <ListItemText primary='View PaySlip' />
+            </ListItem>
+
             <ListItem button onClick={() => history.push("/timesheet")}>
             <ListItemIcon>
               <ListAltIcon />

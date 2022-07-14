@@ -8,7 +8,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import { Box } from '@material-ui/core';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -16,6 +15,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useParams } from "react-router-dom";
+import InputAdornment from '@mui/material/InputAdornment';
+
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -79,24 +80,61 @@ function Alert(props) {
 export default function FormPropsTextFields() {
   let { id } = useParams();
   const classes = useStyles();
+  const inputAdornment= '₹'
   const [clientData, setClientdata] = React.useState([]);
-  const [candidateData, setState] = React.useState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
+  const [candidateData, setState] = React.useState(
+    { 
+      name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()),
+    Basic: 0,
+    Designation:'',
+    pan_no:'',
+    D_allow: 0,
+    HR_allow: 0,
+    Bonus: 0,
+    conveyance:0,
+    others:0,
+    total_earnings:0,
+    prof_tax:0,
+    p_f_employer:0,
+    p_f_employee:0,
+    td_S:0,
+    other_tax:0, 
+    });
+
   const [open, setOpen] = React.useState(false);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [openLoader, setOpenLoader] = React.useState(false);
+  const [tds,setTds] = React.useState("")
 
 
   useEffect(() => {
     const fetchData = () => {
       axios.get(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
         .then((response) => {
+          console.log(response.data.data)
+          setTds(response.data.data.td_S)
           setState({
             name: response.data.data.name,
             email: response.data.data.email,
             assigned_to: response.data.data.assigned_to,
+            Designation:response.data.data.Designation,
+            pan_no:response.data.data.pan_no,
             payment_terms: response.data.data.payment_terms,
             date_of_birth: response.data.data.date_of_birth,
-            date_of_Joining: response.data.data.date_of_Joining
+            date_of_Joining: response.data.data.date_of_Joining,
+            Basic:response.data.data.Basic,
+            D_allow: response.data.data.D_allow,
+            HR_allow: response.data.data.HR_allow,
+            Bonus: response.data.data.Bonus,
+            conveyance:response.data.data.conveyance,
+            others:response.data.data.others,
+            total_earnings:response.data.data.total_earnings,
+            prof_tax:response.data.data.prof_tax,
+            p_f_employer:response.data.data.p_f_employer,
+            p_f_employee:response.data.data.p_f_employee,
+            td_S:response.data.data.td_S,
+            other_tax:response.data.data.other_tax,
+
           })
         })
         .catch((error) => {
@@ -118,6 +156,7 @@ export default function FormPropsTextFields() {
 
   const birthDateChange = (date) => {
     setState({ ...candidateData, date_of_birth: String(date) })
+    
   };
   const joiningDateChange = (date) => {
     setState({ ...candidateData, date_of_Joining: String(date) })
@@ -129,9 +168,131 @@ export default function FormPropsTextFields() {
       ...candidateData,
       [e.target.name]: e.target.value,
     });
+
+  }
+function handleChangesforBasic(event){
+
+  if (candidateData.total_earnings !== 0)
+  {candidateData.total_earnings= parseFloat(candidateData.total_earnings) - (parseFloat(candidateData.Basic)+parseFloat(candidateData.D_allow)+parseFloat(candidateData.HR_allow));}
+
+
+  if (event.target.value === ""){
+    candidateData.Basic=0;}
+    else{
+  candidateData.Basic=parseInt(event.target.value);}
+
+  candidateData.D_allow=candidateData.Basic*30/100
+  candidateData.HR_allow=candidateData.Basic*45/100
+  candidateData.p_f_employee=(candidateData.Basic+candidateData.D_allow)*12/100
+  candidateData.total_earnings+=(candidateData.Basic+candidateData.D_allow+candidateData.HR_allow)
+
+
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+}
+
+function handleChangeforbonus(event){
+  candidateData.total_earnings-=candidateData.Bonus;
+
+  if (event.target.value === ""){
+  candidateData.Bonus=0;}
+  else{
+  candidateData.Bonus=parseInt(event.target.value);}
+
+  candidateData.total_earnings+=candidateData.Bonus;
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+}
+
+function handleChangeforTDS(event){
+
+  if (event.target.value === ""){
+  candidateData.td_S=0;}
+  else{
+  candidateData.td_S=parseInt(event.target.value);}
+
+  setTds(candidateData.td_S)
+}
+
+function handleChangeforDA(event){
+  candidateData.total_earnings-=candidateData.D_allow;
+
+  if (event.target.value === ""){
+  candidateData.D_allow=0;}
+  else{
+  candidateData.D_allow=parseInt(event.target.value);}
+
+  candidateData.total_earnings+=candidateData.D_allow;
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.p_f_employee=(candidateData.Basic+candidateData.D_allow)*12/100
+
+
+}
+
+function handleChangeforHRA(event){
+  candidateData.total_earnings-=candidateData.HR_allow;
+
+  if (event.target.value === ""){
+  candidateData.HR_allow=0;}
+  else{
+  candidateData.HR_allow=parseInt(event.target.value);}
+
+  candidateData.total_earnings+=candidateData.HR_allow;
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+
+
+}
+function handleChangeforconveyance(event){
+  candidateData.total_earnings-=candidateData.conveyance;
+
+  if (event.target.value === ""){
+  candidateData.conveyance=0;}
+  else{
+  candidateData.conveyance=parseInt(event.target.value);}
+
+  candidateData.total_earnings+=candidateData.conveyance;
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+
+}
+function handleChangeforothers(event){
+  candidateData.total_earnings-=candidateData.others;
+
+  if (event.target.value === ""){
+  candidateData.others=0;}
+  else{
+  candidateData.others=parseInt(event.target.value);}
+
+  candidateData.total_earnings+=candidateData.others;
+  setTds(candidateData.total_earnings*.1)
+  candidateData.td_S=candidateData.total_earnings*.1
+
+}
+
+function changeFieldValue() {
+  const fieldValues = {
+    name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()),
+    Basic: 0,
+    Designation:'',
+    pan_no:'',
+    D_allow: 0,
+    HR_allow: 0,
+    Bonus: 0,
+    conveyance:0,
+    others:0,
+    total_earnings:0,
+    prof_tax:0,
+    p_f_employer:0,
+    p_f_employee:0,
+    td_S:0,
+    other_tax:0, 
   }
 
-
+  setTds("");
+  setState(fieldValues);
+}
   function printdata() {
     setOpenLoader(true);
     axios.post(`${process.env.REACT_APP_API_URL}/candidate`, candidateData, { headers: { 'Content-Type': 'application/json' } })
@@ -142,7 +303,8 @@ export default function FormPropsTextFields() {
         message.severity = "success"
         setMessage(message);
         setOpen(true);
-        setState({ name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()) });
+        changeFieldValue();
+
       })
       .catch(error => {
         setOpenLoader(false);
@@ -207,104 +369,336 @@ export default function FormPropsTextFields() {
 
   return (
     <div>
-      <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
+      <h1 style={{ marginLeft: '300px', marginTop: '50px', marginRight:"0" }}>
         {id ? 'Edit Candidate Details' : 'Add Candidate'}
       </h1>
-      <Box className="form">
 
-        <div style={{ marginLeft: '10px' }}>
-          <form noValidate autoComplete="off">
-            <div className="leftDivision">
-              <div style={{ marginRight: '15px' }} >
-                <TextField
-                  id="outlined-required"
-                  required
-                  label="Name of the candidate"
-                  name="name"
-                  value={candidateData.name}
-                  variant="outlined"
-                  onChange={handleChange}
+      <div className="form">
+        <div className='top' style={{ display:"flex" }}>
+          <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '0px',marginLeft:'15px',flexGrow:"1",width:"100px" }} >
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-mutiple-name-label">Assigned To</InputLabel>
+            <Select
+              labelId="demo-mutiple-name-label"
+              id="demo-mutiple-name"
+              value={candidateData.assigned_to}
+              onChange={handleChange}
+              name="assigned_to"
+              input={<Input />}
+              MenuProps={MenuProps}
+            >{clientData.map((name) => (
+              <MenuItem key={name._id} value={name._id}>{name.client_name}</MenuItem>
+            ))}</Select>
+          </FormControl>
+            
+          </div>
+
+          <div style={{  float: "left",marginRight: "15px", marginTop: '14px', marginBottom: '0px',width:"150px" }} >
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <KeyboardDatePicker
+                  disableToolbar
+                  openTo="year"
+                  variant="inline"
+                  format="yyyy-MM-dd"
+                  margin="normal"
+                  id="date-picker-inline"
+                  label="Date of Joining"
+                  views={['year', 'month', 'date']}
+                  value={candidateData.date_of_Joining}
+                  onChange={joiningDateChange}
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
                 />
-              </div>
-              <div style={{ marginRight: "15px", marginTop: '30px', marginBottom: '15px' }}>
-                <TextField
-                  required
-                  id="outlined-required"
-                  label="Email"
-                  variant="outlined"
-                  name="email"
-                  value={candidateData.email}
-                  onChange={handleChange}
-                />
-              </div>
-              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <KeyboardDatePicker
-                    disableToolbar
-                    variant="inline"
-                    format="yyyy-MM-dd"
-                    margin="normal"
-                    id="date-picker-inline"
-                    label="Date of Birth"
-                    value={candidateData.date_of_birth}
-                    onChange={birthDateChange}
-                    KeyboardButtonProps={{
-                      'aria-label': 'change date',
-                    }}
-                  />
-                </MuiPickersUtilsProvider>
-              </div>
-              <FormControl className={classes.formControl}>
-                <InputLabel id="demo-mutiple-name-label">Assigned To</InputLabel>
-                <Select
-                  labelId="demo-mutiple-name-label"
-                  id="demo-mutiple-name"
-                  value={candidateData.assigned_to}
-                  onChange={handleChange}
-                  name="assigned_to"
-                  input={<Input />}
-                  MenuProps={MenuProps}
-                >{clientData.map((name) => (
-                  <MenuItem key={name._id} value={name._id}>{name.client_name}</MenuItem>
-                ))}</Select>
-              </FormControl>
-              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <KeyboardDatePicker
-                    disableToolbar
-                    variant="inline"
-                    format="yyyy-MM-dd"
-                    margin="normal"
-                    id="date-picker-inline"
-                    label="Date of Joining"
-                    value={candidateData.date_of_Joining}
-                    onChange={joiningDateChange}
-                    KeyboardButtonProps={{
-                      'aria-label': 'change date',
-                    }}
-                  />
-                </MuiPickersUtilsProvider>
-              </div>
-              <div style={{ marginBottom: '10px', marginRight: "15px" }}>
-                <TextField
-                  id="outlined-textarea"
-                  label="Payment Terms"
-                  multiline
-                  variant="outlined"
-                  inputProps={{ className: classes.payment }}
-                  name="payment_terms"
-                  value={candidateData.payment_terms}
-                  onChange={handleChange}
-                />
-              </div>
+              </MuiPickersUtilsProvider>
             </div>
-          </form>
+            <div style={{  float: "left",marginLeft: "15px", marginTop: '14px', marginBottom: '0px',width:"150px"  }}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                disableToolbar
+                openTo="year"
+                views={['year', 'month', 'date']}
+                variant="inline"
+                format="yyyy-MM-dd"
+                margin="normal"
+                id="date-picker-inline"
+                label="Date of Birth"
+                value={candidateData.date_of_birth}
+                onChange={birthDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </div>
         </div>
-      </Box>
 
-      <div style={{ marginLeft: "300px", marginTop: "10px" }}>
+        <form noValidate autoComplete="off" style={{ padding: "10px"}}>
+        <div className="leftDivision">
+
+          <div style={{  float: "left",marginLeft: "0px", marginTop: '30px', marginBottom: '30px' }}>
+          <TextField
+              id="outlined-required"
+              required
+              label="Name of the candidate"
+              name="name"
+              value={candidateData.name}
+              variant="outlined"
+              onChange={handleChange}
+            />
+          </div>
+
+            
+          <div style={{  float: "left",marginLeft: "15px", marginTop: '30px', marginBottom: '30px' }} >
+              <TextField
+              required
+              label="Designation"
+              name="Designation"
+              value={candidateData.Designation}
+              placeholder="Designation"
+              variant="outlined"
+              onChange={handleChange}
+            />
+            </div>
+          <div style={{  float: "left",marginLeft: "15px", marginTop: '32px', marginBottom: '30px', }}>
+          <TextField
+              required
+              id="outlined-required"
+              label="Email"
+              variant="outlined"
+              name="email"
+              value={candidateData.email}
+              onChange={handleChange}
+            />
+            </div>
+            <div style={{  float: "left",marginLeft: "15px", marginTop: '30px', marginBottom: '30px' }} >
+              <TextField
+              required
+              label="Pan Card No."
+              name="pan_no"
+              value={candidateData.pan_no}
+              placeholder="Pan Card No."
+              variant="outlined"
+              onChange={handleChange}
+            />
+            </div>
+            </div>
+
+          <div className="leftDivision">
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <TextField
+              
+                required
+                name='Basic'
+                label="Basic Salary"
+                value={candidateData.Basic}
+                onChange={handleChangesforBasic}
+                placeholder="Basic Salary"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+                }}
+                variant="outlined"
+              />
+            </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <TextField
+                required
+                label="DA"
+                value={candidateData.D_allow}
+                onChange={handleChangeforDA}
+                placeholder="DA"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+                }}
+                variant="outlined"
+              />
+            </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <TextField
+                required
+                label="HR_allow"
+                value={candidateData.HR_allow}
+                onChange={handleChangeforHRA}
+
+                placeholder="Hr-allowance"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+
+                }}
+                variant="outlined"
+              />
+
+            </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <TextField
+                required
+                label="Conveyance"
+                value={candidateData.conveyance}
+                placeholder="conveyance"
+                onChange={handleChangeforconveyance}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+                }}
+                variant="outlined"
+              />
+
+            </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
+              <TextField
+                required
+                label="Bonus"
+                onChange={handleChangeforbonus}
+                value={candidateData.Bonus}
+                placeholder="Bonus"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math
+                }}
+                variant="outlined"
+              />
+            </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <TextField
+                label="Others"
+                onChange={handleChangeforothers}
+                value={candidateData.others}
+                placeholder="Others"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math
+                }}
+                variant="outlined"
+              />
+            </div>
+          </div>
+
+          <div className="leftDivision">
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <TextField
+                required
+                name='prof_tax'
+                label="Professional tax"
+                onChange={handleChange}
+                value={candidateData.prof_tax}
+                placeholder="Professional tax"
+
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+
+                  
+                }}
+                variant="outlined"
+              />
+              </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+              <TextField
+                required
+                name='p_f_employer'
+                label="Employer PF"
+                onChange={handleChange}
+                value={candidateData.p_f_employer}
+                placeholder="Employer PF"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+
+                }}
+                variant="outlined"
+              />
+              </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
+              <TextField
+                required
+                label="Employee PF"
+                name='p_f_employee'
+                value={candidateData.p_f_employee}
+                onChange={handleChange}
+                placeholder="Employee PF"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+
+                }}
+                variant="outlined"
+              />
+              </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <TextField
+                required
+                label="Advance TAX/TDS"
+                value={tds}
+                onChange={handleChangeforTDS}
+                placeholder="TDS"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math,
+
+                }}
+                variant="outlined"
+              />
+              </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <TextField
+                name='other_tax'
+                label="Other Tax"
+                onChange={handleChange}
+                value={candidateData.other_tax}
+                placeholder="other tax"
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+                }}
+                inputProps={{
+                  className: classes.math
+                }}
+                variant="outlined"
+              />
+              </div>
+            <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }} >
+              <TextField
+                id="outlined-textarea"
+                label="Payment Terms"
+                multiline
+                variant="outlined"
+                inputProps={{ className: classes.payment }}
+                name="payment_terms"
+                value={candidateData.payment_terms}
+                onChange={handleChange}
+              />
+              </div>
+          </div>
+        </form>
+        
+
+      </div>
+
+      <div style={{ marginLeft: "300px", marginTop: "10px", marginBottom:"30px" }}>
         {!id &&
-          <Button type="reset" variant="contained" color="primary" onClick={printdata}>
+          <Button type="reset" variant="contained" color="primary" onClick={()=>{console.log(candidateData);printdata()}}>
             Add Candidate
           </Button>}
         {id &&
@@ -331,7 +725,5 @@ export default function FormPropsTextFields() {
 
       </div>
     </div>
-
-
   );
 }

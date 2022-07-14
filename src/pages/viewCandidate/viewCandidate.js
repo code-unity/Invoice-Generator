@@ -51,10 +51,9 @@ const ViewCandidate = () => {
     }
     
     const getName = (row, clientData) => {
-        const dummy = clientData.filter((item) =>  item._id === row.assigned_to)
-        return  dummy[0].client_name
+        const name = clientData.filter((item) =>  item._id === row.assigned_to)
+        return (name[0].client_name);
     }
-
 
     useEffect(() => {
         fetchData()
@@ -91,7 +90,7 @@ const ViewCandidate = () => {
     }
 
     return (
-        <div style={{ width: '100vw' }}>
+        <div style={{ marginRight:'90px' }}>
             <Button type="button" variant='contained' color="primary" style={{ marginTop: '3%', marginLeft: '2.6%', marginBottom: '1%' }} onClick={() => history.push('/candidate')}>
                 Add New Candidate
             </Button>
@@ -99,9 +98,13 @@ const ViewCandidate = () => {
                 <Table aria-label="collapsible table">
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Details</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Info</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Assigned to</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Email Id.</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Date of Birth</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Date of Joining</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Pan Card No</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Edit</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Delete</TableCell>
                         </TableRow>

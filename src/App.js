@@ -12,7 +12,8 @@ import history from './history'
 import Paysliphistory from './pages/history/paysliphistory';
 import TimeSheetComp from "./components/addTimeSheet/TimeSheetComp";
 import ViewTimeSheet from "./components/viewTimesheet";
-import payslip from "./pages/payslip"
+import payslip from "./pages/payslip";
+import ViewPayslip from './pages/viewPayslip/viewPayslip';
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
         <ProtectedRoute path="/view-client"  component={ViewClient} exact />
         <ProtectedRoute path="/paysliphistory" component={Paysliphistory} exact />
         <ProtectedRoute path="/view-candidate" component={ViewCandidate} exact />
+        <ProtectedRoute path="/view-payslip" component={ViewPayslip} exact />
       </Switch>
     </Router>
   );

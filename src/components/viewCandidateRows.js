@@ -41,7 +41,11 @@ const Rows = (props) => {
                 <TableCell component="th" scope="row">
                     {row.name}
                 </TableCell>
+                <TableCell>{assignedTo}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.date_of_birth.substr(0, 16)}</TableCell>
                 <TableCell>{row.date_of_Joining.substr(0, 16)}</TableCell>
+                <TableCell>{row.pan_no}</TableCell>                
                 <TableCell>
                     <IconButton
                         aria-label="edit-candidate"
@@ -62,29 +66,43 @@ const Rows = (props) => {
                 </TableCell>
             </TableRow>
             <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0, }} colSpan={10}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
                             <Typography variant="h6" gutterBottom component="div" sx={{ fontWeight: 'bold' }}>
-                                Details
+                            Salary Details
                             </Typography>
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Date of Birth</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Basic Salary</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>DA</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>HRA</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Bonus</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Conveyance</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>others</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Professional Tax</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Employee PF</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Employer PF</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Advance TDS/TAX</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Other Tax</TableCell>
                                         <TableCell sx={{ fontWeight: 'bold' }}>Payment Terms</TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold' }}>Assigned To</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     <TableRow key={row._id}>
-                                        <TableCell component="th" scope="row">
-                                            {row.email}
-                                        </TableCell>
-                                        <TableCell>{row.date_of_birth.substr(0, 16)}</TableCell>
-                                        <TableCell>{row.payment_terms}</TableCell>
-                                        <TableCell>{assignedTo}</TableCell>
+                                        <TableCell component="th" scope="row" style={{textAlign:"center" }}>{'₹'+row.Basic.substr(0, 16)}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.D_allow}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.HR_allow}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.Bonus}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.conveyance}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.others}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.prof_tax}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.p_f_employee}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.p_f_employer}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.td_S}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{'₹'+row.other_tax}</TableCell>
+                                        <TableCell style={{textAlign:"center" }}>{row.payment_terms}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>

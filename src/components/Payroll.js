@@ -149,6 +149,7 @@ export default function FormPropsTextFields() {
     isActive:'true',
     candidate:'',
     candidate_id:'',
+    change_id:'',
     date: month + ' '+year,
     Designation: '',
     assigned:'',
@@ -175,21 +176,25 @@ export default function FormPropsTextFields() {
       let data = candidateData.filter(eachObj => eachObj._id === event.target.value);
       const tempDefault = payslipData;
       const temp2=clientData.filter(eachObj => eachObj._id === data[0].assigned_to )
-      tempDefault.Designation="Software Developer I";
-      tempDefault.Basic = 20000;
-      tempDefault.D_allow = 6000;
-      tempDefault.HR_allow = 9000;
-      tempDefault.candidate=data[0].name
-      tempDefault.candidate_id=event.target.value;
+      tempDefault.Designation=data[0].Designation;
+      tempDefault.Basic = data[0].Basic;
+      tempDefault.D_allow = data[0].D_allow;
+      tempDefault.HR_allow = data[0].HR_allow;
+      tempDefault.Bonus = data[0].Bonus;
+      tempDefault.others = data[0].others;
+      tempDefault.candidate=data[0].name;
+      tempDefault.candidate_id=data[0]._id;
+      tempDefault.conveyance=data[0].conveyance;
+      tempDefault.prof_tax=data[0].prof_tax;
+      tempDefault.p_f_employee=data[0].p_f_employee;
+      tempDefault.p_f_employer=data[0].p_f_employer;
+      tempDefault.td_S=data[0].td_S;
+      tempDefault.other_tax=data[0].other_tax;
+      tempDefault.total_earnings=data[0].total_earnings;
+      tempDefault.change_id=event.target.value;
       tempDefault.assigned=temp2[0].client_name;
-      tempDefault.conveyance=7000;
-      tempDefault.prof_tax=200;
-      tempDefault.p_f_employee=1800;
-      tempDefault.p_f_employer=3120;
-      tempDefault.td_S=4400;
-      tempDefault.total_earnings=tempDefault.Basic+tempDefault.D_allow+tempDefault.HR_allow+tempDefault.conveyance+tempDefault.Bonus+tempDefault.others;
-      tempDefault.total_tax=tempDefault.prof_tax+tempDefault.p_f_employer;
-      tempDefault.net_deductions=tempDefault.total_tax+tempDefault.td_S+tempDefault.other_tax;
+      tempDefault.total_tax=parseFloat(tempDefault.prof_tax)+parseFloat(tempDefault.p_f_employee);
+      tempDefault.net_deductions=parseFloat(tempDefault.total_tax)+parseFloat(tempDefault.td_S)+parseFloat(tempDefault.other_tax);
       tempDefault.net_salary=tempDefault.total_earnings-tempDefault.net_deductions;
       setNetsalary(tempDefault.net_salary);
       setPersonName(event.target.value);
@@ -221,7 +226,7 @@ export default function FormPropsTextFields() {
         setNetdeductions(response.data.data.net_deductions)
         setNetearnings(response.data.data.total_earnings)
         setNetsalary(response.data.data.net_salary)
-        setPersonName(response.data.data.candidate_id)
+        setPersonName(response.data.data.change_id)
         setState({
           Bonus:response.data.data.Bonus,
           Basic: response.data.data.Basic,
@@ -229,6 +234,7 @@ export default function FormPropsTextFields() {
           assigned:response.data.data.assigned,
           D_allow:response.data.data.D_allow,
           candidate:response.data.data.candidate,
+          candidate_id:response.data.data.candidate_id,
           HR_allow:response.data.data.HR_allow,
           conveyance:response.data.data.conveyance,
           others:response.data.data.others,
@@ -251,16 +257,14 @@ export default function FormPropsTextFields() {
       })
   }
 
-  React.useEffect(() => {
-    {        
+  React.useEffect(() => {      
       fetchData();
-    }
   }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     if(id){
       fetchpayslipData()}
-   }, []);
+   }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -274,108 +278,174 @@ export default function FormPropsTextFields() {
 
   ///functions for Calculations
   function handleChangesforBasic(event) {
-    payslipData.net_salary-=payslipData.Basic;
-    payslipData.total_earnings-=payslipData.Basic;
 
+    if (payslipData.total_earnings !== 0)
+      { 
+        payslipData.net_salary= parseFloat(payslipData.net_salary) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow)-parseFloat(payslipData.net_deductions));
+        payslipData.total_earnings= parseFloat(payslipData.total_earnings) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow));
+        payslipData.total_tax = parseFloat( payslipData.total_tax) -  parseFloat(payslipData.p_f_employee);
+        payslipData.net_deductions = parseFloat( payslipData.net_deductions) -  parseFloat(payslipData.p_f_employee) - parseFloat(payslipData.td_S) 
+    }
     if (event.target.value === ""){
     payslipData.Basic=0;}
     else{
-    payslipData.Basic=parseInt(event.target.value);}
+      payslipData.Basic=parseInt(event.target.value);}
+      payslipData.D_allow=payslipData.Basic*30/100
+      payslipData.HR_allow=payslipData.Basic*45/100
+      payslipData.p_f_employee=(payslipData.Basic+payslipData.D_allow)*12/100
+      payslipData.total_earnings+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow)
+      payslipData.total_tax +=  payslipData.p_f_employee
+      payslipData.td_S=payslipData.total_earnings*0.1
+      payslipData.net_deductions +=  (payslipData.p_f_employee + payslipData.td_S)
+      payslipData.net_salary+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow-payslipData.net_deductions)
 
-    payslipData.net_salary+=payslipData.Basic;
-    payslipData.total_earnings+=payslipData.Basic;
-
-    setNetsalary(payslipData.net_salary);
-    setNetearnings(payslipData.total_earnings);
+      setNetsalary(payslipData.net_salary);
+      setNetearnings(payslipData.total_earnings);
+      setTotaltax( payslipData.total_tax);
+      setNetdeductions(payslipData.net_deductions)
   }
 
   function handleChangesforD_allow(event) {
-    payslipData.net_salary-=payslipData.D_allow;
-    payslipData.total_earnings-=payslipData.D_allow;
+    
+    if (payslipData.total_earnings !== 0)
+    { 
+      payslipData.net_salary-=((payslipData.D_allow)-(payslipData.net_deductions));
+      payslipData.total_earnings-=payslipData.D_allow;  
+      payslipData.total_tax = parseFloat( payslipData.total_tax) -  parseFloat(payslipData.p_f_employee);
+      payslipData.net_deductions = parseFloat( payslipData.net_deductions) -  parseFloat(payslipData.p_f_employee) - parseFloat(payslipData.td_S)
+    }
 
     if (event.target.value === ""){
     payslipData.D_allow=0;}
     else{
     payslipData.D_allow=parseInt(event.target.value);}
 
-    payslipData.net_salary+=payslipData.D_allow;
+  
     payslipData.total_earnings+=payslipData.D_allow;
+    payslipData.p_f_employee=(payslipData.Basic+payslipData.D_allow)*12/100
+    payslipData.total_tax +=  payslipData.p_f_employee
+    payslipData.td_S=(payslipData.total_earnings*0.1)
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) + (payslipData.p_f_employee + payslipData.td_S)
+    payslipData.net_salary+=(payslipData.D_allow - payslipData.net_deductions);
 
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
+    setTotaltax( payslipData.total_tax);
+    setNetdeductions(payslipData.net_deductions)
   }
 
   function handleChangesforHR_allow(event) {
-    payslipData.net_salary-=payslipData.HR_allow;
+    
+    if (payslipData.total_earnings !== 0)
+    { 
+    payslipData.net_salary-=((payslipData.HR_allow)-(payslipData.net_deductions));
     payslipData.total_earnings-=payslipData.HR_allow;
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
+    }
 
     if (event.target.value === ""){
     payslipData.HR_allow=0;}
     else{
     payslipData.HR_allow=parseInt(event.target.value);}
 
-    payslipData.net_salary+=payslipData.HR_allow;
     payslipData.total_earnings+=payslipData.HR_allow;
+    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1)
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
+    payslipData.net_salary+=(payslipData.HR_allow-payslipData.net_deductions);
+
 
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
+    setNetdeductions(payslipData.net_deductions)
+
   }
 
   function handleChangesforconveyance(event) {
-    payslipData.net_salary-=payslipData.conveyance;
+    if (payslipData.total_earnings !== 0)
+    { 
+    payslipData.net_salary-=((payslipData.conveyance)-(payslipData.net_deductions));
     payslipData.total_earnings-=payslipData.conveyance;
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
+
+    }
 
     if (event.target.value === ""){
     payslipData.conveyance=0;}
     else{
     payslipData.conveyance=parseInt(event.target.value);}
 
-    payslipData.net_salary+=payslipData.conveyance;
     payslipData.total_earnings+=payslipData.conveyance;
+    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1);
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
+    payslipData.net_salary+=(payslipData.conveyance-payslipData.net_deductions);
 
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
+    setNetdeductions(payslipData.net_deductions)
+
   }
 
   function handleChangesforBonus(event) {
-    if (event.target.value !== ""){
-    payslipData.net_salary-=payslipData.Bonus;
+    if (payslipData.total_earnings !== 0)
+    { 
+    payslipData.net_salary-=((payslipData.Bonus)-(payslipData.net_deductions));
     payslipData.total_earnings-=payslipData.Bonus;
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
 
-    payslipData.Bonus=parseInt(event.target.value);
 
-    payslipData.net_salary+=payslipData.Bonus;
+    }
+    if(event.target.value=== ""){
+      payslipData.Bonus=0}
+    else{
+      payslipData.Bonus=parseInt(event.target.value);}
+    
+    
     payslipData.total_earnings+=payslipData.Bonus;
+    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1)
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
+    payslipData.net_salary+=(payslipData.Bonus-payslipData.net_deductions);
 
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
-  }}
+    setNetdeductions(payslipData.net_deductions)
+
+  }
   
   function handleChangesforOthers(event) {
-    if (event.target.value !== ""){
-    payslipData.net_salary-=payslipData.others;
+    if (payslipData.total_earnings !== 0)
+    { 
+    payslipData.net_salary-=((payslipData.others)-(payslipData.net_deductions));
     payslipData.total_earnings-=payslipData.others;
-    
-    payslipData.others=parseInt(event.target.value);
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
 
-    payslipData.net_salary+=payslipData.others;
+    }
+
+    if(event.target.value=== ""){
+      payslipData.others=0}
+    else{
+      payslipData.others=parseInt(event.target.value);}
+      
     payslipData.total_earnings+=payslipData.others;
+    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1);
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
+    payslipData.net_salary+=(payslipData.others-payslipData.net_deductions);
 
     setNetsalary(payslipData.net_salary);
     setNetearnings(payslipData.total_earnings);
-  }}
+    setNetdeductions(payslipData.net_deductions)
+
+  }
 
   function handleChangesforprof_tax(event) {
-    payslipData.net_salary+=payslipData.prof_tax;
+    payslipData.net_salary+=parseInt(payslipData.prof_tax);
     payslipData.net_deductions-=payslipData.prof_tax;
     payslipData.total_tax-=payslipData.prof_tax;
-
     if (event.target.value === ""){
     payslipData.prof_tax=0;}
     else{
     payslipData.prof_tax=parseInt(event.target.value);}
 
-    payslipData.net_salary-=payslipData.prof_tax;
+    payslipData.net_salary-=(payslipData.prof_tax);
     payslipData.net_deductions+=payslipData.prof_tax;
     payslipData.total_tax+=payslipData.prof_tax;
 
@@ -384,19 +454,19 @@ export default function FormPropsTextFields() {
     setTotaltax(payslipData.total_tax)
   }
 
-  function handleChangesforp_femployer(event) {
-    payslipData.net_salary+=payslipData.p_f_employer;
-    payslipData.net_deductions-=payslipData.p_f_employer;
-    payslipData.total_tax-=payslipData.p_f_employer;
+  function handleChangesforp_femployee(event) {
+    payslipData.net_salary+=parseInt(payslipData.p_f_employee);
+    payslipData.net_deductions-=payslipData.p_f_employee;
+    payslipData.total_tax-=payslipData.p_f_employee;
 
     if (event.target.value === ""){
-    payslipData.p_f_employer=0;}
+    payslipData.p_f_employee=0;}
     else{
-    payslipData.p_f_employer=parseInt(event.target.value);}
+    payslipData.p_f_employee=parseInt(event.target.value);}
 
-    payslipData.net_salary-=payslipData.p_f_employer;
-    payslipData.net_deductions+=payslipData.p_f_employer;
-    payslipData.total_tax+=payslipData.p_f_employer;
+    payslipData.net_salary-=payslipData.p_f_employee;
+    payslipData.net_deductions+=payslipData.p_f_employee;
+    payslipData.total_tax+=payslipData.p_f_employee;
 
     setNetsalary(payslipData.net_salary);
     setNetdeductions(payslipData.net_deductions);
@@ -404,7 +474,7 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforTDS(event) {
-    payslipData.net_salary+=payslipData.td_S;
+    payslipData.net_salary+=parseInt(payslipData.td_S);
     payslipData.net_deductions-=payslipData.td_S;
 
     if (event.target.value === ""){
@@ -421,24 +491,26 @@ export default function FormPropsTextFields() {
 
 
   function handleChangesforOthertaxes(event) {
-    if (event.target.value !== ""){
-    payslipData.net_salary+=payslipData.other_tax;
+    payslipData.net_salary+=parseInt(payslipData.other_tax);
     payslipData.net_deductions-=payslipData.other_tax;
-    
-    payslipData.other_tax=parseInt(event.target.value);
+
+    if(event.target.value=== ""){
+      payslipData.other_tax=0}
+    else{
+      payslipData.other_tax=parseInt(event.target.value);}
 
     payslipData.net_salary-=payslipData.other_tax;
     payslipData.net_deductions+=payslipData.other_tax;
 
-    setNetsalary(payslipData.net_salary);
+    setNetsalary(parseInt(payslipData.net_salary));
     setNetdeductions(payslipData.net_deductions);
-  }}
+  }
   
   const convert = (str) => {
     var date = new Date(str),
-    mnth = (date.getMonth().toLocaleString('default',{month:'long'}));
+    mnth = date.toLocaleString('en-us', { month: 'long' });
     
-    return [date.getFullYear(), mnth].join("-");
+    return [mnth, date.getFullYear()].join(" ");
 }
   const handleDateChange = (date) => {
     const dateInReqFormat=convert(date);
@@ -507,6 +579,7 @@ function changeFieldValue() {
     isActive:'true',
     candidate:'',
     candidate_id:'',
+    change_id:'',
     date:year + '-' + (month+1),
     Designation: '',
     assigned:'',
@@ -534,6 +607,7 @@ function changeFieldValue() {
   setNetsalary(0);
   setTotaltax(0);
   setPersonName('');
+  setDate(month + ' '+year,);
 }
 const deleteData = () => {
   setOpenLoader(true)
@@ -558,13 +632,24 @@ const deleteData = () => {
 }
 
 function updateData () {
-  axios.patch(`${process.env.REACT_APP_API_URL}/payslip/${id}`, payslipData, { headers: { 'Content-Type': 'application/json' } })
+  setOpenLoader(true);
+  axios.put(`${process.env.REACT_APP_API_URL}/payslip/${id}`, payslipData, { headers: { 'Content-Type': 'application/json' } })
     .then((response) => {
-      window.alert('successfully updated Payslip');
-      history.push('/paysliphistory');
+      setOpenLoader(false);
+      const message = alert;
+      message.message = "Payslip Updated Successfully";
+      message.severity = 'success';
+      setMessage(message);
+      setOpen(false);
+      history.push('/view-payslip');
     })
     .catch((error) => {
-     window.alert('Failed to update Payslip');
+      setOpenLoader(false);
+      const message = alert;
+      message.message = " Failed to Update Payslip";
+      message.severity = "error"
+      setMessage(message);
+      setOpen(false);    
     })
 }
 
@@ -646,8 +731,6 @@ function updateData () {
               variant="outlined"
               inputProps={{
                 readOnly: true,
-
-
               }}
             />
             </div>
@@ -727,6 +810,7 @@ function updateData () {
               
               label="Bonus"
               onChange={handleChangesforBonus}
+              value={payslipData.Bonus}
               placeholder="Bonus"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -743,6 +827,7 @@ function updateData () {
               
               label="Others"
               onChange={handleChangesforOthers}
+              value={payslipData.others}
               placeholder="Others"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -798,10 +883,10 @@ function updateData () {
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
             <TextField
               required
-              label="Employer PF"
-              value={payslipData.p_f_employer}
-              onChange={handleChangesforp_femployer}
-              placeholder="Employer PF"
+              label="Employee PF"
+              value={payslipData.p_f_employee}
+              onChange={handleChangesforp_femployee}
+              placeholder="Employee PF"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
@@ -815,11 +900,11 @@ function updateData () {
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
             <TextField
               required
-              label="Employee PF"
-              name='p_f_employee'
-              value={payslipData.p_f_employee}
+              label="Employer PF"
+              name='p_f_employer'
+              value={payslipData.p_f_employer}
               onChange={e=>{handleDatachange(e)}}
-              placeholder="Employee PF"
+              placeholder="Employer PF"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
@@ -871,6 +956,7 @@ function updateData () {
               
               label="Others"
               onChange={handleChangesforOthertaxes}
+              value={payslipData.other_tax}
               placeholder="other tax"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -1023,6 +1109,12 @@ function updateData () {
             <CircularProgress color="primary" />
           </div>
           <span>Saving Payslip...</span>
+        </Backdrop>
+        <Backdrop className={classes.backdrop} open={openLoader} >
+          <div>
+            <CircularProgress color="primary" />
+          </div>
+          <span>Request Processing...</span>
         </Backdrop>
       </div>
     </div>
