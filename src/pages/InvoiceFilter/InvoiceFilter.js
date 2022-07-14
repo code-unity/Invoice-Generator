@@ -63,7 +63,7 @@ const InvoiceReport = () => {
     useEffect(() => {
         setOpenLoader(true);
         axios.get(`${process.env.REACT_APP_API_URL}/invoiceFilter/${prevMonth}/${currYear}`)
-            //when everything went fine
+            //when everything went fine 
             .then(response => {
                 setData(response.data.data);
                 setOpenLoader(false);
@@ -72,7 +72,7 @@ const InvoiceReport = () => {
                 message.severity = "success";
                 setMessage(message);
                 setOpenAlert(true);
-            })
+            }) 
             //when lost connection with backend or no internet connection
             .catch(() => {
                 setOpenLoader(false);
@@ -128,7 +128,6 @@ const InvoiceReport = () => {
             .catch(error => {
                 //if there is any validations error, or  no internet to sent email or pdf generation error
                 if (error.response) {
-                    console.log('inside catch if');
                     setOpenDownloader(false);
                     const message = alert;
                     message.message = error.response.data.status.message;
