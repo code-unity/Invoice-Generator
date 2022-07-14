@@ -59,16 +59,30 @@ const InvoiceReport = () => {
     const [alert, setMessage] = useState({ message: "", severity: "" });
     const classes = useStyles();
 
-    //getting the filtered data from backend
+    //getting the filtered data from backend 
     useEffect(() => {
         setOpenLoader(true);
         axios.get(`${process.env.REACT_APP_API_URL}/invoiceFilter/${prevMonth}/${currYear}`)
+            //when everything went fine
             .then(response => {
                 setData(response.data.data);
                 setOpenLoader(false);
-            }).catch(error =>
-                console.log('Fetching Filtered Data unsuccessful'));
-    }, [date])
+                const message = alert;
+                message.message = response.data.status.message;
+                message.severity = "success";
+                setMessage(message);
+                setOpenAlert(true);
+            })
+            //when lost connection with backend or no internet connection
+            .catch(() => {
+                setOpenLoader(false);
+                const message = alert;
+                message.message = "Invoices Fetching Failed";
+                message.severity = "error";
+                setMessage(message);
+                setOpenAlert(true);
+            });
+    }, [date, alert])
 
 
     const sendData = () => {
@@ -100,23 +114,32 @@ const InvoiceReport = () => {
                 {
                     'Content-type': 'application/json',
                 },
-            }).then(response => {
+            })
+            //When everything worked perfectly fine 
+            .then((res) => {
+                console.log('inside then', res);
                 setOpenDownloader(false);
                 const message = alert;
-                message.message = "invoices sent successfully";
+                message.message = res.data.status.message;
                 message.severity = "success";
                 setMessage(message);
                 setOpenAlert(true);
             })
             .catch(error => {
+                //if there is any validations error, or  no internet to sent email or pdf generation error
                 if (error.response) {
+                    console.log('inside catch if');
+                    setOpenDownloader(false);
                     const message = alert;
                     message.message = error.response.data.status.message;
                     message.severity = "error";
                     setMessage(message);
                     setOpenAlert(true);
                 }
+                //when lost connection with backend
                 else {
+
+                    console.log('inside catch else');
                     setOpenDownloader(false);
                     const message = alert;
                     message.message = "invoices sending Failed";
@@ -214,7 +237,7 @@ const InvoiceReport = () => {
                     })}
                 </Grid>
             }
-            <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+            <Snackbar open={openAlert} autoHideDuration={2000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity={alert.severity}>
                     {alert.message}
                 </Alert>
@@ -233,4 +256,4 @@ const InvoiceReport = () => {
         </Fragment>
     )
 }
-export default InvoiceReport;
+export default InvoiceReport; 
