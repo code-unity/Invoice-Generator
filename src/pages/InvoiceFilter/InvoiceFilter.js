@@ -24,19 +24,10 @@ const useStyles = makeStyles((theme) => ({
 
 }))
 
-var currDate = new Date();
-var currYear = currDate.getFullYear();
-var prevMonth = currDate.getMonth();
-if (prevMonth === 0) {
-    currYear = currYear - 1;
-    prevMonth = 12;
-}
-prevMonth = prevMonth.toString();
-if (Number(prevMonth) < 10)
-    prevMonth = '0' + prevMonth;
-currYear = currYear.toString();
-var defYear = currYear;
-var defMonth = prevMonth;
+var today = new Date();
+today.setMonth(today.getMonth() - 1);
+var prevMonth = today.toLocaleString('default', { month: 'short' });
+var currYear = today.getFullYear().toString();
 
 const Months = {
     "Jan": '01',
@@ -60,30 +51,26 @@ function Alert(props) {
 const InvoiceReport = () => {
     const [toEmails, setToEmail] = useState('');
     const [ccEmails, setccEmails] = useState('');
-    const [date, setDate] = useState(`${currYear}-${prevMonth}`);
+    const [date, setDate] = useState(`${currYear}-${Months[prevMonth]}`);
     const [data, setData] = useState([]);
     const [openLoader, setOpenLoader] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
     const [alert, setMessage] = useState({ message: "", severity: "" });
     const classes = useStyles();
 
-    useEffect((openLoader) => {
-        const fetchData = () => {
-            setOpenLoader(!openLoader);
-            axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
-                .then((res) => {
-                    setOpenLoader(false);
-                    setData(res.data.data.results);
-                })
-        };
-        fetchData();
-    }, []);
+    //getting the filtered data from backend
+    useEffect(() => {
+        setOpenLoader(true);
+        axios.get(`${process.env.REACT_APP_API_URL}/invoiceFilter/${prevMonth}/${currYear}`)
+            .then(response => {
+                setData(response.data.data);
+                setOpenLoader(false);
+            }).catch(error =>
+                console.log('Fetching Filtered Data unsuccessful'));
+    }, [date])
 
-    const filteredData = data.filter(data => { return data.date.split(" ")[3] === currYear && Months[data.date.split(" ")[1]] === prevMonth })
-    console.log(filteredData);
 
     const sendData = () => {
-        console.log(toEmails);
         const currToEmails = toEmails.split(',');
         const currCCEmails = ccEmails.split(',');
         const finalToEmails = [];
@@ -102,10 +89,9 @@ const InvoiceReport = () => {
             ccEmails: finalCCEmails,
             month: prevMonth,
             year: currYear,
-            invoiceData: filteredData,
+            invoiceData: data,
         }
-        /*fetch always returns a response, if reponse.ok is true then work is done sucessfully else not done
-        always use the headers and body should be in json format */
+        //post call for backend for pdf generation and mail sending
         axios.post(`${process.env.REACT_APP_API_URL}/invoiceFilter`, formInfo,
             {
                 headers:
@@ -133,9 +119,12 @@ const InvoiceReport = () => {
 
     const dateChangeHandler = (event) => {
         var selectedDate = event.target.value;
+        const date = new Date();
+        const monthNumber = selectedDate.split('-')[1];
+        date.setMonth(monthNumber - 1);
+        prevMonth = date.toLocaleString('default', { month: 'short' })
         currYear = selectedDate.split('-')[0];
-        prevMonth = selectedDate.split('-')[1];
-        setDate(`${currYear}-${prevMonth}`);
+        setDate(`${currYear}-${Months[prevMonth]}`);
     }
     const toChangeHandler = (event) => {
         setToEmail(event.target.value);
@@ -147,10 +136,8 @@ const InvoiceReport = () => {
         event.preventDefault();
         setToEmail('');
         setccEmails('');
-        currYear = defYear;
-        prevMonth = defMonth;
-        setDate(`${currYear}-${prevMonth}`);
-    }
+        setDate(`${currYear}-${Months[prevMonth]}`);
+    } 
     return (
         <Fragment>
             <form className={styles["container"]} onSubmit={onSubmitHandler}  >
@@ -191,15 +178,17 @@ const InvoiceReport = () => {
                     Send Invoices
                 </Button>
 
+                {/* Dispalying message when there are no invoices */}
             </form>
             {
-                filteredData.length === 0 &&
+                data.length === 0 &&
                 <h2>There is no Invoices for {prevMonth} {currYear}  </h2>
             }
 
-            {filteredData.length !== 0 &&
+            {/*dipslaying the invoice cards */}
+            {data.length !== 0 &&
                 <Grid container spacing={1} className={classes.gridContainer}>
-                    {filteredData.map((historyData, index) => {
+                    {data.map((historyData, index) => {
                         return (
                             <Grid item xs={12} sm={6} md={3} key={index}>
                                 <Card data={historyData} idx={index} />
@@ -222,8 +211,3 @@ const InvoiceReport = () => {
     )
 }
 export default InvoiceReport;
-/*Bugs
-1.Cannot able to add mulitple email address to textfield
-2.When moved to other page and come again the previous data is displaying
-nodemailer doesn't works in the browser,it requires node for working.
- */ 
