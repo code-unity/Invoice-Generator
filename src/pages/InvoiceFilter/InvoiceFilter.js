@@ -55,6 +55,7 @@ const InvoiceReport = () => {
     const [data, setData] = useState([]);
     const [openLoader, setOpenLoader] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
+    const [openDownloader, setOpenDownloader] = useState(false);
     const [alert, setMessage] = useState({ message: "", severity: "" });
     const classes = useStyles();
 
@@ -92,17 +93,33 @@ const InvoiceReport = () => {
             invoiceData: data,
         }
         //post call for backend for pdf generation and mail sending
+        setOpenDownloader(true);
         axios.post(`${process.env.REACT_APP_API_URL}/invoiceFilter`, formInfo,
             {
                 headers:
                 {
                     'Content-type': 'application/json',
                 },
+            }).then(response => {
+                setOpenDownloader(false);
+                const message = alert;
+                message.message = "invoices sent successfully";
+                message.severity = "success";
+                setMessage(message);
+                setOpenAlert(true);
             })
             .catch(error => {
                 if (error.response) {
                     const message = alert;
                     message.message = error.response.data.status.message;
+                    message.severity = "error";
+                    setMessage(message);
+                    setOpenAlert(true);
+                }
+                else {
+                    setOpenDownloader(false);
+                    const message = alert;
+                    message.message = "invoices sending Failed";
                     message.severity = "error";
                     setMessage(message);
                     setOpenAlert(true);
@@ -137,7 +154,7 @@ const InvoiceReport = () => {
         setToEmail('');
         setccEmails('');
         setDate(`${currYear}-${Months[prevMonth]}`);
-    } 
+    }
     return (
         <Fragment>
             <form className={styles["container"]} onSubmit={onSubmitHandler}  >
@@ -206,6 +223,12 @@ const InvoiceReport = () => {
                 className={classes.backdrop}
                 open={openLoader} >
                 <CircularProgress color="primary" />
+            </Backdrop>
+            <Backdrop className={classes.backdrop} open={openDownloader} >
+                <div>
+                    <CircularProgress color="primary" />
+                </div>
+                <span>Sending Invoices....</span>
             </Backdrop>
         </Fragment>
     )

@@ -599,7 +599,7 @@ export default function FormPropsTextFields() {
       discount: 0,
       amount_paid: '0',
       balance_due: 0,
-    } 
+    }
     setSelectedDueDate(fieldValues.due_date)
     setSelectedDate(fieldValues.date)
     setInvoiceNumber(0);
@@ -662,9 +662,8 @@ export default function FormPropsTextFields() {
     data.invoice_number = invoiceNumber;
 
     setInvoiceData(data);
-    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } }) 
       .then(function (response) {
-        console.log(invoiceData);
         setOpenDownloader(false);
         const message = alert;
         message.message = "invoice generated successfully";
