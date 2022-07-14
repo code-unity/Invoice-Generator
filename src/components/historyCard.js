@@ -1,4 +1,4 @@
-import React from 'react';
+import React , {}from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -9,6 +9,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ShareIcon from '@material-ui/icons/Share';
 import { Divider } from '@material-ui/core';
 import axios from "axios";
+import EditIcon from '@material-ui/icons/Edit';
+import history from '../history';
+
 
 const useStyles = makeStyles((theme)=>({
   root: {
@@ -57,13 +60,20 @@ const useStyles = makeStyles((theme)=>({
   },
 }));
 
+
 export default function OutlinedCard(props) {
+  // const { row } = props
   const classes = useStyles();
+  
     function deleteInvoice() {
       axios.delete(`${process.env.REACT_APP_API_URL}/invoice/${props.data._id}`)
-
     }
+    // function editInvoice(){
+      // axios.put(`${process.env.REACT_APP_API_URL}/invoice/${props.data._id}`)
+    // }
+
   return (
+
     <Card className={classes.root} variant="outlined">
       <CardContent>
         <Typography className={classes.title} color="textSecondary" gutterBottom>
@@ -129,7 +139,7 @@ export default function OutlinedCard(props) {
         <Typography  color="primary" gutterBottom>
           Balance due: {props.data.balance_due}
         </Typography>
-
+        
         
       </CardContent>
       <CardActions disableSpacing>
@@ -137,10 +147,20 @@ export default function OutlinedCard(props) {
          
         <DeleteIcon/>
         </IconButton>
+        
         <IconButton size ="small" aria-label="share">
           <ShareIcon />
         </IconButton>
+        <IconButton 
+                        aria-label="edit-client"
+                        size='small'
+                        // onClick= {editInvoice}
+                        onClick={() => history.push(`/home/${props.data._id}`)}
+                    >
+                        <EditIcon />
+                    </IconButton>
       </CardActions>
     </Card>
   );
 }
+  

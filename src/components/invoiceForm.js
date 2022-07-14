@@ -1,4 +1,5 @@
 import React from 'react';
+// import React, { useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
@@ -6,6 +7,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import history from '../history';
+import { useParams } from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
@@ -19,7 +22,6 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextareaAutosize from '@mui/material/TextareaAutosize'
-import { Typography } from "@material-ui/core";
 
 import {
   MuiPickersUtilsProvider,
@@ -33,104 +35,17 @@ const useStyles = makeStyles((theme) => ({
       width: '25ch',
     },
   },
-  invoice: {
-    marginLeft: '250px',
-    marginTop: '50px',
-    marginBottom: '15px',
-    fontSize: '30px',
-    [theme.breakpoints.down("sm")]: {
-      marginLeft: '10px',
-      fontSize: '20px',
-      width: '150px',
-    },
-  },
-  client: {
-    paddingLeft: "15px",
-    [theme.breakpoints.down("sm")]: {
-      width: '150px',
-      fontSize: '13px',
-      paddingTop: '3px',
-      paddingLeft: '16px',
-    },
-  },
-  currency: {
-    [theme.breakpoints.down("sm")]: {
-      width: '100px',
-      paddingLeft: '1px',
-    },
-  },
-  notes: {
-    width: 470,
-    fontSize: 19,
-    padding: '5px',
-    borderRadius: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
-  },
-  terms: {
-    width: 470,
-    fontSize: 19,
-    padding: '5px',
-    borderRadius: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
-  },
   multiline: {
     width: '400px',
   },
   payment: {
-    width: 225,
-    fontSize: 19,
-    borderRadius: '5px',
-    padding: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
+    width: '195px',
   },
 
   formControl: {
     margin: theme.spacing(1),
     minWidth: 150,
     maxWidth: 300,
-    paddingLeft: '15px',
-    [theme.breakpoints.down("sm")]: {
-      width: '200px',
-    },
-  },
-
-  who: {
-    width: 475,
-    fontSize: 19,
-    borderRadius: '5px',
-    padding: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
-  },
-  select: {
-    [theme.breakpoints.down("sm")]: {
-      width: 100,
-    },
-  },
-  itemh: {
-    [theme.breakpoints.up("sm")]: {
-      display: "none",
-    },
-  },
-  Description: {
-    paddingTop: 0,
-    width: 470,
-    [theme.breakpoints.down("sm")]: {
-      width: 250,
-      marginTop: 0,
-    },
-
   },
   chips: {
     display: 'flex',
@@ -140,180 +55,41 @@ const useStyles = makeStyles((theme) => ({
     margin: 2,
   },
   invoiceNumber: {
-    margin: theme.spacing(1),
-    marginRight: '20px',
+    marginRight: '10px',
     float: 'right',
     width: '150px',
-    paddingTop: '10px',
-    [theme.breakpoints.down("sm")]: {
-      margin: theme.spacing(-4),
-      marginRight: '20px',
-      marginTop: '-60px',
-
-    },
+    padding: '10px'
   },
   noLabel: {
     marginTop: theme.spacing(3),
   },
   item: {
     width: '490px',
-    padding: '5px',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
+    padding: '5px'
   },
   quantity: {
     width: '45px',
-    padding: '5px',
-  },
-  quantitybox: {
-    paddingLeft: '20px',
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '-0px',
-      marginRight: '-100px'
-    },
-  },
-  ratebox: {
-    paddingLeft: '20px',
-    width: '165px',
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '5px',
-      paddingLeft: '0px',
-      float: 'left',
-
-    },
-  },
-  downloadbutton: {
-    float: 'right',
-    marginRight: "150px",
-    marginBottom: "30px",
-    marginTop: "20px",
-    [theme.breakpoints.down("sm")]: {
-      marginRight: '115px',
-
-
-    },
-  },
-  amountbox: {
-    paddingLeft: '20px',
-    width: '165px',
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '5px',
-      paddingLeft: '10px',
-    },
+    padding: '5px'
   },
   rate: {
-    width: '165px',
+    width: '45px',
     padding: '5px'
   },
   math: {
     width: '150px',
-    padding: '10px',
+    padding: '10px'
   },
-  subtotal: {
-    float: 'right',
-    marginTop: '35px',
-    marginBottom: '15px',
-    marginRight: "20px",
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '-20px',
-
-    },
-  },
-  discontbox: {
-    float: 'right',
-    marginBottom: '15px',
-    marginRight: "20px",
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '0px',
-      marginRight: "20px",
-      marginBottom: '-5px',
-
-    },
-  },
-  totalbox: {
-    float: 'right',
-    marginBottom: '10px',
-    marginTop: '5px',
-    marginRight: "20px",
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '-15px',
-      marginLeft: '250px',
-    },
-  },
-
   discount: {
-    width: '80px',
-    padding: '10px',
-
+    width: '100px',
+    padding: '10px'
   },
   type: {
     width: '50px',
-    marginLeft: '15px',
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '-40px',
-      marginLeft: "120px"
-
-
-    },
+    marginLeft: '5px'
   },
-
   menu: {
-    width: '200px',
+    width: '100px',
     padding: '10px'
-  },
-  bill: {
-    width: 225,
-    height: 150,
-    fontSize: 19,
-    borderRadius: '5px',
-    padding: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
-  },
-  ship: {
-    width: 225,
-    fontSize: 19,
-    borderRadius: '5px',
-    padding: '5px',
-    background: '#fafafa',
-    [theme.breakpoints.down("sm")]: {
-      width: '324px',
-    },
-  },
-  date: {
-    float: "right",
-    marginTop: '20px',
-    marginRight: "20px",
-    marginBottom: '10px',
-    marginLeft: "45px",
-    [theme.breakpoints.down("sm")]: {
-      width: '140px',
-      float: "left",
-      marginLeft: "-240px",
-      marginTop: '0px',
-    },
-  },
-  duedate: {
-    float: "right",
-    marginBottom: '10px',
-    marginRight: "20px",
-    marginLeft: "45px",
-    [theme.breakpoints.down("sm")]: {
-      width: '140px',
-      marginTop: '0px',
-    },
-  },
-  shipto: {
-    float: "left",
-    marginRight: "20px",
-    marginTop: '30px',
-    marginBottom: '20px',
-    [theme.breakpoints.down("sm")]: {
-      marginTop: '10px',
-    },
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -344,14 +120,17 @@ function getStyles(name, personName, theme) {
     fontWeight:
       personName.indexOf(name) === -1
         ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
+        : theme.typography.fontWeightMzum,
   };
 }
 
 
+
+
 export default function FormPropsTextFields() {
+  let { id } = useParams();
   const token = localStorage.getItem('token');
-  const config = { headers: { Authorization: `Bearer ${token}` } };
+  const config = { headers: { Authorization: `Bearer ${token}` }};
   const classes = useStyles();
   const theme = useTheme();
   const [inputAdornment, setInputAdornment] = React.useState('₹')
@@ -371,12 +150,14 @@ export default function FormPropsTextFields() {
   const [selectedDate, setSelectedDate] = React.useState(new Date().toDateString());
   const [selectedDueDate, setSelectedDueDate] = React.useState(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString());
   const [openDownloader, setOpenDownloader] = React.useState(false);
+  
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory, setInvoiceHistory] = React.useState([]);
   const [invoiceNumber, setInvoiceNumber] = React.useState(0);
-  const currency = [{ id: 'Rupee', value: '₹' }, { id: 'USD', value: '$' }, { id: 'GBP', value: '£' }]
+  const currency=[{id:'Rupee',value:'₹'},{id:'USD',value:'$'},{id:'GBP',value:'£'}]
+  
 
-  const [invoiceData, setInvoiceData] = React.useState({
+  const [invoiceData, setInvoiceData,setState] = React.useState({
     client: '',
     bill_from: '',
     bill_to: '',
@@ -396,6 +177,28 @@ export default function FormPropsTextFields() {
     invoice_number: ''
   });
 
+  // const fetchData = () => {
+  //   axios.get(`${process.env.REACT_APP_API_URL}/home/${id}`)
+  //     .then((response) => {
+  //       setState({
+  //         client: response.data.data.client,
+  //         invoice_number: response.data.data.invoice_number,
+  //         bill_from: response.data.data.bill_from,
+  //         payment_terms: response.data.data.payment_terms,
+    
+  //       })
+  //     })
+  //     .catch((error) => {
+  //       history.push('/home')
+  //     })
+  // }
+  
+  // useEffect(() => {
+  //   if (id) {
+  //     fetchData()
+  //   }
+  // }, []);
+  
   function inputAdornmentChange(e) {
     setInputAdornment(e.target.value)
   };
@@ -418,12 +221,12 @@ export default function FormPropsTextFields() {
     }
 
   };
-
+  
   const fetchData = () => {
     setOpen(true);
-    axios.get(`${process.env.REACT_APP_API_URL}/admin/address`, config)
-      .then((res) => {
-        setInvoiceData({ ...invoiceData, bill_from: res.data.address })
+    axios.get(`${process.env.REACT_APP_API_URL}/admin/address`,config)
+    .then((res) => {
+      setInvoiceData({...invoiceData,bill_from:res.data.address })
       })
     axios.get(`${process.env.REACT_APP_API_URL}/client`)
       .then((res) => {
@@ -434,13 +237,26 @@ export default function FormPropsTextFields() {
         setOpen(false);
         setInvoiceHistory(res.data.data.results);
       })
+      axios.get(`${process.env.REACT_APP_API_URL}/home/${id}`)
+      .then((response) => {
+        setState({
+          client: response.data.data.client,
+          invoice_number: response.data.data.invoice_number,
+          bill_from: response.data.data.bill_from,
+          payment_terms: response.data.data.payment_terms,
+    
+        })
+      })
+      .catch((error) => {
+        history.push('/home')
+      })
   };
 
   React.useEffect(() => {
     fetchData();
   }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
-
+ 
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -616,6 +432,7 @@ export default function FormPropsTextFields() {
       }
       data.amount_paid = 'US' + inputAdornment + amountPaid;
       data.balance_due = 'US' + inputAdornment + balanceDue;
+      
     }
     else {
       for (let i = 0; i < data.items.length; i++) {
@@ -627,7 +444,7 @@ export default function FormPropsTextFields() {
       data.amount_paid = inputAdornment + amountPaid;
       data.balance_due = inputAdornment + balanceDue;
     }
-    if (tax !== 0 && tax !== '') {
+    if (tax !==0 && tax !== '') {
       if (taxType === 'flat') {
         data.tax = inputAdornment + tax;
       }
@@ -638,7 +455,7 @@ export default function FormPropsTextFields() {
     else {
       data.tax = ''
     }
-    if (discount !== 0 && discount !== '') {
+    if (discount!==0 && discount !== '') {
       if (discountType === 'flat') {
         data.discount = inputAdornment + discount;
       }
@@ -650,9 +467,9 @@ export default function FormPropsTextFields() {
       data.discount = ''
     }
     data.invoice_number = invoiceNumber;
-
+    
     setInvoiceData(data);
-    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/invoice`,invoiceData, { headers: { 'Content-Type': 'application/json' } })
       .then(function (response) {
         setOpenDownloader(false);
         const message = alert;
@@ -693,12 +510,13 @@ export default function FormPropsTextFields() {
 
   return (
     <div >
-      <Typography variant="h1" className={classes.invoice}>
+      <h1 style={{ marginLeft: '300px', marginTop: '50px' }}>
         Generate Invoice
-      </Typography>
+      </h1>
       <div className="form">
+
         <FormControl className={classes.formControl}>
-          <InputLabel className={classes.client} id="demo-mutiple-name-label">Select Client</InputLabel>
+          <InputLabel id="demo-mutiple-name-label">Select Client</InputLabel>
           <Select
             labelId="demo-mutiple-name-label"
             id="demo-mutiple-name"
@@ -707,7 +525,6 @@ export default function FormPropsTextFields() {
             onChange={e => handleChange(e)}
             input={<Input />}
             MenuProps={MenuProps}
-            className={classes.select}
           >
             <MenuItem value="">
               <em>None</em>
@@ -720,20 +537,19 @@ export default function FormPropsTextFields() {
           </Select>
         </FormControl>
         <FormControl className={classes.formControl}>
-          <InputLabel style={{ paddingLeft: "26px" }} id="demo-mutiple-name-label">Currency</InputLabel>
+          <InputLabel id="demo-mutiple-name-label">Currency</InputLabel>
           <Select
-            className={classes.currency}
             labelId="demo-mutiple-name-label"
             id="demo-mutiple-name"
             value={inputAdornment}
             onChange={e => inputAdornmentChange(e)}
             input={<Input />}
             MenuProps={MenuProps}
-          >{currency.map(item => (<MenuItem key={item.id} value={item.value}>{item.id}</MenuItem>))}
+          >{currency.map(item=>(<MenuItem key={item.id} value={item.value}>{item.id}</MenuItem>))}
           </Select>
         </FormControl>
         <div className={classes.invoiceNumber}>
-          <TextField size="small"
+          <TextField
             required
             label="Invoice Number"
             variant="outlined"
@@ -741,48 +557,48 @@ export default function FormPropsTextFields() {
             onChange={e => setInvoiceNumber(e.target.value)}
           />
         </div>
-        <form noValidate autoComplete="off" style={{ paddingLeft: "20px" }}>
+        <form noValidate autoComplete="off" style={{ padding: "10px" }}>
           <div className="leftDivision">
-            <div style={{ marginTop: '20px' }} >
+            <div style={{ marginRight: '15px' }} >
               <TextareaAutosize
                 required
                 value={invoiceData.bill_from}
                 name="bill_from"
-                minRows={6}
+                minRows={3}
                 onChange={handleDataChange}
                 placeholder="Who is this invoice from (required)"
-                className={classes.who}
+                style={{ width: 425, fontSize: 19, padding: '5px', borderRadius: '5px', background: '#fafafa' }}
               />
             </div>
-            <div style={{ float: "left", marginRight: "20px", marginTop: '30px', marginBottom: '20px' }}>
+            <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
               <TextareaAutosize
                 required
                 label="Bill To"
                 name="bill_to"
                 variant="outlined"
-                minRows={6}
+                minRows={3}
                 value={invoiceData.bill_to}
                 onChange={handleDataChange}
                 placeholder="Bill To"
-                className={classes.bill}
+                style={{ width: 225, fontSize: 19, borderRadius: '5px', padding: '5px', background: '#fafafa' }}
               />
             </div>
-            <div className={classes.shipto}>
+            <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
               <TextareaAutosize
                 required
                 label="Ship To"
                 name="ship_to"
                 variant="outlined"
-                minRows={6}
+                minRows={3}
                 value={invoiceData.ship_to}
                 onChange={handleDataChange}
                 placeholder="Ship To"
-                className={classes.ship}
+                style={{ width: 225, fontSize: 19, borderRadius: '5px', padding: '5px', background: '#fafafa' }}
               />
             </div>
           </div>
           <div className='rightDivision'>
-            <div className={classes.date}>
+            <div style={{ float: "right", marginTop: '30px', marginRight: "15px", marginBottom: '10px', marginLeft: "45px" }}>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
                   disableToolbar
@@ -799,7 +615,7 @@ export default function FormPropsTextFields() {
               </MuiPickersUtilsProvider>
             </div>
 
-            <div className={classes.duedate}>
+            <div style={{ float: "right", marginBottom: '10px', marginRight: "15px", marginLeft: "45px" }}>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
                   disableToolbar
@@ -816,15 +632,15 @@ export default function FormPropsTextFields() {
                 />
               </MuiPickersUtilsProvider>
             </div>
-            <div style={{ float: 'right', marginTop: "15px", marginBottom: '10px', marginRight: "20px" }}>
+            <div style={{ float: 'right', marginLeft: "45px", marginBottom: '10px', marginRight: "15px" }}>
               <TextareaAutosize
                 required
                 name="payment_terms"
                 value={invoiceData.payment_terms}
-                minRows={6}
+                minRows={2}
                 onChange={handleDataChange}
                 placeholder="Payment Terms"
-                className={classes.payment}
+                style={{ width: 225, fontSize: 19, padding: '5px', borderRadius: '5px', background: '#fafafa' }}
               />
             </div>
 
@@ -841,7 +657,7 @@ export default function FormPropsTextFields() {
             <div className="rate">
               Rate
             </div>
-            <div className="amount">
+            <div className="rate">
               Amount
             </div>
           </div>
@@ -849,10 +665,8 @@ export default function FormPropsTextFields() {
             {fields.map((field, idx) => {
               return (
                 <div key={`${field}-${idx}`}>
-                  <h4 className={classes.itemh} style={{ fontsize: "19px" }}>Item</h4>
-                  <h4 className={classes.itemh} style={{ fontsize: "19px", float: "right", marginRight: '20px', marginTop: '-20px' }}>Quantity</h4>
                   <TextField
-                    className={classes.Description}
+                    style={{ margin: 8 }}
                     placeholder="Description of service or product.."
                     margin="normal"
                     InputLabelProps={{
@@ -866,7 +680,7 @@ export default function FormPropsTextFields() {
                     onChange={e => handleChanges(idx, e)}
                   />
                   <TextField
-                    className={classes.quantitybox}
+                    style={{ margin: 8 }}
                     margin="normal"
                     InputLabelProps={{
                       shrink: true,
@@ -879,10 +693,8 @@ export default function FormPropsTextFields() {
                     value={field.quantity}
                     onChange={e => handleChangesforQuantity(idx, e)}
                   />
-                  <h4 className={classes.itemh} style={{ fontsize: "19px" }}>Rate</h4>
-                  <h4 className={classes.itemh} style={{ fontsize: "19px", float: "right", marginRight: '115px', marginTop: '-20px' }}>Amount</h4>
                   <TextField
-                    className={classes.ratebox}
+                    style={{ margin: 8 }}
                     margin="normal"
                     InputLabelProps={{
                       shrink: true,
@@ -899,7 +711,7 @@ export default function FormPropsTextFields() {
                     onChange={e => handleChangesforRate(idx, e)}
                   />
                   <TextField
-                    className={classes.amountbox}
+                    style={{ margin: 8 }}
                     margin="normal"
                     InputLabelProps={{
                       shrink: true,
@@ -915,7 +727,7 @@ export default function FormPropsTextFields() {
                     value={field.amount}
                     onChange={e => handleChangesforRate(idx, e)}
                   />
-                  {idx !== 0 && <IconButton size="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{ marginTop: "15px" }}>
+                  {idx !== 0 && <IconButton size="small" aria-label="Delete" onClick={() => handleRemove(idx)} style={{ marginTop: "6px" }}>
                     <DeleteIcon />
                   </IconButton>}
                 </div>
@@ -923,40 +735,40 @@ export default function FormPropsTextFields() {
               );
 
             })}
+            <Button variant="contained" color="primary" onClick={handleAdd}>
+              Add item
+            </Button>
           </div>
-          <Button style={{ paddingLeft: 20 }} variant="contained" color="primary" onClick={handleAdd}>
-            Add item
-          </Button>
         </form>
 
 
 
-        <div style={{ float: 'left', overflow: 'hidden', padding: "20px" }}>
+        <div style={{ float: 'left', overflow: 'hidden', padding: "10px" }}>
           <div style={{ marginTop: '15px' }}>
             <TextareaAutosize
               required
               name="notes"
-              minRows={6}
+              minRows={2}
               value={invoiceData.notes}
               onChange={handleDataChange}
               placeholder="Notes - any relevant information already not covered"
-              className={classes.notes}
+              style={{ width: 425, fontSize: 19, padding: '5px', borderRadius: '5px', background: '#fafafa' }}
             />
           </div>
-          <div style={{ marginTop: "20px", marginBottom: '20px' }}>
+          <div style={{ marginTop: "15px", marginBottom: '20px' }}>
             <TextareaAutosize
               required
               name="terms"
               value={invoiceData.terms}
-              minRows={6}
+              minRows={2}
               onChange={handleDataChange}
               placeholder="Terms and conditions"
-              className={classes.terms}
+              style={{ width: 425, fontSize: 19, padding: '5px', borderRadius: '5px', background: '#fafafa' }}
             />
           </div>
         </div>
         <div className='rightDivision'>
-          <div className={classes.subtotal}>
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
               required
               label="Sub total"
@@ -971,7 +783,7 @@ export default function FormPropsTextFields() {
               variant="outlined"
             />
           </div>
-          <div className={classes.discontbox}>
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
               label="Discount"
               variant="outlined"
@@ -996,7 +808,7 @@ export default function FormPropsTextFields() {
               </Select>
             </FormControl>
           </div>
-          <div style={{ float: 'right', marginBottom: '10px', marginRight: "20px" }}>
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
             <TextField
               label="GST"
               variant="outlined"
@@ -1021,58 +833,57 @@ export default function FormPropsTextFields() {
               </Select>
             </FormControl>
           </div>
-        </div>
-        <div className={classes.totalbox}>
-          <TextField
-            required
-            label="Total"
-            value={total}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
-            }}
-            inputProps={{
-              readOnly: true,
-              className: classes.math
-            }}
-            variant="outlined"
-          />
-        </div>
-        <div style={{ float: 'right', marginTop: '5px', marginRight: "20px" }}>
-          <TextField
-            label="Amount paid"
-            value={amountPaid}
-            onChange={handlePaidChange}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
-            }}
-            inputProps={{
-              className: classes.math
-            }}
-            variant="outlined"
-          />
-        </div>
-        <div style={{ float: 'right', marginTop: '15px', marginBottom: '10px', marginRight: "20px" }}>
-          <TextField
-            required
-            label="Balance due"
-            InputProps={{
-              startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
-            }}
-            value={balanceDue}
-            inputProps={{
-              readOnly: true,
-              className: classes.math
-            }}
-            variant="outlined"
-          />
-
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+            <TextField
+              required
+              label="Total"
+              value={total}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+              }}
+              inputProps={{
+                readOnly: true,
+                className: classes.math
+              }}
+              variant="outlined"
+            />
+          </div>
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+            <TextField
+              label="Amount paid"
+              value={amountPaid}
+              onChange={handlePaidChange}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+              }}
+              inputProps={{
+                className: classes.math
+              }}
+              variant="outlined"
+            />
+          </div>
+          <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+            <TextField
+              required
+              label="Balance due"
+              InputProps={{
+                startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
+              }}
+              value={balanceDue}
+              inputProps={{
+                readOnly: true,
+                className: classes.math
+              }}
+              variant="outlined"
+            />
+          </div>
         </div>
 
         <div style={{ clear: 'both' }}>
         </div>
 
       </div>
-      <div className={classes.downloadbutton}>
+      <div style={{ marginLeft: "300px", marginBottom: "30px", marginTop: "10px" }}>
         <Button variant="contained" color="primary" onClick={printdata} >
           Download Invoice
         </Button>
