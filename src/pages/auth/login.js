@@ -67,21 +67,22 @@ function LoginForm() {
             <div>
               <div className="logo">
               <img
-                src="https://media-exp1.licdn.com/dms/image/C4D0BAQHNwdJlZmUh8g/company-logo_200_200/0/1593941980738?e=1632960000&amp;v=beta&amp;t=a7LpkSX_fT5QrIsDb9DxbXWzFvyhPxAhc4oHl-rBLOQ"
+                src="https://www.codeunity.in/images/logo/logo.png"
                 loading="lazy"
                 alt="CodeUnity logo"
                 id="ember499"
                 style={{
                   marginLeft: '31%',
-                  marginTop: '-1%',
+                  marginTop: '10%',
+                  marginBottom:'10px',
                   height: '0%',
                   width: '40%',
                 }}
               ></img>
               </div>
-              <h2 style={{marginLeft:'50px',marginTop:'-45px'}}>Log In to Your Account</h2>
+              <h2 style={{marginLeft:'83px',marginTop:'10px',fontSize:'16px',marginBottom:'-5px'}}>Log In to Your Account</h2>
               <form className={classes.root} onSubmit={submitHandler}>
-                <div style={{marginLeft:"20px"}}>
+                <div style={{marginLeft:"10px"}}>
                   <TextField
                     required
                     id="outlined-full-width"
@@ -117,7 +118,7 @@ function LoginForm() {
                     )} */}
                     
                 </div>
-                <div style={{marginLeft:"30px",marginBottom:"30px"}}>
+                <div style={{marginLeft:"20px",marginBottom:"20px",marginTop:'5px'}}>
                     <Button variant="contained" color="primary" onClick={submitHandler}>
                       Log In
                     </Button>
