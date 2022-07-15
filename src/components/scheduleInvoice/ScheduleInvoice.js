@@ -286,7 +286,6 @@ export default function ScheduleInvoice() {
                 variant='inline'
                 margin='normal'
                 label='Starting Date'
-                minDate={Date.now()}
                 value={scheduleData.date}
                 onChange={handleDateChange}
                 style={{marginTop:'0px'}}
