@@ -79,7 +79,11 @@ export default function PersistentDrawerLeft(props) {
     invoice: false,
   });
   const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex1, setSelectedIndex1] = React.useState(1);
 
+  const handleListItemClickindex = (e, index) => {
+    setSelectedIndex1(index);
+  };
   const handleListItemClick = (e, index) => {
     setSelectedIndex(index);
   };
@@ -142,12 +146,16 @@ export default function PersistentDrawerLeft(props) {
         </div>
         <Divider />
         <List>
-          <div onChange={(e) => handleChange('client')} className={state.client ? "sidebar-item open" : "sidebar-item"} >
-            <ListItem button className="sidebar-title" onClick={(e) =>
+          <div onChange={(e) => handleChange('client')} 
+              className={state.client ? "sidebar-item open" : "sidebar-item"} >
+            <ListItem button selected={selectedIndex1 === 0} 
+              className="sidebar-title" onClick={(e) => {
               handleChange('client')
-            }>
+              handleListItemClickindex(e, 0)
+            }}>
               <ListItemText primary='Client' />
-              <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('client')} ></KeyboardArrowDownIcon>
+              <KeyboardArrowDownIcon 
+                className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('client')} ></KeyboardArrowDownIcon>
             </ListItem>
             <div className="sidebar-content">
               <ListItem button selected={selectedIndex === 0} onClick={(e) => {
@@ -166,11 +174,12 @@ export default function PersistentDrawerLeft(props) {
               </ListItem>
             </div>
           </div >
-          <div style={{ marginTop: -5 }}>
+          <div style={{ marginTop: 0 }}>
             <div onChange={(e) => handleChange('candidate')} className={state.candidate ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={(e) =>
+              <ListItem button selected={selectedIndex1 === 1} className="sidebar-title" onClick={(e) =>{
                 handleChange('candidate')
-              }>
+                handleListItemClickindex(e, 1)
+              }}>
                 <ListItemText primary='Candidate' />
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => handleChange('candidate')}></KeyboardArrowDownIcon>
               </ListItem>
@@ -191,10 +200,11 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -5 }}>
+          <div style={{ marginTop: 0 }}>
             <div onChange={(e) => handleChange('timesheet')} className={state.timesheet ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={(e) =>
-                handleChange('timesheet')}>
+              <ListItem button selected={selectedIndex1 === 2} className="sidebar-title" onClick={(e) =>{
+                handleChange('timesheet')
+                handleListItemClickindex(e, 2)}}>
                 <ListItemText primary='Time Sheet' />
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('timesheet')} ></KeyboardArrowDownIcon>
               </ListItem>
@@ -217,11 +227,12 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-          <div style={{ marginTop: -5 }}>
+          <div style={{ marginTop: 0 }}>
             <div onChange={(e) => handleChange('invoice')} className={state.invoice ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button className="sidebar-title" onClick={(e) =>
+              <ListItem button selected={selectedIndex1 === 3} className="sidebar-title" onClick={(e) =>{
                 handleChange('invoice')
-              }>
+                handleListItemClickindex(e, 3)
+              }}>
                 <ListItemText primary='Invoice' />
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('invoice')} ></KeyboardArrowDownIcon>
               </ListItem>
