@@ -348,6 +348,9 @@ function getStyles(name, personName, theme) {
   };
 }
 
+const intialDateString = String(new Date().toDateString());
+const intialMonth = intialDateString.split(" ")[1];
+const intialYear = intialDateString.split(" ")[3];
 
 export default function FormPropsTextFields() {
   const token = localStorage.getItem('token');
@@ -385,6 +388,8 @@ export default function FormPropsTextFields() {
     notes: '',
     terms: '',
     date: String(new Date().toDateString()),
+    month: intialMonth,
+    year: intialYear,
     due_date: String(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString()),
     payment_terms: '',
     sub_total: '0',
@@ -451,9 +456,13 @@ export default function FormPropsTextFields() {
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    invoiceData.date = date.toDateString();
+    console.log(date.toDateString().getMonth, date.toDateString().getFullYear)
+    const dateString = date.toDateString();
+    invoiceData.date = dateString;
+    invoiceData.month = dateString.split(" ")[1];
+    invoiceData.year = dateString.split(" ")[3];
+    // invoiceData.date = 
     // setInvoiceData({...invoiceData,date:date.toDateString()})
-
   };
   const handleDueDateChange = (date) => {
     setSelectedDueDate(date);
@@ -580,6 +589,8 @@ export default function FormPropsTextFields() {
       notes: '',
       terms: '',
       date: String(new Date().toDateString()),
+      month: intialMonth,
+      year: intialYear,
       due_date: String(new Date(new Date(new Date()).setDate(new Date().getDate() + 15)).toDateString()),
       payment_terms: '',
       sub_total: '0',
@@ -587,7 +598,7 @@ export default function FormPropsTextFields() {
       tax: 0,
       discount: 0,
       amount_paid: '0',
-      balance_due: 0
+      balance_due: 0,
     }
     setSelectedDueDate(fieldValues.due_date)
     setSelectedDate(fieldValues.date)
@@ -600,7 +611,6 @@ export default function FormPropsTextFields() {
     setAmountPaid(0);
     setTax(0);
     setBalanceDue(0);
-
   }
   let b64;
   function printdata() {
@@ -652,7 +662,7 @@ export default function FormPropsTextFields() {
     data.invoice_number = invoiceNumber;
 
     setInvoiceData(data);
-    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } })
+    axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } }) 
       .then(function (response) {
         setOpenDownloader(false);
         const message = alert;
