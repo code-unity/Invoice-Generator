@@ -16,8 +16,12 @@ import { WhatsappShareButton } from "react-share";
 import { WhatsappIcon } from "react-share";
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
-import{ createRef, useState } from 'react'
-import { useScreenshot } from 'use-react-screenshot'
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import './historyCard.css';
+import EditIcon from '@mui/icons-material/Edit';
+import history from '../history';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -75,6 +79,13 @@ export default function OutlinedCard(props) {
 
   const [open, setOpen] = React.useState(false);
 
+  const [checked, setChecked] = React.useState(false);
+
+  const paidChangeHandler = (event) => {
+    setChecked(event.target.checked);
+  };
+
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -87,7 +98,7 @@ export default function OutlinedCard(props) {
   return (
     <div>
       <Card className={classes.root} variant="outlined">
-        <CardContent>
+        <CardContent className={checked ? 'cardpaid' : 'card'} >
           <Typography className={classes.title} color="textSecondary" gutterBottom>
             # {props.idx + 1}
           </Typography>
@@ -154,12 +165,32 @@ export default function OutlinedCard(props) {
 
         </CardContent>
         <CardActions disableSpacing>
-          <IconButton size="small" aria-label="Delete">
+          <IconButton size="small" aria-label="Delete" >
             <DeleteIcon />
           </IconButton>
-          <IconButton size="small" aria-label="share">
+          <IconButton size="small" aria-label="share" style={{ marginLeft: "15px" }}>
             <ShareIcon variant="outlined" onClick={handleClickOpen} />
           </IconButton>
+          <Button
+            size="small"
+            style={{ marginLeft: "20px" }}
+            startIcon={<EditIcon />}
+            variant="text"
+            color="primary"
+            onClick={(e) => {
+              history.push(`/home/ ${props.data.sub_total}`)
+
+            }}>
+            Edit
+          </Button>
+          <FormGroup style={{ marginLeft: "20px" }}>
+            <FormControlLabel
+              control={<Switch defaultChecked />}
+              label={checked ? 'Paid' : 'Unpaid'}
+              checked={checked}
+              size="small"
+              onChange={paidChangeHandler} />
+          </FormGroup>
         </CardActions>
       </Card>
       <div>
@@ -175,7 +206,7 @@ export default function OutlinedCard(props) {
           <DialogTitle>{"Share Invoice"}</DialogTitle>
           <DialogContent>
             <WhatsappShareButton
-              url="https://www.codeunity.in" 
+              url="https://www.codeunity.in"
               title={`Date = ${props.data.date}\n
 Due Date = ${props.data.due_date}\n
 Bill To = ${props.data.bill_to}\n
@@ -189,7 +220,7 @@ SubTotal = ${props.data.sub_total}\n
 Total = ${props.data.total}\n
 Balance due = ${props.data.balance_due}\n
 Amount paid = ${props.data.amount_paid}\n
-`}  
+`}
             >
               <WhatsappIcon logofillcolour='white' round={true}></WhatsappIcon>
             </WhatsappShareButton>

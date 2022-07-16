@@ -650,6 +650,7 @@ export default function FormPropsTextFields() {
       data.discount = ''
     }
     data.invoice_number = invoiceNumber;
+    console.log(data);
 
     setInvoiceData(data);
     axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } })
@@ -665,7 +666,7 @@ export default function FormPropsTextFields() {
         b64 = response.data.pdf;
         var link = document.createElement('a');
         link.innerHTML = 'Download PDF file';
-        link.download = 'file.pdf';
+        link.download = (`${invoiceNumber}-${data.date}.pdf`)
         link.href = 'data:application/octet-stream;base64,' + b64;
         document.body.appendChild(link);
         link.click();
