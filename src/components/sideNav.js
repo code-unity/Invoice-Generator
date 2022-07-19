@@ -20,7 +20,7 @@ import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import Timer from "@material-ui/icons/Timer";
 import history from '../history';
 import Box from '@mui/material/Box';
 import './sideNav.css';
@@ -234,7 +234,7 @@ export default function PersistentDrawerLeft(props) {
             <ListItemText primary='Generate Invoice' />
           </ListItem>
           <ListItem button onClick={() => history.push('/schedule-invoice')}>
-            <ListItemIcon><CalendarMonthIcon /></ListItemIcon>
+            <ListItemIcon><Timer /></ListItemIcon>
             <ListItemText primary='Schedule Invoice' />
           </ListItem>
           <ListItem button onClick={() => history.push("/timesheet")}>
