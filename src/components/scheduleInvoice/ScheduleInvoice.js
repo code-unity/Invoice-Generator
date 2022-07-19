@@ -268,7 +268,7 @@ export default function ScheduleInvoice() {
                 <em>None</em>
               </MenuItem>
               {invoiceHistory.map((item) => (
-                <MenuItem key={item._id} value={item.invoice_number} >
+                <MenuItem key={item._id} value={item._id} >
                   {item.invoice_number}
                 </MenuItem>
               ))}

@@ -146,7 +146,7 @@ const ViewSchedule = () => {
                                 {!temp.isDisabled &&
                                 <>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{temp.scheduleName}</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{clientData.filter(data => data._id === temp.clientId)[0] && clientData.filter(data => data._id === temp.clientId)[0].client_name}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{clientData.filter(data => data._id === temp.clientId)[0] && clientData.filter(data => data._id === temp.clientId)[0].client_name}{!clientData.filter(data => data._id === temp.clientId)[0] && <>-deleted- </>}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{temp.invoiceNumber}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{convertDate(temp.date)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{convertTime(temp.time)}</TableCell>
