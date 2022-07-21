@@ -112,23 +112,13 @@ const ViewSchedule = () => {
     }
 
     const getClientName = (newClientId) => {
-        var fetchClientDetails=clientData.filter(obj => obj._id === newClientId)
-        if(fetchClientDetails[0]){
-            return fetchClientDetails[0].client_name
-        }
-        else{
-            return "Deleted"
-        }
+        const clientObj =  clientData.find(obj => obj._id === newClientId);
+        return (clientObj && clientObj.client_name ? clientObj.client_name : "Deleted")
     }
 
     const getInvoiceNumber = (newInvoiceId) => {
-        var fetchInvoiceDetails=invoiceData.filter(obj => obj._id === newInvoiceId)
-        if(fetchInvoiceDetails[0]){
-            return fetchInvoiceDetails[0].invoice_number
-        }
-        else{
-            return "Deleted"
-        }
+        const invoiceObj =  invoiceData.find(obj => obj._id === newInvoiceId);
+        return (invoiceObj && invoiceObj.invoice_number ? invoiceObj.invoice_number : "Deleted")
     }
 
     useEffect(() => {
