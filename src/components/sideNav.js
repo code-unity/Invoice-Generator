@@ -77,7 +77,6 @@ export default function PersistentDrawerLeft(props) {
     candidate: false,
     timesheet: false,
     invoice: false,
-    schedule : false,
   });
   const [selectedIndex, setSelectedIndex] = React.useState(1);
 
@@ -204,26 +203,6 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-            <div style={{ marginTop: -5 }}>
-            <div onChange={(e) => handleChange('schedule')} className={state.schedule ? "sidebar-item open" : "sidebar-item"}>
-              <ListItem button selected={selectedIndex === 2} className="sidebar-title" onClick={(e) => {
-                handleChange('schedule')
-                handleListItemClick(e, 2)
-              }}>
-                <ListItemText primary='schedule' />
-                <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('schedule')} ></KeyboardArrowDownIcon>
-              </ListItem>
-              <div className="sidebar-content">
-                <ListItem button onClick={() => history.push('/schedule-invoice')}>
-                  <ListItemIcon><Timer /></ListItemIcon>
-                  <ListItemText primary='Schedule Invoice' />
-                </ListItem>
-                <ListItem button onClick={() => history.push('/view-schedule')}>
-                  <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-                  <ListItemText primary='View Schedule' />
-                </ListItem>
-              </div>
-            </div></div>
           <div style={{ marginTop: -5 }}>
             <div onChange={(e) => handleChange('invoice')} className={state.invoice ? "sidebar-item open" : "sidebar-item"}>
               <ListItem button selected={selectedIndex === 3} className="sidebar-title" onClick={(e) => {
@@ -252,6 +231,14 @@ export default function PersistentDrawerLeft(props) {
           <ListItem button onClick={() => history.push('/home')}>
             <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
             <ListItemText primary='Generate Invoice' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/schedule-invoice')}>
+            <ListItemIcon><Timer /></ListItemIcon>
+            <ListItemText primary='Schedule Invoice' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-schedule')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Schedule' />
           </ListItem>
           <ListItem button onClick={() => history.push("/timesheet")}>
             <ListItemIcon>
