@@ -268,7 +268,7 @@ export default function ScheduleInvoice() {
                 <em>None</em>
               </MenuItem>
               {invoiceHistory.map((item) => (
-                <MenuItem key={item._id} value={item.invoice_number} >
+                <MenuItem key={item._id} value={item._id} >
                   {item.invoice_number}
                 </MenuItem>
               ))}
@@ -278,6 +278,7 @@ export default function ScheduleInvoice() {
         <br></br>
         <div style={{display:'flex', justifyContent:'space-between'}}>
           <div style={{ marginLeft: '40px' }}>
+            {!id && 
             <MuiPickersUtilsProvider utils={DateFnsUtils} style={{marginTop:'0px'}}>
               <KeyboardDatePicker
                 disableToolbar
@@ -294,7 +295,24 @@ export default function ScheduleInvoice() {
                   'aria-label': 'change date',
                 }}
               />
-            </MuiPickersUtilsProvider>
+            </MuiPickersUtilsProvider>}
+            {id &&
+            <MuiPickersUtilsProvider utils={DateFnsUtils} style={{marginTop:'0px'}}>
+              <KeyboardDatePicker
+                disableToolbar
+                format='yyyy-MM-dd'
+                openTo='year'
+                variant='inline'
+                margin='normal'
+                label='Starting Date'
+                value={scheduleData.date}
+                onChange={handleDateChange}
+                style={{marginTop:'0px'}}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+          </MuiPickersUtilsProvider>}
             <FormControl className={classes.formControl} style={{ marginLeft: '40px' , marginRight:'40px',marginTop:'0px'}}>
               <InputLabel id='demo-multiple-name-label' style={{marginTop:'0px'}}>Set Frequency</InputLabel>
               <Select
