@@ -29,13 +29,12 @@
     background-color: black;
     float: left;
     color: rgb(222, 235, 232);
-    width: 900px;
     height: 30px;
-    /* border-style: groove; */
     border-radius: 4px;
     padding-left: 5px;
     display: flex;
     align-items: center;
+    width: 900px;
 }
 .item{
   padding-left: 10px;
