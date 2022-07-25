@@ -60,9 +60,11 @@ function Alert(props) {
 
 
 export default function FormPropsTextFields() {
+  const [toEmails, setToEmail] = React.useState('');
+  const [ccEmails, setccEmails] = React.useState('');
   let { id } = useParams();
   const classes = useStyles();
-  const [clientData, setState] = React.useState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "", date_of_contract: String(new Date()) });
+  const [clientData, setState] = React.useState({ client_name: "", billing_address: "", shipping_address: "", payment_terms: "", notes: "", terms: "",email_cc:"" ,email_to:"", date_of_contract: String(new Date())});
   const [open, setOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
@@ -79,6 +81,8 @@ export default function FormPropsTextFields() {
           notes: response.data.data.notes,
           terms: response.data.data.terms,
           date_of_contract: response.data.data.date_of_contract,
+          email_cc:response.data.data.email_cc,
+          email_to:response.data.data.email_to
         })
       })
       .catch((error) => {
@@ -96,6 +100,20 @@ export default function FormPropsTextFields() {
     setSelectedDate(date);
     clientData.date_of_contract = String(date);
   };
+
+  const sendData = () => {
+    const currToEmails = toEmails.split(',');
+    const currCCEmails = ccEmails.split(',');
+    const finalToEmails = [];
+    const finalCCEmails = [];
+    const regx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  }
+  const toChangeHandler = (event) => {
+    setToEmail(event.target.value);
+  }
+  const ccChangeHandler = (event) => {
+    setccEmails(event.target.value)
+  }
 
 
   const handleChange = e => {
@@ -291,9 +309,37 @@ export default function FormPropsTextFields() {
                 onChange={handleChange}
               />
             </div>
+            <h3>Email</h3>
+            <div style={{display: "flex",justifyContent: "space-around"}}>
+              <div style={{ float: "left", marginRight: "15px", marginTop: '15px', marginBottom: '30px' }}>
+                <TextField
+                  required
+                  type='text'
+                  id="outlined-required"
+                  label="To"
+                  name="Email-to"
+                  variant="outlined"
+                  placeholder="Add , seperated Emails"
+                  onChange={(toChangeHandler,handleChange)}
+                  value={(toEmails,clientData.email_to)} >
+                </TextField>
+              </div>
+              <div style={{ float: "right", marginRight: "15px", marginTop: '15px', marginBottom: '30px' }}>
+                <TextField
+                  required
+                  id="outlined-required"
+                  type='text'
+                  label="CC"
+                  name="Email-cc"
+                  variant="outlined"
+                  onChange={(ccChangeHandler,handleChange)}
+                  value={(ccEmails,clientData.email_cc)}
+                  placeholder="Add , seperated Emails">
+                </TextField>
+              </div>
+            </div>
           </div>
-        </div>
-        <div style={{ clear: 'both' }}>
+          <div style={{ clear: 'both' }} />
         </div>
       </Box>
 

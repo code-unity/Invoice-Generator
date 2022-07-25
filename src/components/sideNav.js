@@ -20,7 +20,7 @@ import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import history from '../history';
 import Box from '@mui/material/Box';
 import './sideNav.css';
@@ -234,7 +234,6 @@ export default function PersistentDrawerLeft(props) {
             <ListItemText primary='Generate Invoice' />
           </ListItem>
           <ListItem button onClick={() => history.push('/schedule-invoice')}>
-            <ListItemIcon><CalendarMonthIcon /></ListItemIcon>
             <ListItemText primary='Schedule Invoice' />
           </ListItem>
           <ListItem button onClick={() => history.push("/timesheet")}>
@@ -258,6 +257,10 @@ export default function PersistentDrawerLeft(props) {
           <ListItem button onClick={() => history.push('/view-schedule')}>
             <ListItemIcon><ViewComfyIcon /></ListItemIcon>
             <ListItemText primary='View Schedule' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/charts')}>
+            <ListItemIcon><BarChartIcon /></ListItemIcon>
+            <ListItemText primary='Charts' />
           </ListItem>
           <ListItem button style={{ marginTop: 0 }} onClick={() => { history.push('/'); localStorage.clear() }}>
             <ListItemText primary='Logout' />
