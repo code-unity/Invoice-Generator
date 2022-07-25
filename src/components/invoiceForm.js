@@ -51,12 +51,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '5px',
     fontSize: 16,
     padding: '10px',
+    background: '#fafafa',
   },
   ccEmailsBox: {
     width: '100%',
     borderRadius: '5px',
     fontSize: 16,
     padding: '10px',
+    background: '#fafafa',
   },
   invoice: {
     marginLeft: '250px',
