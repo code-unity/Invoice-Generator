@@ -20,8 +20,9 @@ import AssignmentRoundedIcon from "@material-ui/icons/AssignmentRounded";
 import AccountBoxRoundedIcon from "@material-ui/icons/AccountBoxRounded";
 import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
-import Timer from "@material-ui/icons/Timer";
+
 import history from '../history';
+import Box from '@mui/material/Box';
 import './sideNav.css';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
@@ -227,18 +228,13 @@ export default function PersistentDrawerLeft(props) {
                 </ListItem>
               </div>
             </div></div>
-            
+
           <ListItem button onClick={() => history.push('/home')}>
             <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
             <ListItemText primary='Generate Invoice' />
           </ListItem>
           <ListItem button onClick={() => history.push('/schedule-invoice')}>
-            <ListItemIcon><Timer /></ListItemIcon>
             <ListItemText primary='Schedule Invoice' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-schedule')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Schedule' />
           </ListItem>
           <ListItem button onClick={() => history.push("/timesheet")}>
             <ListItemIcon>
@@ -257,6 +253,10 @@ export default function PersistentDrawerLeft(props) {
           <ListItem button onClick={() => history.push('/view-timesheet')}>
             <ListItemIcon><ViewComfyIcon /></ListItemIcon>
             <ListItemText primary='View Time Sheet' />
+          </ListItem>
+          <ListItem button onClick={() => history.push('/view-schedule')}>
+            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
+            <ListItemText primary='View Schedule' />
           </ListItem>
           <ListItem button style={{ marginTop: 0 }} onClick={() => { history.push('/'); localStorage.clear() }}>
             <ListItemText primary='Logout' />
