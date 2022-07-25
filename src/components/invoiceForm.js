@@ -528,7 +528,7 @@ export default function FormPropsTextFields() {
     if (id) {
       fetchInvoiceData()
     }
-  }, [id]) 
+  }, [id])
 
   function inputAdornmentChange(e) {
     setInputAdornment(e.target.value)
