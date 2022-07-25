@@ -12,6 +12,11 @@
     margin-bottom: 20px;
     margin-top: 20px;
 }
-/* .MuiFormControl-root{
-    min-width: 90% !important
-  } */
+.first-row{
+    display: flex;
+    flex-direction: row;
+}
+.search-container{
+    margin-top: 25px;
+    margin-left: 25px;
+}
