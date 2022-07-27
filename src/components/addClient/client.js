@@ -89,7 +89,7 @@ export default function FormPropsTextFields() {
             toEmailString = toEmailString + Data.toEmails[i] + ",";
           else toEmailString = toEmailString + Data.toEmails[i];
         }
-        if (Data.ccEmails.length != 0) {
+        if (Data.ccEmails.length !== 0) {
           for (var j = 0; j < Data.ccEmails.length; j++) {
             if (j !== Data.ccEmails.length - 1)
               ccEmailString = ccEmailString + Data.ccEmails[j] + ",";

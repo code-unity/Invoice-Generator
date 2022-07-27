@@ -2620,7 +2620,7 @@
   "resolved" "https://registry.npmjs.org/@popperjs/core/-/core-2.11.5.tgz"
   "version" "2.11.5"
 
-"@popperjs/core@^2.8.6":
+"@popperjs/core@^2.8.6", "@popperjs/core@^2.9.0":
   "integrity" "sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q=="
   "resolved" "https://registry.npmjs.org/@popperjs/core/-/core-2.9.2.tgz"
   "version" "2.9.2"
@@ -2878,6 +2878,13 @@
   "version" "12.8.3"
   dependencies:
     "@babel/runtime" "^7.12.5"
+
+"@tippyjs/react@^4.2.6":
+  "integrity" "sha512-91RicDR+H7oDSyPycI13q3b7o4O60wa2oRbjlz2fyRLmHImc4vyDwuUP8NtZaN0VARJY5hybvDYrFzhY9+Lbyw=="
+  "resolved" "https://registry.npmjs.org/@tippyjs/react/-/react-4.2.6.tgz"
+  "version" "4.2.6"
+  dependencies:
+    "tippy.js" "^6.3.1"
 
 "@tootallnate/once@1":
   "integrity" "sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw=="
@@ -11111,7 +11118,7 @@
     "strip-ansi" "6.0.0"
     "text-table" "0.2.0"
 
-"react-dom@*", "react-dom@^0.14.0 || ^15.0.0 || ^16 || ^17", "react-dom@^15.0.0 || ^16.0.0", "react-dom@^15.0.0 || ^16.0.0 || ^17.0.0", "react-dom@^15.4.0 || ^16.0.0", "react-dom@^15.5.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.3.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || ^17.0.0", "react-dom@^16.8.2 || ^17.0.0", "react-dom@^16.8.4", "react-dom@^16.8.4 || ^17.0.0", "react-dom@^16.8.5", "react-dom@^17.0.0 || ^18.0.0", "react-dom@^17.0.2", "react-dom@>=16.3.0", "react-dom@>=16.6.0", "react-dom@>=16.8.0":
+"react-dom@*", "react-dom@^0.14.0 || ^15.0.0 || ^16 || ^17", "react-dom@^15.0.0 || ^16.0.0", "react-dom@^15.0.0 || ^16.0.0 || ^17.0.0", "react-dom@^15.4.0 || ^16.0.0", "react-dom@^15.5.0 || ^16.0.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.3.0 || ^17.0.0 || ^18.0.0", "react-dom@^16.8.0 || ^17.0.0", "react-dom@^16.8.2 || ^17.0.0", "react-dom@^16.8.4", "react-dom@^16.8.4 || ^17.0.0", "react-dom@^16.8.5", "react-dom@^17.0.0 || ^18.0.0", "react-dom@^17.0.2", "react-dom@>=16.3.0", "react-dom@>=16.6.0", "react-dom@>=16.8", "react-dom@>=16.8.0":
   "integrity" "sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-17.0.2.tgz"
   "version" "17.0.2"
@@ -12919,6 +12926,13 @@
   "integrity" "sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA=="
   "resolved" "https://registry.npmjs.org/tiny-warning/-/tiny-warning-1.0.3.tgz"
   "version" "1.0.3"
+
+"tippy.js@^6.3.1":
+  "integrity" "sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ=="
+  "resolved" "https://registry.npmjs.org/tippy.js/-/tippy.js-6.3.7.tgz"
+  "version" "6.3.7"
+  dependencies:
+    "@popperjs/core" "^2.9.0"
 
 "tmpl@1.0.x":
   "integrity" "sha1-I2QN17QtAEM5ERQIIOXPRA5SHdE="
