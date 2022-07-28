@@ -16,6 +16,8 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import history from "../../history";
+import TextEditor from "./TextEditor";
+import { white } from "material-ui/styles/colors";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
   },
+  wrapper: {
+    height: "300px",
+  },
+  editor: {
+    backgroundColor: "white",
+  },
 }));
 
 function Alert(props) {
@@ -69,6 +77,7 @@ export default function FormPropsTextFields() {
     date_of_contract: String(new Date()),
     toEmails: "",
     ccEmails: "",
+    emailContent: "",
   });
   const [open, setOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState(new Date());
@@ -76,6 +85,12 @@ export default function FormPropsTextFields() {
   const [openLoader, setOpenLoader] = React.useState(false);
   const [toEmailStr, setToEmailStr] = React.useState("");
   const [ccEmailStr, setCCEmailStr] = React.useState("");
+  const [emailContent, setEmailContent] = React.useState("");
+
+  const htmlData = (data) => {
+    setEmailContent(data);
+    console.log(emailContent);
+  };
 
   const fetchData = () => {
     var toEmailString = "",
@@ -156,11 +171,14 @@ export default function FormPropsTextFields() {
     const clientInfo = { ...clientData };
     clientInfo.toEmails = finalToEmails;
     clientInfo.ccEmails = finalCCEmails;
+    clientInfo.emailContent = emailContent;
     return clientInfo;
   };
 
   function printdata() {
+    // console.log('inside Print data')
     const clientInfo = getEmailDetails();
+    // console.log("clientInfo is", clientInfo);
     setOpenLoader(true);
     axios
       .post(`${process.env.REACT_APP_API_URL}/client`, clientInfo, {
@@ -186,6 +204,7 @@ export default function FormPropsTextFields() {
           date_of_contract: String(new Date()),
           toEmails: "",
           ccEmails: "",
+          emailContent: "",
         });
       })
       .catch((error) => {
@@ -432,6 +451,9 @@ export default function FormPropsTextFields() {
               </div>
             </div>
           </div>
+
+          <TextEditor getHtml={htmlData}></TextEditor>
+
           <div style={{ clear: "both" }} />
         </div>
       </Box>
