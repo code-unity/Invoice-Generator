@@ -385,7 +385,8 @@ export default function FormPropsTextFields() {
     discount: 0,
     amount_paid: '0',
     balance_due: 0,
-    invoice_number: ''
+    invoice_number: '',
+    gstAmount:0
   });
 
   function inputAdornmentChange(e) {
@@ -468,9 +469,11 @@ export default function FormPropsTextFields() {
       const a = (sTotal - parseInt(pdiscount));
       if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
+        invoiceData.gstAmount = Math.ceil(parseInt(ptax));
       }
       else if (tType === '%') {
         b = Math.ceil(a * (1 + ptax / 100));
+        invoiceData.gstAmount = Math.ceil(a *  ptax / 100);
       }
       setTotal(b);
       setBalanceDue(b - amountPaid);
@@ -479,9 +482,11 @@ export default function FormPropsTextFields() {
       const a = ((sTotal * (1 - pdiscount / 100)));
       if (tType === 'flat') {
         b = Math.ceil(a + parseInt(ptax));
+        invoiceData.gstAmount = Math.ceil(parseInt(ptax));
       }
       else if (tType === '%') {
         b = Math.ceil(a * (1 + ptax / 100));
+        invoiceData.gstAmount = Math.ceil(a *  ptax / 100);
       }
       setTotal(b);
       setBalanceDue(b - amountPaid);
@@ -579,7 +584,8 @@ export default function FormPropsTextFields() {
       tax: 0,
       discount: 0,
       amount_paid: '0',
-      balance_due: 0
+      balance_due: 0,
+      gstAmount:0
     }
     setSelectedDueDate(fieldValues.due_date)
     setSelectedDate(fieldValues.date)
@@ -646,6 +652,7 @@ export default function FormPropsTextFields() {
     setInvoiceData(data);
     axios.post(`${process.env.REACT_APP_API_URL}/invoice`, invoiceData, { headers: { 'Content-Type': 'application/json' } })
       .then(function (response) {
+        console.log(response)
         setOpenDownloader(false);
         const message = alert;
         message.message = "invoice generated successfully";

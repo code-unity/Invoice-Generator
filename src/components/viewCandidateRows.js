@@ -38,6 +38,7 @@ const Rows = (props) => {
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
+                <TableCell>{row.type}</TableCell>
                 <TableCell component="th" scope="row">
                     {row.name}
                 </TableCell>

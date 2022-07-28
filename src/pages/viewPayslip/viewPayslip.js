@@ -15,7 +15,8 @@ import IconButton from '@mui/material/IconButton';
 import DateFnsUtils from '@date-io/date-fns';
 //import * as XLSX from 'xlsx';
 import {CSVLink}  from "react-csv";
-
+import jsPDF from 'jspdf'
+//import autoTable from 'jspdf-autotable';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
@@ -70,11 +71,12 @@ function deleteData (value) {
         fetchData()
     }, [])// eslint-disable-line react-hooks/exhaustive-deps
 
-
+const [filterdate,setFilterdate] =useState('')
 function filterData(newdate){
     axios.get(`${process.env.REACT_APP_API_URL}/payslip/filter/${newdate}`)
         .then((response) => {
             setThings(response.data.data)
+            setFilterdate(newdate)
 })
         .catch((error) => {
             console.log("failed")
@@ -103,12 +105,10 @@ const headers = [
   { label: "NET DEDUCTIONS", key: "net_deductions" },
   { label: "NET SALARY", key: "net_salary" },
 ];
-
 // function printData(things){
 //     const newData=things.map(row=>{
 //         delete row._id;
 //         delete row.isActive;
-//         delete row.change_id;
 //         delete row.__v;
 //         return row
 //       })
@@ -131,11 +131,175 @@ const csvReport = {
     headers: headers,
     filename: 'PayslipData.csv'
   };
+// const year = (new Date().getFullYear());
+// const month =(new Date().toLocaleString('default',{month:'long'}));
+const state= {
+fromdate :'May 2022',
+todate :'september 2022'
+}
+
+function fullData(){
+    axios.post(`${process.env.REACT_APP_API_URL}/payslip/total`, state)
+    .then((response) => {
+        console.log(response)
+    })
+    .catch((error) => {
+        console.log("failed")})
+}
+
+function halfData(){
+    axios.post(`${process.env.REACT_APP_API_URL}/payslip/half`, state)
+    .then((response) => {
+        console.log(response)
+    })
+    .catch((error) => {
+        console.log("failed")})
+}
+
+
+var tds = []
+  async function tdsData(){
+    await axios.post(`${process.env.REACT_APP_API_URL}/payslip/tds/`, state)
+    .then((response) => {
+        tds=response.data.data
+        console.log(response.data.data)
+        print(tds)
+    })
+    .catch((error) => {
+        console.log("failed")})
+}
+const columns = [
+    { title: "Month & Year", field: "date", },
+    { title: "Employee Name", field: "candidate", },
+    { title: "PAN NO.", field: "candidate_id" },
+    { title: "Gross Salary", field: "total_earnings" },
+    { title: "ADVANCE TAX / TDS", field: 'td_S', type: "currency" },
+]
+
+function print(tds){
+    const doc =new jsPDF('p', 'pt', 'a4');
+    //doc.setFontType("italic");
+    doc.setFontSize(18);
+    doc.text(" Advance TAX/TDS Details In The Given Range Of Months", 50, 50)
+    doc.setFontSize(13);
+    doc.text("Full Time Employees Data", 30, 90);
+    let finalY = 90;
+    
+    for(var i=0;i<(tds.fullTimedata).length-1;i++){
+    doc.autoTable({
+      theme: "grid",
+      startY: (finalY) + 10,
+      startX: 0,
+      //columnStyles: { 1: { halign: 'center'} },
+      columns: columns.map(col => ({ ...col, dataKey: col.field })),
+      body: ((tds.fullTimedata)[i]).slice(0, -1),
+      headStyles: {
+        halign: "center",
+        valign: "middle",
+        lineWidth: 0.25,
+        lineColor: 200
+      },
+      bodyStyles: {
+        halign: "center",
+        valign: "middle",
+        lineWidth: 0.25,
+        lineColor: 200
+      },
+      rowStyles:{ 0:{ content: 'Text', rowSpan: 5} }
+    })
+    finalY = doc.previousAutoTable.finalY+15;
+    doc.setFontSize(10);
+    doc.setTextColor("Blue");
+    var k=((tds.fullTimedata)[i]).length
+    doc.text(`Sub Total:${(tds.fullTimedata)[i][k-1]}`, 50, finalY);
+    doc.setFontSize(13);
+    doc.setTextColor("black");
+    finalY+=10
+}
+    finalY+=10
+    doc.setTextColor("red");
+    doc.setFontSize(11);
+    var len=((tds.fullTimedata)).length
+    doc.text(`Full Time Total:${(tds.fullTimedata)[len-1]}`, 50, finalY);
+    doc.setTextColor("black");
+    doc.setFontSize(13);
+    finalY+=40
+    doc.text("Part TIme / Internship Employees Data", 30, finalY);
+
+    for(i=0;i<(tds.internData).length-1;i++){
+        doc.autoTable({
+        theme: "grid",
+        startY: (finalY) + 10,
+        startX: 0,
+        //columnStyles: { 1: { halign: 'center'} },
+        columns: columns.map(col => ({ ...col, dataKey: col.field })),
+        body: ((tds.internData)[i]).slice(0, -1),
+        headStyles: {
+            halign: "center",
+            valign: "middle",
+            lineWidth: 0.25,
+            lineColor: 200
+        },
+        bodyStyles: {
+            halign: "center",
+            valign: "middle",
+            lineWidth: 0.25,
+            lineColor: 200
+        },
+        rowStyles:{ 0:{ content: 'Text', rowSpan: 5} }
+        })
+        finalY = doc.previousAutoTable.finalY+15;
+        doc.setFontSize(10);
+        doc.setTextColor("Blue");
+        k=((tds.internData)[i]).length
+        doc.text(`Sub Total:${(tds.internData)[i][k-1]}`, 50, finalY);
+        doc.setFontSize(13);
+        doc.setTextColor("black");
+        finalY+=10
+    }
+    finalY+=10
+    doc.setTextColor("red");
+    doc.setFontSize(11);
+    var len2=((tds.internData)).length
+    doc.text(`Part Time Total:${(tds.internData)[len2-1]}`, 50, finalY);
+    doc.setTextColor("black");
+    finalY+=20
+    var totalTds= parseFloat((tds.internData)[len2-1])+parseFloat((tds.fullTimedata)[len-1])
+    doc.text(`TOTAL TDS AMOUNT:${totalTds}`, 50, finalY);
+    doc.setFontSize(13);
+
+    
+    // for(i=0;i<(tds.internData).length;i++){
+    // doc.autoTable({
+    //     theme: "grid",
+    //     startX: 0,
+    //     startY: (finalY) + 10,
+    //     columnStyles: { 1: { halign: 'center'} },
+    //     columns: columns.map(col => ({ ...col, dataKey: col.field })),
+    //     body: (tds.internData)[i],
+    //     headStyles: {
+    //         halign: "center",
+    //         valign: "middle",
+    //         lineWidth: 0.25,
+    //         lineColor: 200
+    //       },
+    //       bodyStyles: {
+    //         halign: "center",
+    //         valign: "middle",
+    //         lineWidth: 0.25,
+    //         lineColor: 200
+    //       },
+    //   })
+    //   finalY = doc.previousAutoTable.finalY+10;}
+      
+    doc.save('ADVANCE TAX/TDS Report.pdf')
+
+}
 
     return (
         <div style={{ overflowX:'hidden', padding:'1.5%'}}>
             <div style={{ padding:'1%',paddingBottom:"0", display:"flex",alignItems:"center"}}>
-            <div style={{flexGrow:"1",textAlign:"left"}}>
+            <div style={{flexGrow:"1",textAlign:"left", padding:"0"}}>
             <Button type="button" variant='contained' color="primary" onClick={() => history.push('/payslip')}>
                 Add New Payslip
             </Button>
@@ -171,16 +335,8 @@ const csvReport = {
           </div>
           <hr style={{border: ".5px solid black"}}/>
 
-          {things.length === 0 && 
-                    <div className='side' style={{width:"100%", padding:"3%",fontSize: "20px", textAlign:"center", flexGrow:"1"}}>
-                        
-                        <h2 style={{fontFamily:"Candara"}}>There are no Payslips for {newdate}  </h2>
-                        
-                    </div>
-                    }
-            
-            {things.length !== 0 &&
-            <TableContainer component={Paper} sx={{ ml: 5 }} style={{marginLeft:'0',marginBottom:'10px', borderWidth:"2px", borderColor:"white", borderStyle:'solid'}}>
+
+          <TableContainer component={Paper} sx={{ ml: 5 }} style={{marginLeft:'0',marginBottom:'10px', borderWidth:"2px", borderColor:"white", borderStyle:'solid'}}>
                 
                 <Table aria-label="collapsible table">
                     <TableHead>
@@ -189,6 +345,7 @@ const csvReport = {
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Employee Id</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Employee Name</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Designation</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Type</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Basic</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>DA</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>HRA</TableCell>
@@ -209,9 +366,17 @@ const csvReport = {
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
-
-
-
+                    {/* {things.length === 0 && 
+                    <TableBody >
+                        <TableRow>
+                            <TableCell colSpan={"22"} style={{color:"white"}}>
+                                .
+                        </TableCell>
+                        </TableRow>
+                    </TableBody >
+                    } */}
+            
+            {things.length !== 0 &&
                     <TableBody >
                         {things.map((temp) => (
                             <TableRow key={temp._id} >
@@ -219,6 +384,7 @@ const csvReport = {
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.candidate_id}</TableCell>
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.candidate}</TableCell>
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.Designation}</TableCell>
+                        <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.type}</TableCell>
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.Basic}</TableCell>
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.D_allow}</TableCell>
                         <TableCell sx={{ fontWeight: 'light' }} style={{border: ".25px solid black"}}>{temp.HR_allow}</TableCell>
@@ -259,14 +425,39 @@ const csvReport = {
                                 </TableCell>
                             </TableRow>
                         ))}
-                    </TableBody>
+                    </TableBody>}
                 </Table>
-            </TableContainer>}
+            </TableContainer>
+            {things.length === 0 && 
+                <div className='side' style={{width:"100%", padding:"2%",fontSize: "20px", textAlign:"center", flexGrow:"1"}}>
+        
+                <h2 style={{fontFamily:"Candara"}}>There are no Payslips for {filterdate}  </h2>
+                
+            </div>}
             <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
             <Button  variant='contained' color="primary">
                 
                 <CSVLink {...csvReport} style={{textDecoration:"none",color:"white"}}>Print</CSVLink>
                 {/* onClick={()=>{printData(things)}} */}
+            </Button>
+
+            </div>
+
+            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
+            <Button  variant='contained' color="primary" onClick={fullData}>
+                send
+            </Button>
+
+            </div>
+            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
+            <Button  variant='contained' color="primary" onClick={halfData}>
+                Half Data
+            </Button>
+
+            </div>
+            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
+            <Button  variant='contained' color="primary" onClick={tdsData}>
+                Tds Data
             </Button>
 
             </div>

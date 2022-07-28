@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import React, { useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,6 +18,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useParams } from "react-router-dom";
 import InputAdornment from '@mui/material/InputAdornment';
+import Tooltip from "@material-ui/core/Tooltip";
 
 import {
   MuiPickersUtilsProvider,
@@ -86,6 +89,7 @@ export default function FormPropsTextFields() {
     { 
       name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()),
     Basic: 0,
+    type:'',
     Designation:'',
     pan_no:'',
     D_allow: 0,
@@ -104,49 +108,35 @@ export default function FormPropsTextFields() {
   const [open, setOpen] = React.useState(false);
   const [alert, setMessage] = React.useState({ message: "", severity: "" });
   const [openLoader, setOpenLoader] = React.useState(false);
-  const [tds,setTds] = React.useState("")
-
+  const [tds,setTds] = React.useState(0)
+  const [isloading, setIsloading]=React.useState(true);
+  const fetchClientData = async() => {
+    await axios.get(`${process.env.REACT_APP_API_URL}/client`)
+      .then((res) => {
+        setClientdata(res.data.data.results);
+        setIsloading(false)
+      });
+  }
 
   useEffect(() => {
-    const fetchData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
+    const fetchData = async() => {
+      await axios.get(`${process.env.REACT_APP_API_URL}/candidate/${id}`)
         .then((response) => {
+          var assign='';
           console.log(response.data.data)
-          setTds(response.data.data.td_S)
-          setState({
-            name: response.data.data.name,
-            email: response.data.data.email,
-            assigned_to: response.data.data.assigned_to,
-            Designation:response.data.data.Designation,
-            pan_no:response.data.data.pan_no,
-            payment_terms: response.data.data.payment_terms,
-            date_of_birth: response.data.data.date_of_birth,
-            date_of_Joining: response.data.data.date_of_Joining,
-            Basic:response.data.data.Basic,
-            D_allow: response.data.data.D_allow,
-            HR_allow: response.data.data.HR_allow,
-            Bonus: response.data.data.Bonus,
-            conveyance:response.data.data.conveyance,
-            others:response.data.data.others,
-            total_earnings:response.data.data.total_earnings,
-            prof_tax:response.data.data.prof_tax,
-            p_f_employer:response.data.data.p_f_employer,
-            p_f_employee:response.data.data.p_f_employee,
-            td_S:response.data.data.td_S,
-            other_tax:response.data.data.other_tax,
 
-          })
-        })
+        setState(response.data.data)
+        setTds(response.data.data.td_S)    
+        if(!clientData.filter(data => data._id === response.data.data.assigned_to)[0])
+        {candidateData.assigned_to=null}
+    
+      })
         .catch((error) => {
           history.push('/candidate')
         })
     }
-    const fetchClientData = () => {
-      axios.get(`${process.env.REACT_APP_API_URL}/client`)
-        .then((res) => {
-          setClientdata(res.data.data.results);
-        });
-    }
+
+
     fetchClientData()
     if (id) {
       fetchData()
@@ -183,12 +173,10 @@ function handleChangesforBasic(event){
 
   candidateData.D_allow=candidateData.Basic*30/100
   candidateData.HR_allow=candidateData.Basic*45/100
-  candidateData.p_f_employee=(candidateData.Basic+candidateData.D_allow)*12/100
+  candidateData.p_f_employee=Math.round((candidateData.Basic+candidateData.D_allow)*12/100)
   candidateData.total_earnings+=(candidateData.Basic+candidateData.D_allow+candidateData.HR_allow)
-
-
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
 }
 
 function handleChangeforbonus(event){
@@ -200,8 +188,8 @@ function handleChangeforbonus(event){
   candidateData.Bonus=parseInt(event.target.value);}
 
   candidateData.total_earnings+=candidateData.Bonus;
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
 }
 
 function handleChangeforTDS(event){
@@ -223,8 +211,8 @@ function handleChangeforDA(event){
   candidateData.D_allow=parseInt(event.target.value);}
 
   candidateData.total_earnings+=candidateData.D_allow;
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
   candidateData.p_f_employee=(candidateData.Basic+candidateData.D_allow)*12/100
 
 
@@ -239,8 +227,8 @@ function handleChangeforHRA(event){
   candidateData.HR_allow=parseInt(event.target.value);}
 
   candidateData.total_earnings+=candidateData.HR_allow;
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
 
 
 }
@@ -253,9 +241,8 @@ function handleChangeforconveyance(event){
   candidateData.conveyance=parseInt(event.target.value);}
 
   candidateData.total_earnings+=candidateData.conveyance;
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
-
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
 }
 function handleChangeforothers(event){
   candidateData.total_earnings-=candidateData.others;
@@ -266,8 +253,8 @@ function handleChangeforothers(event){
   candidateData.others=parseInt(event.target.value);}
 
   candidateData.total_earnings+=candidateData.others;
-  setTds(candidateData.total_earnings*.1)
-  candidateData.td_S=candidateData.total_earnings*.1
+  candidateData.td_S=(candidateData.total_earnings*.1).toFixed(1)
+  setTds(candidateData.td_S)
 
 }
 
@@ -276,6 +263,7 @@ function changeFieldValue() {
     name: "", email: "", assigned_to: "", payment_terms: "", date_of_birth: String(new Date()), date_of_Joining: String(new Date()),
     Basic: 0,
     Designation:'',
+    type:'',
     pan_no:'',
     D_allow: 0,
     HR_allow: 0,
@@ -372,15 +360,17 @@ function changeFieldValue() {
       <h1 style={{ marginLeft: '300px', marginTop: '50px', marginRight:"0" }}>
         {id ? 'Edit Candidate Details' : 'Add Candidate'}
       </h1>
-
-      <div className="form">
+      {isloading && <div> Loading... </div> }
+      {!isloading && <>
+        <div className="form">
         <div className='top' style={{ display:"flex" }}>
-          <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '0px',marginLeft:'15px',flexGrow:"1",width:"100px" }} >
+          <div style={{  float: "left", marginLeft:'15px',marginTop: '30px', marginBottom: '0px' }} >
           <FormControl className={classes.formControl}>
             <InputLabel id="demo-mutiple-name-label">Assigned To</InputLabel>
             <Select
               labelId="demo-mutiple-name-label"
               id="demo-mutiple-name"
+              defaultValue={null}
               value={candidateData.assigned_to}
               onChange={handleChange}
               name="assigned_to"
@@ -392,8 +382,32 @@ function changeFieldValue() {
           </FormControl>
             
           </div>
-
-          <div style={{  float: "left",marginRight: "15px", marginTop: '14px', marginBottom: '0px',width:"150px" }} >
+          <div style={{ float: "left",marginLeft: "50px", marginTop: '30px', marginBottom: '0px',width:"150px"}}>
+          <FormControl className={classes.formControl}>
+            <InputLabel id="demo-mutiple-name-label">Type Of Employee</InputLabel>
+            <Select
+              labelId="demo-mutiple-name-label"
+              id="demo-mutiple-name"
+              defaultValue={""}
+              value={candidateData.type}
+              onChange={handleChange}
+              name="type"
+              input={<Input />}
+              MenuProps={MenuProps}
+            >
+              <MenuItem value="" >
+                <em style={{ fontFamily:"sans-serif", fontStyle:"unset" }}>None</em>
+              </MenuItem>
+              <MenuItem value="Full-Time" >
+                <em style={{ fontFamily:"sans-serif", fontStyle:"unset" }}>Full-Time</em>
+              </MenuItem>
+              <MenuItem value="Internship" >
+                <em style={{ fontFamily:"sans-serif", fontStyle:"unset" }}>Internship</em>
+              </MenuItem>
+            </Select>
+          </FormControl> 
+          </div>
+          <div style={{  float: "left",marginLeft: "150px", marginTop: '14px', marginBottom: '0px',width:"150px" }} >
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
                   disableToolbar
@@ -412,7 +426,7 @@ function changeFieldValue() {
                 />
               </MuiPickersUtilsProvider>
             </div>
-            <div style={{  float: "left",marginLeft: "15px", marginTop: '14px', marginBottom: '0px',width:"150px"  }}>
+            <div style={{  float: "left",marginLeft: "50px", marginTop: '14px', marginBottom: '0px',width:"150px"  }}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <KeyboardDatePicker
                 disableToolbar
@@ -486,8 +500,8 @@ function changeFieldValue() {
 
           <div className="leftDivision">
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Basic Salary" placement='top' arrow>
               <TextField
-              
                 required
                 name='Basic'
                 label="Basic Salary"
@@ -502,8 +516,10 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
             </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Dearness Allowance (30% of Basic Salary)" placement='top' arrow>
               <TextField
                 required
                 label="DA"
@@ -518,11 +534,13 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
             </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="House Rent Allowance (45% of Basic Salary)" placement='top' arrow>
               <TextField
                 required
-                label="HR_allow"
+                label="HRA"
                 value={candidateData.HR_allow}
                 onChange={handleChangeforHRA}
 
@@ -536,9 +554,11 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
 
             </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Conveyance" placement='top' arrow>
             <TextField
                 required
                 label="Conveyance"
@@ -553,9 +573,10 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
-
+              </Tooltip>
             </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
+            <Tooltip title="Add Bonus" placement='top' arrow>
               <TextField
                 required
                 label="Bonus"
@@ -570,8 +591,10 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
             </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Other Earnings" placement='top' arrow>
             <TextField
                 label="Others"
                 onChange={handleChangeforothers}
@@ -585,36 +608,39 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
             </div>
           </div>
 
           <div className="leftDivision">
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Professional Tax" placement='top' arrow>
               <TextField
                 required
                 name='prof_tax'
-                label="Professional tax"
+                label="Professional Tax"
                 onChange={handleChange}
                 value={candidateData.prof_tax}
                 placeholder="Professional tax"
-
+                type='number'
                 InputProps={{
                   startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
                 }}
                 inputProps={{
-                  className: classes.math,
-
-                  
+                  className: classes.math,                  
                 }}
                 variant="outlined"
               />
+              </Tooltip>
               </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Employer PF" placement='top' arrow>
               <TextField
                 required
                 name='p_f_employer'
                 label="Employer PF"
                 onChange={handleChange}
+                type='number'
                 value={candidateData.p_f_employer}
                 placeholder="Employer PF"
                 InputProps={{
@@ -626,14 +652,17 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
               </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
+            <Tooltip title="Employee PF (12% of Total Earnings)" placement='top' arrow>
               <TextField
                 required
                 label="Employee PF"
                 name='p_f_employee'
                 value={candidateData.p_f_employee}
                 onChange={handleChange}
+                type='number'
                 placeholder="Employee PF"
                 InputProps={{
                   startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -644,8 +673,10 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
               </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="TDS (10% of Total Earnings)" placement='top' arrow>
             <TextField
                 required
                 label="Advance TAX/TDS"
@@ -661,12 +692,15 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
               </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Any Other Taxes" placement='top' arrow>
             <TextField
                 name='other_tax'
                 label="Other Tax"
                 onChange={handleChange}
+                type='number'
                 value={candidateData.other_tax}
                 placeholder="other tax"
                 InputProps={{
@@ -677,6 +711,7 @@ function changeFieldValue() {
                 }}
                 variant="outlined"
               />
+              </Tooltip>
               </div>
             <div style={{  float: "left",marginRight: "15px", marginTop: '30px', marginBottom: '30px' }} >
               <TextField
@@ -698,9 +733,12 @@ function changeFieldValue() {
 
       <div style={{ marginLeft: "300px", marginTop: "10px", marginBottom:"30px" }}>
         {!id &&
+          <Tooltip title="Click To Add Candidate" arrow>
           <Button type="reset" variant="contained" color="primary" onClick={()=>{console.log(candidateData);printdata()}}>
             Add Candidate
-          </Button>}
+          </Button>
+          </Tooltip>
+          }
         {id &&
           <div>
             <Button type="button" variant='contained' color="primary" onClick={updateData}>
@@ -724,6 +762,8 @@ function changeFieldValue() {
         </Backdrop>
 
       </div>
+      </>}
+      
     </div>
   );
 }

@@ -51,8 +51,12 @@ const ViewCandidate = () => {
     }
     
     const getName = (row, clientData) => {
-        const name = clientData.filter((item) =>  item._id === row.assigned_to)
-        return (name[0].client_name);
+    if(clientData.filter(data => data._id === row.assigned_to)[0]){
+        return(clientData.filter(data => data._id === row.assigned_to)[0].client_name)}
+
+    else if(!clientData.filter(data => data._id === row.assigned_to)[0])
+    {return(<>- Client Data Deleted- </>);}
+
     }
 
     useEffect(() => {
@@ -99,6 +103,7 @@ const ViewCandidate = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell sx={{ fontWeight: 'bold' }}>Info</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Type Of Employee</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Assigned to</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Email Id.</TableCell>

@@ -20,6 +20,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import "react-datepicker/dist/react-datepicker.css";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import {
   MuiPickersUtilsProvider,
@@ -149,7 +150,7 @@ export default function FormPropsTextFields() {
     isActive:'true',
     candidate:'',
     candidate_id:'',
-    change_id:'',
+    type:'',
     date: month + ' '+year,
     Designation: '',
     assigned:'',
@@ -184,6 +185,7 @@ export default function FormPropsTextFields() {
       tempDefault.others = data[0].others;
       tempDefault.candidate=data[0].name;
       tempDefault.candidate_id=data[0]._id;
+      tempDefault.type=data[0].type;
       tempDefault.conveyance=data[0].conveyance;
       tempDefault.prof_tax=data[0].prof_tax;
       tempDefault.p_f_employee=data[0].p_f_employee;
@@ -191,13 +193,12 @@ export default function FormPropsTextFields() {
       tempDefault.td_S=data[0].td_S;
       tempDefault.other_tax=data[0].other_tax;
       tempDefault.total_earnings=data[0].total_earnings;
-      tempDefault.change_id=event.target.value;
       tempDefault.assigned=temp2[0].client_name;
       tempDefault.total_tax=parseFloat(tempDefault.prof_tax)+parseFloat(tempDefault.p_f_employee);
       tempDefault.net_deductions=parseFloat(tempDefault.total_tax)+parseFloat(tempDefault.td_S)+parseFloat(tempDefault.other_tax);
       tempDefault.net_salary=tempDefault.total_earnings-tempDefault.net_deductions;
       setNetsalary(tempDefault.net_salary);
-      setPersonName(event.target.value);
+      setPersonName(tempDefault.candidate_id);
       setNetearnings(payslipData.total_earnings);
       setNetdeductions(payslipData.net_deductions);
       setTotaltax(tempDefault.total_tax);
@@ -219,36 +220,16 @@ export default function FormPropsTextFields() {
         
       }); 
   };
-  const fetchpayslipData = () => {
-    axios.get(`${process.env.REACT_APP_API_URL}/payslip/${id}`)
+  const fetchpayslipData = async() => {
+    await axios.get(`${process.env.REACT_APP_API_URL}/payslip/${id}`)
       .then((response) => {
-        console.log(response.data.data)
-        setNetdeductions(response.data.data.net_deductions)
-        setNetearnings(response.data.data.total_earnings)
-        setNetsalary(response.data.data.net_salary)
-        setPersonName(response.data.data.change_id)
-        setState({
-          Bonus:response.data.data.Bonus,
-          Basic: response.data.data.Basic,
-          Designation:response.data.data.Designation,
-          assigned:response.data.data.assigned,
-          D_allow:response.data.data.D_allow,
-          candidate:response.data.data.candidate,
-          candidate_id:response.data.data.candidate_id,
-          HR_allow:response.data.data.HR_allow,
-          conveyance:response.data.data.conveyance,
-          others:response.data.data.others,
-          total_earnings:response.data.data.total_earnings,
-          prof_tax:response.data.data.prof_tax,
-          p_f_employer:response.data.data.p_f_employer,
-          p_f_employee:response.data.data.p_f_employee,
-          total_tax:response.data.data.total_tax,
-          td_S:response.data.data.td_S,
-          other_tax:response.data.data.other_tax,
-          net_deductions:response.data.data.net_deductions,
-          net_salary:response.data.data.net_salary,
-          remarks:response.data.data.remarks,
-        })
+        console.log(response.data.data);
+        setNetdeductions(response.data.data.net_deductions);
+        setNetearnings(response.data.data.total_earnings);
+        setNetsalary(response.data.data.net_salary);
+        setTotaltax( response.data.data.total_tax);
+        setPersonName(response.data.data.candidate_id);
+        (setState(response.data.data));
       })
       
       .catch((error) => {
@@ -279,53 +260,55 @@ export default function FormPropsTextFields() {
   ///functions for Calculations
   function handleChangesforBasic(event) {
 
+    if (payslipData.net_salary !== 0)
+      {payslipData.net_salary= parseFloat(payslipData.net_salary) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow)-parseFloat(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-      { 
-        payslipData.net_salary= parseFloat(payslipData.net_salary) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow)-parseFloat(payslipData.net_deductions));
-        payslipData.total_earnings= parseFloat(payslipData.total_earnings) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow));
-        payslipData.total_tax = parseFloat( payslipData.total_tax) -  parseFloat(payslipData.p_f_employee);
-        payslipData.net_deductions = parseFloat( payslipData.net_deductions) -  parseFloat(payslipData.p_f_employee) - parseFloat(payslipData.td_S) 
-    }
-    if (event.target.value === ""){
-    payslipData.Basic=0;}
-    else{
-      payslipData.Basic=parseInt(event.target.value);}
-      payslipData.D_allow=payslipData.Basic*30/100
-      payslipData.HR_allow=payslipData.Basic*45/100
-      payslipData.p_f_employee=(payslipData.Basic+payslipData.D_allow)*12/100
-      payslipData.total_earnings+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow)
-      payslipData.total_tax +=  payslipData.p_f_employee
-      payslipData.td_S=payslipData.total_earnings*0.1
-      payslipData.net_deductions +=  (payslipData.p_f_employee + payslipData.td_S)
-      payslipData.net_salary+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow-payslipData.net_deductions)
+      {payslipData.total_earnings= parseFloat(payslipData.total_earnings) - (parseFloat(payslipData.Basic)+parseFloat(payslipData.D_allow)+parseFloat(payslipData.HR_allow));}
+    if (payslipData.total_tax !== 0)
+      {payslipData.total_tax = parseFloat( payslipData.total_tax) -  (payslipData.p_f_employee);}
+    if (payslipData.net_deductions !== 0)
+      {payslipData.net_deductions = parseFloat( payslipData.net_deductions) -  parseFloat(payslipData.p_f_employee) -parseInt(payslipData.td_S);} 
+  
+    if (event.target.value === ""){payslipData.Basic=0;}
+    else{payslipData.Basic=parseInt(event.target.value);}
 
-      setNetsalary(payslipData.net_salary);
-      setNetearnings(payslipData.total_earnings);
-      setTotaltax( payslipData.total_tax);
-      setNetdeductions(payslipData.net_deductions)
+    payslipData.D_allow=payslipData.Basic*30/100
+    payslipData.HR_allow=payslipData.Basic*45/100
+    payslipData.total_earnings+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow)
+    payslipData.p_f_employee=Math.ceil((payslipData.Basic+payslipData.D_allow)*12/100);
+    payslipData.total_tax +=  payslipData.p_f_employee
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1)
+    payslipData.net_deductions +=  parseInt(payslipData.p_f_employee + payslipData.td_S)
+    payslipData.net_salary+=(payslipData.Basic+payslipData.D_allow+payslipData.HR_allow-payslipData.net_deductions)
+    setNetsalary(payslipData.net_salary);
+    setNetearnings(payslipData.total_earnings);
+    setTotaltax( payslipData.total_tax);
+    setNetdeductions(payslipData.net_deductions);
+
   }
 
   function handleChangesforD_allow(event) {
     
+    if (payslipData.net_salary !== 0)
+    { payslipData.net_salary-=((payslipData.D_allow)-(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-    { 
-      payslipData.net_salary-=((payslipData.D_allow)-(payslipData.net_deductions));
-      payslipData.total_earnings-=payslipData.D_allow;  
-      payslipData.total_tax = parseFloat( payslipData.total_tax) -  parseFloat(payslipData.p_f_employee);
-      payslipData.net_deductions = parseFloat( payslipData.net_deductions) -  parseFloat(payslipData.p_f_employee) - parseFloat(payslipData.td_S)
-    }
+    { payslipData.total_earnings-=payslipData.D_allow;}
+    if (payslipData.total_tax !== 0)
+    { payslipData.total_tax = parseFloat( payslipData.total_tax) -  parseFloat(payslipData.p_f_employee);}
+    if (payslipData.net_deductions !== 0)
+    { payslipData.net_deductions = ( payslipData.net_deductions) -  (payslipData.p_f_employee+payslipData.td_S);}
+  
 
     if (event.target.value === ""){
     payslipData.D_allow=0;}
     else{
     payslipData.D_allow=parseInt(event.target.value);}
 
-  
     payslipData.total_earnings+=payslipData.D_allow;
-    payslipData.p_f_employee=(payslipData.Basic+payslipData.D_allow)*12/100
+    payslipData.p_f_employee=Math.ceil((payslipData.Basic+payslipData.D_allow)*12/100)
     payslipData.total_tax +=  payslipData.p_f_employee
-    payslipData.td_S=(payslipData.total_earnings*0.1)
-    payslipData.net_deductions = parseInt(payslipData.net_deductions) + (payslipData.p_f_employee + payslipData.td_S)
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1);
+    payslipData.net_deductions = parseInt(payslipData.net_deductions) + (payslipData.p_f_employee + payslipData.td_S);
     payslipData.net_salary+=(payslipData.D_allow - payslipData.net_deductions);
 
     setNetsalary(payslipData.net_salary);
@@ -336,10 +319,11 @@ export default function FormPropsTextFields() {
 
   function handleChangesforHR_allow(event) {
     
+    if (payslipData.net_salary !== 0){
+    payslipData.net_salary-=((payslipData.HR_allow)-(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-    { 
-    payslipData.net_salary-=((payslipData.HR_allow)-(payslipData.net_deductions));
-    payslipData.total_earnings-=payslipData.HR_allow;
+    { payslipData.total_earnings-=payslipData.HR_allow;}
+    if (payslipData.net_deductions !== 0){
     payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
     }
 
@@ -349,7 +333,7 @@ export default function FormPropsTextFields() {
     payslipData.HR_allow=parseInt(event.target.value);}
 
     payslipData.total_earnings+=payslipData.HR_allow;
-    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1)
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1)
     payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
     payslipData.net_salary+=(payslipData.HR_allow-payslipData.net_deductions);
 
@@ -361,13 +345,12 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforconveyance(event) {
+    if (payslipData.net_salary !== 0){
+    payslipData.net_salary-=((payslipData.conveyance)-(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-    { 
-    payslipData.net_salary-=((payslipData.conveyance)-(payslipData.net_deductions));
-    payslipData.total_earnings-=payslipData.conveyance;
-    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
-
-    }
+    {payslipData.total_earnings-=payslipData.conveyance;}
+    if (payslipData.net_deductions !== 0){
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);}
 
     if (event.target.value === ""){
     payslipData.conveyance=0;}
@@ -375,7 +358,7 @@ export default function FormPropsTextFields() {
     payslipData.conveyance=parseInt(event.target.value);}
 
     payslipData.total_earnings+=payslipData.conveyance;
-    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1);
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1);
     payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
     payslipData.net_salary+=(payslipData.conveyance-payslipData.net_deductions);
 
@@ -386,14 +369,13 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforBonus(event) {
+    if (payslipData.net_salary !== 0)
+    {payslipData.net_salary-=((payslipData.Bonus)-(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-    { 
-    payslipData.net_salary-=((payslipData.Bonus)-(payslipData.net_deductions));
-    payslipData.total_earnings-=payslipData.Bonus;
-    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
+    {payslipData.total_earnings-=payslipData.Bonus;}
+    if (payslipData.net_deductions !== 0){
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);}
 
-
-    }
     if(event.target.value=== ""){
       payslipData.Bonus=0}
     else{
@@ -401,7 +383,7 @@ export default function FormPropsTextFields() {
     
     
     payslipData.total_earnings+=payslipData.Bonus;
-    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1)
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1).toFixed(1)
     payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
     payslipData.net_salary+=(payslipData.Bonus-payslipData.net_deductions);
 
@@ -412,13 +394,12 @@ export default function FormPropsTextFields() {
   }
   
   function handleChangesforOthers(event) {
+    if (payslipData.net_salary !== 0){
+    payslipData.net_salary-=((payslipData.others)-(payslipData.net_deductions));}
     if (payslipData.total_earnings !== 0)
-    { 
-    payslipData.net_salary-=((payslipData.others)-(payslipData.net_deductions));
-    payslipData.total_earnings-=payslipData.others;
-    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);
-
-    }
+    { payslipData.total_earnings-=payslipData.others;}
+    if (payslipData.net_deductions !== 0){
+    payslipData.net_deductions = parseFloat( payslipData.net_deductions) - parseFloat(payslipData.td_S);}
 
     if(event.target.value=== ""){
       payslipData.others=0}
@@ -426,7 +407,7 @@ export default function FormPropsTextFields() {
       payslipData.others=parseInt(event.target.value);}
       
     payslipData.total_earnings+=payslipData.others;
-    payslipData.td_S=(payslipData.total_earnings*0.1).toFixed(1);
+    payslipData.td_S=Math.ceil(payslipData.total_earnings*0.1).toFixed(1);
     payslipData.net_deductions = parseInt(payslipData.net_deductions) +parseFloat(payslipData.td_S);
     payslipData.net_salary+=(payslipData.others-payslipData.net_deductions);
 
@@ -437,17 +418,22 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforprof_tax(event) {
-    payslipData.net_salary+=parseInt(payslipData.prof_tax);
-    payslipData.net_deductions-=payslipData.prof_tax;
-    payslipData.total_tax-=payslipData.prof_tax;
+    if (payslipData.net_salary !== 0){
+      payslipData.net_salary=parseInt(payslipData.net_salary)+parseInt(payslipData.prof_tax);}
+    if (payslipData.net_deductions !== 0){
+    payslipData.net_deductions-=payslipData.prof_tax;}
+    if (payslipData.total_tax !== 0){
+    payslipData.total_tax-=payslipData.prof_tax;}
+    
+
     if (event.target.value === ""){
     payslipData.prof_tax=0;}
     else{
     payslipData.prof_tax=parseInt(event.target.value);}
 
     payslipData.net_salary-=(payslipData.prof_tax);
-    payslipData.net_deductions+=payslipData.prof_tax;
-    payslipData.total_tax+=payslipData.prof_tax;
+    payslipData.net_deductions+=(payslipData.prof_tax);
+    payslipData.total_tax+=(payslipData.prof_tax);
 
     setNetsalary(payslipData.net_salary);
     setNetdeductions(payslipData.net_deductions);
@@ -455,7 +441,7 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforp_femployee(event) {
-    payslipData.net_salary+=parseInt(payslipData.p_f_employee);
+    payslipData.net_salary=parseInt(payslipData.net_salary)+parseInt(payslipData.p_f_employee);
     payslipData.net_deductions-=payslipData.p_f_employee;
     payslipData.total_tax-=payslipData.p_f_employee;
 
@@ -474,16 +460,16 @@ export default function FormPropsTextFields() {
   }
 
   function handleChangesforTDS(event) {
-    payslipData.net_salary+=parseInt(payslipData.td_S);
-    payslipData.net_deductions-=payslipData.td_S;
+    payslipData.net_salary=parseInt(payslipData.net_salary)+parseInt(payslipData.td_S);
+    payslipData.net_deductions-=parseInt(payslipData.td_S);
 
     if (event.target.value === ""){
     payslipData.td_S=0;}
     else{
     payslipData.td_S=parseInt(event.target.value);}
 
-    payslipData.net_salary-=payslipData.td_S;
-    payslipData.net_deductions+=payslipData.td_S;
+    payslipData.net_salary-=parseInt(payslipData.td_S);
+    payslipData.net_deductions+=parseInt(payslipData.td_S);
 
     setNetsalary(payslipData.net_salary);
     setNetdeductions(payslipData.net_deductions);
@@ -491,7 +477,7 @@ export default function FormPropsTextFields() {
 
 
   function handleChangesforOthertaxes(event) {
-    payslipData.net_salary+=parseInt(payslipData.other_tax);
+    payslipData.net_salary=parseInt(payslipData.net_salary)+parseInt(payslipData.other_tax);
     payslipData.net_deductions-=payslipData.other_tax;
 
     if(event.target.value=== ""){
@@ -550,7 +536,12 @@ function uploadandprintData(){
   })
 
   
-  .catch(error => {console.log("fail")})
+  .catch(error => {setOpenLoader(false);
+    const message = alert;
+    message.message = "Uploading & Printing Payslip Details Unsuccessful";
+    message.severity = "error"
+    setMessage(message);
+    setOpen(false);})
   
 }
 
@@ -570,7 +561,12 @@ function uploadData(){
   })
 
   
-  .catch(error => {console.log("failed to upload")})
+  .catch(error => {setOpenLoader(false);
+    const message = alert;
+    message.message = "Uploading Payslip Details Unsuccessful";
+    message.severity = "error"
+    setMessage(message);
+    setOpen(false);})
   
 }
 
@@ -579,7 +575,7 @@ function changeFieldValue() {
     isActive:'true',
     candidate:'',
     candidate_id:'',
-    change_id:'',
+    type:'',
     date:year + '-' + (month+1),
     Designation: '',
     assigned:'',
@@ -633,6 +629,7 @@ const deleteData = () => {
 
 function updateData () {
   setOpenLoader(true);
+  console.log(payslipData)
   axios.put(`${process.env.REACT_APP_API_URL}/payslip/${id}`, payslipData, { headers: { 'Content-Type': 'application/json' } })
     .then((response) => {
       setOpenLoader(false);
@@ -735,6 +732,7 @@ function updateData () {
             />
             </div>
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Basic Salary" placement='top' arrow>
             <TextField
               required
               name='Basic'
@@ -750,8 +748,10 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Dearness Allowance (30% of Basic Salary)" placement='top' arrow>
             <TextField
               required
               label="DA"
@@ -767,12 +767,14 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>
 
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="House Rent Allowance (45% of Basic Salary)" placement='top' arrow>
             <TextField
               required
-              label="HR_allow"
+              label="HRA"
               value={payslipData.HR_allow}
               placeholder="Hr-allowance"
               onChange={handleChangesforHR_allow}
@@ -785,9 +787,11 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
 
           </div>
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+          <Tooltip title="Add Conveyance" placement='top' arrow>
           <TextField
               required
               label="Conveyance"
@@ -802,12 +806,12 @@ function updateData () {
               }}
               variant="outlined"
             />
-
+            </Tooltip>
           </div>
 
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
+          <Tooltip title="Add Bonus" placement='top' arrow>
             <TextField
-              
               label="Bonus"
               onChange={handleChangesforBonus}
               value={payslipData.Bonus}
@@ -820,11 +824,12 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>
 
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+          <Tooltip title="Add Other Earnings" placement='top' arrow>
           <TextField
-              
               label="Others"
               onChange={handleChangesforOthers}
               value={payslipData.others}
@@ -837,14 +842,15 @@ function updateData () {
               }}
               variant="outlined"
             />
-
+            </Tooltip>
           </div>
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+          <Tooltip title="Net Earnings" placement='top' arrow>
           <TextField
               required
-              label="Total Earnings"
+              label="Net Earnings"
               value={netearnings}
-              placeholder="Total Earnings"
+              placeholder="Net Earnings"
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
               }}
@@ -855,6 +861,7 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
 
           </div>
           </div>
@@ -862,6 +869,7 @@ function updateData () {
           <div className="leftDivision">
 
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Professional Tax" placement='top' arrow>
             <TextField
               required
               label="Professional tax"
@@ -879,8 +887,10 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Employee PF (12% of Net Earnings)" placement='top' arrow>
             <TextField
               required
               label="Employee PF"
@@ -896,6 +906,7 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px'  }}>
             <TextField
@@ -916,6 +927,7 @@ function updateData () {
             />
             </div>
             <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+            <Tooltip title="Add Employer PF" placement='top' arrow>
             <TextField
               required
               label="Total Tax"
@@ -932,8 +944,10 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
           </div>
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+          <Tooltip title="TDS (10% of Net Earnings)" placement='top' arrow>
           <TextField
               required
               label="Advance TAX/TDS"
@@ -949,11 +963,12 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
           </div>
 
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
-          <TextField
-              
+          <Tooltip title="Add Any Other Taxes" placement='top' arrow>
+          <TextField  
               label="Others"
               onChange={handleChangesforOthertaxes}
               value={payslipData.other_tax}
@@ -966,11 +981,13 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
             </div>        
           </div>
 
           <div className="leftDivision">
           <div style={{ float: "left", marginRight: "15px", marginTop: '30px', marginBottom: '30px' }}>
+          <Tooltip title="Net Deductions" placement='top' arrow>
             <TextField
               required
               label="Net Deductions"
@@ -987,7 +1004,7 @@ function updateData () {
               }}
               variant="outlined"
             />
-
+            </Tooltip>
           </div>
           </div>
  
@@ -1007,9 +1024,10 @@ function updateData () {
 
         <div className='rightDivision'> 
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+          <Tooltip title="Net Earnings" placement='top' arrow>
             <TextField
               required
-              label="Total Earnings"
+              label="Net Earnings"
               value={netearnings}
               InputProps={{
                 startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment>,
@@ -1021,8 +1039,10 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+          <Tooltip title="Net Deductions" placement='top' arrow>
             <TextField
             required
               label="Net Deductions"
@@ -1037,8 +1057,10 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
           </div>
           <div style={{ float: 'right', marginBottom: '10px', marginRight: "15px" }}>
+          <Tooltip title="Net Salary" placement='top' arrow>
           <TextField
               required
               label="Net Salary"
@@ -1054,6 +1076,7 @@ function updateData () {
               }}
               variant="outlined"
             />
+            </Tooltip>
           </div>
         </div>
 
@@ -1068,10 +1091,9 @@ function updateData () {
           Save and Download
 
           </Button>
-          <div className='savebtn'>
+          <div className='savebtn' style={{marginTop:"20px"}}>
           <Button type="reset" variant="contained" color="primary" onClick={()=>{console.log(payslipData);uploadData();}}>
           Save
-
           </Button>
           </div>
           </div>

@@ -30,13 +30,14 @@
     "react-modal": "^3.14.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "react-tooltip": "^4.2.21",
     "react-window": "^1.8.6",
     "web-vitals": "^1.1.2",
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "SET PORT=3001 && react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
