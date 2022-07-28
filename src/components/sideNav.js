@@ -22,7 +22,7 @@ import ListAltIcon from "@material-ui/icons/ListAlt";
 import ViewComfyIcon from '@material-ui/icons/ViewComfy';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import history from '../history';
-import Box from '@mui/material/Box';
+import MoreTimeIcon from '@mui/icons-material/MoreTime';
 import './sideNav.css';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
@@ -79,7 +79,12 @@ export default function PersistentDrawerLeft(props) {
     timesheet: false,
     invoice: false,
   });
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [selectedIndex1, setSelectedIndex1] = React.useState(0);
+
+  const handleListItemClickindex = (e, index) => {
+    setSelectedIndex1(index);
+  };
 
   const handleListItemClick = (e, index) => {
     setSelectedIndex(index);
@@ -152,11 +157,17 @@ export default function PersistentDrawerLeft(props) {
               <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('client')} ></KeyboardArrowDownIcon>
             </ListItem>
             <div className="sidebar-content">
-              <ListItem button onClick={() => history.push('/client')}>
+              <ListItem button selected={selectedIndex1 === 0} onClick={(e) => {
+                history.push('/client')
+                handleListItemClickindex(e, 0)
+              }}>
                 <ListItemIcon style={{ marginLeft: '15px' }}><AccountBoxRoundedIcon /></ListItemIcon>
                 <ListItemText style={{ marginLeft: '-10px' }} primary='Add Client' />
               </ListItem>
-              <ListItem button onClick={() => history.push('/view-client')}>
+              <ListItem button selected={selectedIndex1 === 1} onClick={(e) => {
+                history.push('/view-client')
+                handleListItemClickindex(e, 1)
+              }}>
                 <ListItemIcon style={{ marginLeft: '15px' }}><ViewComfyIcon /></ListItemIcon>
                 <ListItemText style={{ marginLeft: '-10px' }} primary='View Client' />
               </ListItem>
@@ -172,11 +183,17 @@ export default function PersistentDrawerLeft(props) {
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={() => handleChange('candidate')}></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
-                <ListItem button onClick={() => history.push('/candidate')}>
+                <ListItem button selected={selectedIndex1 === 2} onClick={(e) => {
+                  history.push('/candidate')
+                  handleListItemClickindex(e, 2)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}><AccountBoxRoundedIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='Add Candidate' />
                 </ListItem>
-                <ListItem button onClick={() => history.push('/view-candidate')}>
+                <ListItem button selected={selectedIndex1 === 3} onClick={(e) => {
+                  history.push('/view-candidate')
+                  handleListItemClickindex(e, 3)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}><ViewComfyIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='View Candidate' />
                 </ListItem>
@@ -192,13 +209,19 @@ export default function PersistentDrawerLeft(props) {
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('timesheet')} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
-                <ListItem button onClick={() => history.push("/timesheet")}>
+                <ListItem button selected={selectedIndex1 === 4} onClick={(e) => {
+                  history.push("/timesheet")
+                  handleListItemClickindex(e, 4)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}>
                     <ListAltIcon />
                   </ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary="Add Time Sheet" />
                 </ListItem>
-                <ListItem button onClick={() => history.push('/view-timesheet')}>
+                <ListItem button selected={selectedIndex1 === 5} onClick={(e) => {
+                  history.push('/view-timesheet')
+                  handleListItemClickindex(e, 5)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }} ><ViewComfyIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='View Time Sheet' />
                 </ListItem>
@@ -214,51 +237,40 @@ export default function PersistentDrawerLeft(props) {
                 <KeyboardArrowDownIcon className="bi-chevron-down toggle-btn" onClick={(e) => handleChange('invoice')} ></KeyboardArrowDownIcon>
               </ListItem>
               <div className="sidebar-content">
-                <ListItem button onClick={() => history.push('/home')}>
+                <ListItem button selected={selectedIndex1 === 6} onClick={(e) => {
+                  history.push('/home')
+                  handleListItemClickindex(e, 6)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}><AssignmentRoundedIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='Generate Invoice' />
                 </ListItem>
-                <ListItem button onClick={() => history.push('/history')}>
+                <ListItem button selected={selectedIndex1 === 7} onClick={(e) => {
+                  history.push('/history')
+                  handleListItemClickindex(e, 7)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}><AccessTimeRoundedIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='Invoice History' />
                 </ListItem>
-                <ListItem button onClick={() => history.push('/invoice-filter')}>
+                <ListItem button selected={selectedIndex1 === 8} onClick={(e) => {
+                  history.push('/invoice-filter')
+                  handleListItemClickindex(e, 8)
+                }}>
                   <ListItemIcon style={{ marginLeft: '15px' }}><AccessTimeRoundedIcon /></ListItemIcon>
                   <ListItemText style={{ marginLeft: '-10px' }} primary='Invoice Filter' />
                 </ListItem>
+                <ListItem button selected={selectedIndex1 === 9} onClick={(e) => {
+                  history.push('/schedule-invoice')
+                  handleListItemClickindex(e, 9)
+                }}>
+                  <ListItemIcon style={{ marginLeft: '15px' }}><MoreTimeIcon /></ListItemIcon>
+                  <ListItemText style={{ marginLeft: '-10px' }} primary='Schedule Invoice' />
+                </ListItem>
               </div>
             </div></div>
-
-          <ListItem button onClick={() => history.push('/home')}>
-            <ListItemIcon><AssignmentRoundedIcon /></ListItemIcon>
-            <ListItemText primary='Generate Invoice' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/schedule-invoice')}>
-            <ListItemText primary='Schedule Invoice' />
-          </ListItem>
-          <ListItem button onClick={() => history.push("/timesheet")}>
-            <ListItemIcon>
-              <ListAltIcon />
-            </ListItemIcon>
-            <ListItemText primary="Add Time Sheet" />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-client')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Client' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-candidate')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Candidate' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-timesheet')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Time Sheet' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/view-schedule')}>
-            <ListItemIcon><ViewComfyIcon /></ListItemIcon>
-            <ListItemText primary='View Schedule' />
-          </ListItem>
-          <ListItem button onClick={() => history.push('/charts')}>
+          <ListItem button selected={selectedIndex === 4} onClick={(e) => {
+            history.push('/charts')
+            handleListItemClick(e, 4)
+          }}>
             <ListItemIcon><BarChartIcon /></ListItemIcon>
             <ListItemText primary='Charts' />
           </ListItem>

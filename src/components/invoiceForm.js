@@ -377,7 +377,7 @@ export default function FormPropsTextFields() {
   const [balanceDue, setBalanceDue] = React.useState('0')
   const [selectedDate, setSelectedDate] = React.useState(
     new Date().toDateString(),
-  )
+  ) 
   const [selectedDueDate, setSelectedDueDate] = React.useState(
     new Date(
       new Date(new Date()).setDate(new Date().getDate() + 15),

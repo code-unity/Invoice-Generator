@@ -1,19 +1,22 @@
 import React from 'react';
-import {useEffect} from "react";
+import { useEffect } from "react";
 import styles from './charts.module.css';
 import { Chart } from "react-google-charts";
 import TextField from '@mui/material/TextField';
 import axios from "axios";
 
-const chartdata = [
-    ["Task", "Amount"],
-    ["Total Amount", 11],
-    ["TDS", 2],
-    ["GST", 2],
-];
+
 const options = {
     title: "Amount",
     is3D: true,
+};
+
+
+export const options1 = {
+    chart: {
+        title: "Company Performance",
+        subtitle: "Total Amount,TDS,GST",
+    },
 };
 
 var fromdate = new Date();
@@ -25,6 +28,7 @@ var todate = new Date();
 todate.setMonth(todate.getMonth() + 1);
 var nextMonth = todate.toLocaleString('default', { month: 'short' });
 var currYear = todate.getFullYear().toString();
+
 
 const Months = {
     "Jan": '01',
@@ -41,26 +45,52 @@ const Months = {
     "Dec": '12'
 }
 
-
+var chartdata
+var datab
 const Charts = () => {
 
     const [fromdate, setFromdate] = React.useState(`${currYear}-${Months[Month]}`);
     const [todate, setTodate] = React.useState(`${currYear}-${Months[nextMonth]}`);
     const [data, setData] = React.useState([]);
 
-    useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}//payslip/${fromdate}/${todate}`)
-            .then(response => {
-                setData(response.data.data);
-            });
-        }, [])
-        
+
+
+    useEffect(async function () {
+        const dates = {
+            fromdate,
+            todate,
+        }
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/payslip/total/`, dates, {
+            headers:
+            {
+                'Content-type': 'application/json',
+            },
+        })
+        const data = response.data.data
+        console.log(data)
+        chartdata = [
+            ["category", "Amount-share"],
+            ["Total Amount", data.totalAmount],
+            ["TDS", data.tDs],
+            ["GST", data.gST],
+            ["salaries", data.salaries],
+        ];
+
+
+        datab = [
+            ["Month", "Total Amount", "TDS", "GST"],
+            [data.Month, data.totalAmount, data.tDs, data.gST]
+        ];
+        setData(data)
+    }, [fromdate, todate])
+
 
     const dateChangeHandler = (event) => {
         var selectedDate = event.target.value;
+        console.log(event.target.value)
         const fromdate = new Date();
         const monthNumber = selectedDate.split('-')[1];
-        fromdate.setMonth(monthNumber);
+        fromdate.setMonth(monthNumber - 1);
         Month = fromdate.toLocaleString('default', { month: 'short' })
         currYear = selectedDate.split('-')[0];
         setFromdate(`${currYear}-${Months[Month]}`);
@@ -68,12 +98,13 @@ const Charts = () => {
 
     const todateChangeHandler = (event) => {
         var selectedDate = event.target.value;
+        console.log(event.target.value)
         const todate = new Date();
         const monthNumber = selectedDate.split('-')[1];
-        todate.setMonth(monthNumber);
+        todate.setMonth(monthNumber - 1);
         Month = todate.toLocaleString('default', { month: 'short' })
         currYear = selectedDate.split('-')[0];
-        setTodate(`${currYear}-${Months[nextMonth]}`);
+        setTodate(`${currYear}-${Months[Month]}`);
     }
 
 
@@ -102,12 +133,20 @@ const Charts = () => {
                     </TextField>
                 </div>
                 <Chart
-                    style={{ marginTop: '40px',marginLeft:'5%' }}
+                    style={{ marginTop: '40px', marginLeft: '5%' }}
                     chartType="PieChart"
                     data={chartdata}
                     options={options}
                     width={"90%"}
                     height={"400px"}
+                />
+                <Chart
+                    style={{ marginTop: '40px', marginLeft: '5%' }}
+                    chartType="Bar"
+                    width="90%"
+                    height="400px"
+                    data={datab}
+                    options={options1}
                 />
             </form>
         </>

@@ -6,7 +6,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
-### `npm start`
+### `Step-1 Clone the git repository`
+
+open new window in vs code and select the Clone git repository option and paste the master branch URL (https://github.com/code-unity/Invoice-Generator.git). 
+
+### `Step-2 npm install`
+
+Run this command npm install to install the node module files 
+
+
+### `Step-3 npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
