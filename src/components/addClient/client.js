@@ -17,7 +17,6 @@ import {
 } from "@material-ui/pickers";
 import history from "../../history";
 import TextEditor from "./TextEditor";
-import { white } from "material-ui/styles/colors";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -452,7 +451,16 @@ export default function FormPropsTextFields() {
             </div>
           </div>
 
-          <TextEditor getHtml={htmlData}></TextEditor>
+          <div
+            style={{
+              height: "400px",
+              width: "auto",
+              marginLeft: "20px",
+              marginRight: "50px",
+            }}
+          >
+            <TextEditor getHtml={htmlData}></TextEditor>
+          </div>
 
           <div style={{ clear: "both" }} />
         </div>
