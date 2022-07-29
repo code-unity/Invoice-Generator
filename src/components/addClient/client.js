@@ -16,7 +16,7 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import history from "../../history";
-import TextEditor from "./TextEditor";
+import TextEditor from "../TextEditor/TextEditor";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -62,8 +62,6 @@ function Alert(props) {
 }
 
 export default function FormPropsTextFields() {
-  // const [toEmails, setToEmail] = React.useState('')
-  // const [ccEmails, setccEmails] = React.useState('')
   let { id } = useParams();
   const classes = useStyles();
   const [clientData, setState] = React.useState({
@@ -85,7 +83,7 @@ export default function FormPropsTextFields() {
   const [toEmailStr, setToEmailStr] = React.useState("");
   const [ccEmailStr, setCCEmailStr] = React.useState("");
   const [emailContent, setEmailContent] = React.useState("");
-
+  const [emptyEditor, setEmptyEditor] = React.useState(false);
   const htmlData = (data) => {
     setEmailContent(data);
     console.log(emailContent);
@@ -175,9 +173,7 @@ export default function FormPropsTextFields() {
   };
 
   function printdata() {
-    // console.log('inside Print data')
     const clientInfo = getEmailDetails();
-    // console.log("clientInfo is", clientInfo);
     setOpenLoader(true);
     axios
       .post(`${process.env.REACT_APP_API_URL}/client`, clientInfo, {
@@ -186,6 +182,7 @@ export default function FormPropsTextFields() {
       .then(function (response) {
         console.log(response);
         setOpenLoader(false);
+        setEmptyEditor(true);
         const message = alert;
         message.message = "client added successfully";
         message.severity = "success";
@@ -205,17 +202,19 @@ export default function FormPropsTextFields() {
           ccEmails: "",
           emailContent: "",
         });
-      })
+        setEmptyEditor(false);
+      }) 
       .catch((error) => {
         console.log(error);
         setOpenLoader(false);
+        // setEmptyEditor(false);
         const message = alert;
         message.message = error.response.data.status.message;
         message.severity = "error";
         setMessage(message);
         setOpen(true);
       });
-  }
+  } 
 
   const updateData = () => {
     const clientInfo = getEmailDetails();
@@ -254,6 +253,7 @@ export default function FormPropsTextFields() {
         message.severity = "error";
         setMessage(message);
         setOpen(true);
+        console.log(error.message);
       });
   };
 
@@ -459,7 +459,7 @@ export default function FormPropsTextFields() {
               marginRight: "50px",
             }}
           >
-            <TextEditor getHtml={htmlData}></TextEditor>
+            <TextEditor getHtml={htmlData} isEmpty={emptyEditor}></TextEditor>
           </div>
 
           <div style={{ clear: "both" }} />
