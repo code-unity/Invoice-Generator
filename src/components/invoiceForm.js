@@ -26,8 +26,7 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { useParams } from "react-router-dom";
-// import Tippy from "@tippyjs/react";
-// import "tippy.js/dist/tippy.css";
+import "tippy.js/dist/tippy.css";
 import Tippy from "@tippyjs/react"
 
 const useStyles = makeStyles((theme) => ({
