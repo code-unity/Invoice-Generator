@@ -12927,7 +12927,7 @@
   "resolved" "https://registry.npmjs.org/tiny-warning/-/tiny-warning-1.0.3.tgz"
   "version" "1.0.3"
 
-"tippy.js@^6.3.1":
+"tippy.js@^6.3.1", "tippy.js@^6.3.7":
   "integrity" "sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ=="
   "resolved" "https://registry.npmjs.org/tippy.js/-/tippy.js-6.3.7.tgz"
   "version" "6.3.7"
