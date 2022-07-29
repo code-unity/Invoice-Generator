@@ -26,6 +26,8 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { useParams } from "react-router-dom";
+import "tippy.js/dist/tippy.css";
+import Tippy from "@tippyjs/react"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -414,6 +416,8 @@ export default function FormPropsTextFields() {
   const [open, setOpen] = React.useState(false);
   const [invoiceHistory, setInvoiceHistory] = React.useState([]);
   const [invoiceNumber, setInvoiceNumber] = React.useState(0);
+  const [discountValue, setDiscountValue] = React.useState(0);
+  const [gstValue, setGSTValue] = React.useState(0);
   const currency = [
     { id: "Rupee", value: "₹" },
     { id: "USD", value: "$" },
@@ -471,7 +475,7 @@ export default function FormPropsTextFields() {
           (eachObj) => eachObj._id === Data.client
         );
         var newInvoiceNumber;
-        if (data.length == 0) {
+        if (data.length === 0) {
           Data.client = "";
           newInvoiceNumber = "";
         } else {
@@ -482,6 +486,13 @@ export default function FormPropsTextFields() {
             "-" +
             (count.length + 1).toString();
         }
+        updateInputFields(
+          Data.discount_type,
+          Data.tax_type,
+          Data.sub_total,
+          Data.tax,
+          Data.discount
+        );
         setInvoiceNumber(newInvoiceNumber);
         setPersonName(Data.client);
         setInputAdornment(Data.currency);
@@ -496,13 +507,13 @@ export default function FormPropsTextFields() {
         setBalanceDue(Data.balance_due);
         setSelectedDate(Data.date);
         setSelectedDueDate(Data.due_date);
-        if (data.length != 0) {
+        if (data.length !== 0) {
           data[0].toEmails.forEach((Email) => {
             toEmailString = toEmailString + Email + "\n";
           });
         } else toEmailString = "";
         setToEmailStr(toEmailString);
-        if (data.length != 0) {
+        if (data.length !== 0) {
           data[0].ccEmails.forEach((Email) => {
             ccEmailString = ccEmailString + Email + "\n";
           });
@@ -634,18 +645,24 @@ export default function FormPropsTextFields() {
       const a = sTotal - parseInt(pdiscount);
       if (tType === "flat") {
         b = Math.ceil(a + parseInt(ptax));
+        setGSTValue(parseInt(ptax));
       } else if (tType === "%") {
         b = Math.ceil(a * (1 + ptax / 100));
+        setGSTValue(Math.round((a * ptax) / 100));
       }
+      setDiscountValue(parseInt(pdiscount));
       setTotal(b);
       setBalanceDue(b - amountPaid);
     } else if (dType === "%") {
       const a = sTotal * (1 - pdiscount / 100);
       if (tType === "flat") {
         b = Math.ceil(a + parseInt(ptax));
+        setGSTValue(parseInt(ptax));
       } else if (tType === "%") {
         b = Math.ceil(a * (1 + ptax / 100));
+        setGSTValue(Math.round((a * ptax) / 100));
       }
+      setDiscountValue(Math.round((sTotal * pdiscount) / 100));
       setTotal(b);
       setBalanceDue(b - amountPaid);
     }
@@ -1273,15 +1290,18 @@ export default function FormPropsTextFields() {
             />
           </div>
           <div className={classes.discontbox}>
-            <TextField
-              label="Discount"
-              variant="outlined"
-              value={discount}
-              onChange={(e) => handleDiscountChange(e)}
-              inputProps={{
-                className: classes.discount,
-              }}
-            />
+            <Tippy content={`${inputAdornment}${discountValue}`}>
+              <TextField
+                label="Discount"
+                variant="outlined"
+                value={discount}
+                onChange={(e) => handleDiscountChange(e)}
+                inputProps={{
+                  className: classes.discount,
+                }}
+              />
+            </Tippy>
+
             <FormControl variant="outlined" className={classes.type}>
               <Select
                 labelId="demo-simple-select-outlined-label"
@@ -1304,15 +1324,18 @@ export default function FormPropsTextFields() {
               marginRight: "20px",
             }}
           >
-            <TextField
-              label="GST"
-              variant="outlined"
-              onChange={(e) => handleTaxChange(e)}
-              value={tax}
-              inputProps={{
-                className: classes.discount,
-              }}
-            />
+            <Tippy content={`${inputAdornment}${gstValue}`}>
+              <TextField
+                label="GST"
+                variant="outlined"
+                onChange={(e) => handleTaxChange(e)}
+                value={tax}
+                inputProps={{
+                  className: classes.discount,
+                }}
+              />
+            </Tippy>
+
             <FormControl variant="outlined" className={classes.type}>
               <Select
                 labelId="demo-simple-select-outlined-label"

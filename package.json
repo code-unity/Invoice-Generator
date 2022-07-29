@@ -16,6 +16,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@tippyjs/react": "^4.2.6",
     "axios": "^0.21.1",
     "base64topdf": "^1.1.8",
     "bootstrap": "^4.6.0",
@@ -32,6 +33,7 @@
     "react-share": "^4.4.0",
     "react-time-picker-input": "^2.0.10",
     "react-window": "^1.8.6",
+    "tippy.js": "^6.3.7",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
