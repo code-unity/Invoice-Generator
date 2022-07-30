@@ -84,6 +84,7 @@ export default function FormPropsTextFields() {
   const [ccEmailStr, setCCEmailStr] = React.useState("");
   const [emailContent, setEmailContent] = React.useState("");
   const [emptyEditor, setEmptyEditor] = React.useState(false);
+  const [update, setUpdate] = React.useState(false);
   const htmlData = (data) => {
     setEmailContent(data);
     console.log(emailContent);
@@ -110,6 +111,7 @@ export default function FormPropsTextFields() {
         }
         setToEmailStr(toEmailString);
         setCCEmailStr(ccEmailString);
+        setEmailContent(Data.emailContent);
         setState({
           client_name: Data.client_name,
           billing_address: Data.billing_address,
@@ -120,7 +122,11 @@ export default function FormPropsTextFields() {
           date_of_contract: Data.date_of_contract,
           toEmails: Data.toEmails,
           ccEmails: Data.ccEmails,
+          emailContent: Data.emailContent,
         });
+        // console.log(clientData.emailContent);
+        setUpdate(true);
+        setUpdate(false);
       })
       .catch((error) => {
         console.log(error);
@@ -203,7 +209,7 @@ export default function FormPropsTextFields() {
           emailContent: "",
         });
         setEmptyEditor(false);
-      }) 
+      })
       .catch((error) => {
         console.log(error);
         setOpenLoader(false);
@@ -214,7 +220,7 @@ export default function FormPropsTextFields() {
         setMessage(message);
         setOpen(true);
       });
-  } 
+  }
 
   const updateData = () => {
     const clientInfo = getEmailDetails();
@@ -226,6 +232,7 @@ export default function FormPropsTextFields() {
       .then((response) => {
         console.log(response);
         setOpenLoader(false);
+        setEmptyEditor(true);
         const message = alert;
         message.message = "Client Details Updated Successfully";
         message.severity = "success";
@@ -241,10 +248,12 @@ export default function FormPropsTextFields() {
           date_of_contract: String(new Date()),
           toEmails: "",
           ccEmails: "",
+          emailContent: "",
         });
         setToEmailStr("");
         setCCEmailStr("");
-        // history.push('/view-client')
+        setEmailContent("");
+        setEmptyEditor(true);
       })
       .catch((error) => {
         setOpenLoader(false);
@@ -459,7 +468,12 @@ export default function FormPropsTextFields() {
               marginRight: "50px",
             }}
           >
-            <TextEditor getHtml={htmlData} isEmpty={emptyEditor}></TextEditor>
+            <TextEditor
+              getHtml={htmlData}
+              isEmpty={emptyEditor}
+              isUpdate={update}
+              htmlContent={emailContent}
+            ></TextEditor>
           </div>
 
           <div style={{ clear: "both" }} />

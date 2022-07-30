@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from "react";
 import { useState } from "react";
 import { Fragment } from "react";
-import { EditorState, convertToRaw } from "draft-js";
+import { EditorState, convertToRaw, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
@@ -22,9 +22,23 @@ const TextEditor = (props) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   useEffect(() => {
-    const emptyState = EditorState.createEmpty();
-    setEditorState(emptyState);
-  }, [props.isEmpty]);
+    if (props.isEmpty) {
+      const emptyState = EditorState.createEmpty();
+      setEditorState(emptyState);
+    }
+    if (props.isUpdate) {
+      console.log(props.htmlContent);
+      const blocksFromHtml = htmlToDraft(props.htmlContent);
+      const { contentBlocks, entityMap } = blocksFromHtml;
+      const contentstate = ContentState.createFromBlockArray(
+        contentBlocks,
+        entityMap
+      );
+      const editorstate = EditorState.createWithContent(contentstate);
+      console.log(editorstate);
+      setEditorState(editorstate);
+    }
+  }, [props.isEmpty, props.isUpdate]);
 
   const editorStateChangeHandler = (state) => {
     setEditorState(state);
