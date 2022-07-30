@@ -13,10 +13,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@mui/material/IconButton';
 import DateFnsUtils from '@date-io/date-fns';
-//import * as XLSX from 'xlsx';
 import {CSVLink}  from "react-csv";
 import jsPDF from 'jspdf'
-//import autoTable from 'jspdf-autotable';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
@@ -41,12 +39,27 @@ function deleteData (value) {
   export default function ViewPayslip() {
 
     
-    const [newdate, setDate] = useState(null); 
-    const handleDateChange = (date) => {
-        const dateInReqFormat=convert(date);
+    const [newdate, setDate] = useState(null);
+    const [fromdate, setfromDate] = useState(null); 
+    const [todate, settoDate] = useState(null); 
 
+    const state= {
+        fromdate,
+        todate
+    }
+    const handleDateChange = (date) => {
+        var dateInReqFormat=convert(date);
         setDate(dateInReqFormat)
       };
+      const handlefromDateChange = (date) => {
+        const dateInReqFormat=convert(date);
+        setfromDate(dateInReqFormat)
+      };
+      const handletoDateChange = (date) => {
+        const dateInReqFormat=convert(date);
+        settoDate(dateInReqFormat)
+      };
+
 
     const convert = (str) => {
         
@@ -58,7 +71,6 @@ function deleteData (value) {
 
 
     const [things, setThings] = useState([]);
-    //const [filteredList, setFilteredList] = useState([]);
     const fetchData = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/payslip`)
             .then((data) => {
@@ -105,56 +117,31 @@ const headers = [
   { label: "NET DEDUCTIONS", key: "net_deductions" },
   { label: "NET SALARY", key: "net_salary" },
 ];
-// function printData(things){
-//     const newData=things.map(row=>{
-//         delete row._id;
-//         delete row.isActive;
-//         delete row.__v;
-//         return row
-//       })
-//     const workSheet = XLSX.utils.json_to_sheet(newData)
-//     const workBook = XLSX.utils.book_new()
-//     XLSX.utils.book_append_sheet(workBook, workSheet, "payslips")
-//     workSheet.A1.s = {
-//     font: {sz: 14, bold: true, background: '#FF00FF'}
-//     };
-
-//     //let buf=XLSX.write(workBook,{bookType:"xlsx",type:"buffer"})
-//       //Binary string
-//       XLSX.write(workBook,{bookType:"xlsx",type:"binary"})
-//       //Download
-//       XLSX.writeFile(workBook,"PayslipsData.xlsx")
-// }
 
 const csvReport = {
     data: things,
     headers: headers,
     filename: 'PayslipData.csv'
   };
-// const year = (new Date().getFullYear());
-// const month =(new Date().toLocaleString('default',{month:'long'}));
-const state= {
-fromdate :'May 2022',
-todate :'september 2022'
-}
 
-function fullData(){
-    axios.post(`${process.env.REACT_APP_API_URL}/payslip/total`, state)
-    .then((response) => {
-        console.log(response)
-    })
-    .catch((error) => {
-        console.log("failed")})
-}
 
-function halfData(){
-    axios.post(`${process.env.REACT_APP_API_URL}/payslip/half`, state)
-    .then((response) => {
-        console.log(response)
-    })
-    .catch((error) => {
-        console.log("failed")})
-}
+// function fullData(){
+//     axios.post(`${process.env.REACT_APP_API_URL}/payslip/total`, state)
+//     .then((response) => {
+//         console.log(response)
+//     })
+//     .catch((error) => {
+//         console.log("failed")})
+// }
+
+// function halfData(){
+//     axios.post(`${process.env.REACT_APP_API_URL}/payslip/half`, state)
+//     .then((response) => {
+//         console.log(response)
+//     })
+//     .catch((error) => {
+//         console.log("failed")})
+// }
 
 
 var tds = []
@@ -178,7 +165,6 @@ const columns = [
 
 function print(tds){
     const doc =new jsPDF('p', 'pt', 'a4');
-    //doc.setFontType("italic");
     doc.setFontSize(18);
     doc.text(" Advance TAX/TDS Details In The Given Range Of Months", 50, 50)
     doc.setFontSize(13);
@@ -260,38 +246,13 @@ function print(tds){
     finalY+=10
     doc.setTextColor("red");
     doc.setFontSize(11);
-    var len2=((tds.internData)).length
-    doc.text(`Part Time Total:${(tds.internData)[len2-1]}`, 50, finalY);
+    var len1=((tds.internData)).length
+    doc.text(`Part Time Total:${(tds.internData)[len1-1]}`, 50, finalY);
     doc.setTextColor("black");
     finalY+=20
-    var totalTds= parseFloat((tds.internData)[len2-1])+parseFloat((tds.fullTimedata)[len-1])
+    var totalTds= parseFloat((tds.internData)[len1-1])+parseFloat((tds.fullTimedata)[len-1])
     doc.text(`TOTAL TDS AMOUNT:${totalTds}`, 50, finalY);
-    doc.setFontSize(13);
-
-    
-    // for(i=0;i<(tds.internData).length;i++){
-    // doc.autoTable({
-    //     theme: "grid",
-    //     startX: 0,
-    //     startY: (finalY) + 10,
-    //     columnStyles: { 1: { halign: 'center'} },
-    //     columns: columns.map(col => ({ ...col, dataKey: col.field })),
-    //     body: (tds.internData)[i],
-    //     headStyles: {
-    //         halign: "center",
-    //         valign: "middle",
-    //         lineWidth: 0.25,
-    //         lineColor: 200
-    //       },
-    //       bodyStyles: {
-    //         halign: "center",
-    //         valign: "middle",
-    //         lineWidth: 0.25,
-    //         lineColor: 200
-    //       },
-    //   })
-    //   finalY = doc.previousAutoTable.finalY+10;}
-      
+    doc.setFontSize(13);   
     doc.save('ADVANCE TAX/TDS Report.pdf')
 
 }
@@ -366,15 +327,6 @@ function print(tds){
                         <TableCell sx={{ fontWeight: 'bold' }} style={{border: ".5px solid black"}}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
-                    {/* {things.length === 0 && 
-                    <TableBody >
-                        <TableRow>
-                            <TableCell colSpan={"22"} style={{color:"white"}}>
-                                .
-                        </TableCell>
-                        </TableRow>
-                    </TableBody >
-                    } */}
             
             {things.length !== 0 &&
                     <TableBody >
@@ -434,16 +386,64 @@ function print(tds){
                 <h2 style={{fontFamily:"Candara"}}>There are no Payslips for {filterdate}  </h2>
                 
             </div>}
-            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
-            <Button  variant='contained' color="primary">
-                
+            <div style={{ padding:'1%', display:"flex",alignItems:"center"}}>
+            <div style={{ float: "left",textalign:'center',flexGrow:"1" }}>
+            <Button  variant='contained' color="primary"> 
                 <CSVLink {...csvReport} style={{textDecoration:"none",color:"white"}}>Print</CSVLink>
-                {/* onClick={()=>{printData(things)}} */}
+            </Button>
+            </div>
+            <div style={{marginRight:"0px", fontSize:"13px",marginTop:"3px",width:"120px"}}>
+            <h3>Select From & To Months:</h3>
+            </div>
+
+            <div style={{ float: "right", width:"150px",textalign:'center',marginTop:'-25px',marginLeft:'7px'}}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                views={["year", "month"]}
+                format="MMMM/yyyy"
+                name="fromdate"
+                margin="normal"
+                label="From"
+                value={fromdate}
+                onChange={handlefromDateChange}
+                KeyboardButtonProps={{
+                'aria-label': 'change date',
+                }}
+            />
+            </MuiPickersUtilsProvider>
+            </div>
+            <div style={{marginRight:"0px", fontSize:"13px",marginTop:"3px"}}>
+            <h3>-</h3>
+            </div>
+            <div style={{ float: "right", width:"150px",textalign:'center',marginTop:'-25px',marginLeft:'15px'}}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+                disableToolbar
+                variant="inline"
+                views={["year", "month"]}
+                format="MMMM/yyyy"
+                margin="normal"
+                name="todate"
+                label="To"
+                value={todate}
+                onChange={handletoDateChange}
+                KeyboardButtonProps={{
+                'aria-label': 'change date',
+                }}
+            />
+            </MuiPickersUtilsProvider>
+            </div>
+            <div style={{ float: "right",textalign:'center',marginLeft:'15px'}}>
+            <Button  variant='contained' color="primary" onClick={tdsData}>
+                Print Tds Data
             </Button>
 
             </div>
+            </div>
 
-            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
+            {/* <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
             <Button  variant='contained' color="primary" onClick={fullData}>
                 send
             </Button>
@@ -454,13 +454,8 @@ function print(tds){
                 Half Data
             </Button>
 
-            </div>
-            <div style={{ padding:'1%', display:"flex",alignItems:"center" }}>
-            <Button  variant='contained' color="primary" onClick={tdsData}>
-                Tds Data
-            </Button>
+            </div> */}
 
-            </div>
         </div>
     )
 }
