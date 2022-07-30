@@ -8,7 +8,6 @@ import Backdrop from "@material-ui/core/Backdrop";
 import history from "../../history";
 import axios from "axios";
 import "./login.css";
-import logo from "../../logo.png";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,7 +64,7 @@ function LoginForm() {
           <div>
             <div className="logo">
               <img
-                src={logo}
+                src="https://www.codeunity.in/images/logo/logo.png"
                 loading="lazy"
                 alt="CodeUnity logo"
                 id="ember499"
