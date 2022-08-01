@@ -15,7 +15,8 @@ import Tooltip from "@material-ui/core/Tooltip";
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@mui/material/IconButton';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -24,10 +25,11 @@ function Alert(props) {
 const ViewSchedule = () => {
     const [schedulesList, setSchedulesList] = useState([])
     const [clientData, setClientData] = useState([]);
+    const [invoiceData, setInvoiceData] = useState([]);
     const [openAlert, setOpenAlert] = React.useState(false);
     const [alert, setMessage] = React.useState({ message: "", severity: "" });
     const [isLoading, setLoading] = useState(true);
-    
+
     function handleResponse(newMessage,newSeverity){
         const message = alert;
         message.message = newMessage;
@@ -49,6 +51,14 @@ const ViewSchedule = () => {
             const fetchClientData = await axios.get(`${process.env.REACT_APP_API_URL}/client`)
             if (fetchClientData) {
                 setClientData(fetchClientData.data.data.results)
+            }
+          } catch (error) {
+            handleResponse('Failed to fetch details. Please try again.','error');
+          }
+          try {
+            const fetchInvoiceData = await axios.get(`${process.env.REACT_APP_API_URL}/invoice`)
+            if (fetchInvoiceData) {
+                setInvoiceData(fetchInvoiceData.data.data.results)
                 setLoading(false)
             }
           } catch (error) {
@@ -77,7 +87,7 @@ const ViewSchedule = () => {
         try {
             const deleteScheduleData = await axios.delete(`${process.env.REACT_APP_API_URL}/schedule/${value}`)
             if (deleteScheduleData) {
-                handleResponse('Schedule enabled successfully.','success');
+                handleResponse('Schedule deleted successfully.','success');
             }
         } 
         catch (error) {
@@ -100,6 +110,16 @@ const ViewSchedule = () => {
         mnth = ("0" + (date.getMonth() + 1)).slice(-2),
         day = ("0" + date.getDate()).slice(-2);
         return [date.getFullYear(), mnth, day].join("-");
+    }
+
+    const getClientName = (newClientId) => {
+        const clientObj =  clientData.find(obj => obj._id === newClientId);
+        return (clientObj && clientObj.client_name ? clientObj.client_name : "Deleted")
+    }
+
+    const getInvoiceNumber = (newInvoiceId) => {
+        const invoiceObj =  invoiceData.find(obj => obj._id === newInvoiceId);
+        return (invoiceObj && invoiceObj.invoice_number ? invoiceObj.invoice_number : "Deleted")
     }
 
     useEffect(() => {
@@ -136,8 +156,8 @@ const ViewSchedule = () => {
                                 {temp.isDisabled &&
                                 <>
                                     <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{temp.scheduleName}</TableCell>
-                                    <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{clientData.filter(data => data._id === temp.clientId)[0].client_name}</TableCell>
-                                    <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{temp.invoiceNumber}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{ getClientName(temp.clientId)}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{getInvoiceNumber(temp.invoiceNumber)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{convertDate(temp.date)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{convertTime(temp.time)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'light' , fontFamily: 'sans-serif'}}>{temp.frequency}</TableCell>
@@ -146,8 +166,8 @@ const ViewSchedule = () => {
                                 {!temp.isDisabled &&
                                 <>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{temp.scheduleName}</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{clientData.filter(data => data._id === temp.clientId)[0].client_name}</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{temp.invoiceNumber}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{ getClientName(temp.clientId)}</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{ getInvoiceNumber(temp.invoiceNumber)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{convertDate(temp.date)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{convertTime(temp.time)}</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' , fontFamily: 'sans-serif'}}>{temp.frequency}</TableCell>
